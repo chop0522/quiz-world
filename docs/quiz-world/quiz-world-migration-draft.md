@@ -85,7 +85,7 @@ Supabase projectやcloud dataには触れない。
 
 ### role設計案
 
-- 推奨: `profiles.role` をglobal admin判定に使う。
+- MVP方針: `profiles.role` をglobal admin判定に使う。
 - `world_members.role` はworld内のmember/adminに使う。
 - MVPは1ワールドでも、将来複数worldやguildを考えると役割を分ける方が明確。
 
@@ -155,8 +155,8 @@ Supabase projectやcloud dataには触れない。
 | correct_answer | text | yes | 将来用 |
 | answer_aliases | jsonb | yes | 将来用 |
 | difficulty | integer | no | 1-5など |
-| category | text | no | 固定カテゴリ。雑学/歴史/地理/科学/エンタメ/スポーツ/言葉/謎解き/その他 |
-| category_note | text | yes | その他を選んだ場合のみ |
+| category | text | no | 固定カテゴリ。雑学/歴史/地理/科学/エンタメ/スポーツ/言葉/謎解き/その他。MVPではtext + CHECK想定 |
+| category_note | text | yes | その他を選んだ場合のみ。出題者本人とadminのみ閲覧可 |
 | status | question_status | no | default active |
 | created_at | timestamptz | no | |
 | updated_at | timestamptz | no | |
@@ -165,7 +165,8 @@ Supabase projectやcloud dataには触れない。
 - index: `(author_id, status)`, `(category)`, `(difficulty)`, `(status, created_at)`.
 - FK: `author_id -> profiles.id`.
 - RLS注意: start_at前に配信対象者へbody/choices/correctを漏らさない。
-- API処理: author_id固定、choices検証、不適切内容チェック。
+- RLS注意: 回答者向けAPIや結果画面ではcategory_noteを返さない。
+- API処理: author_id固定、choices検証、不適切内容チェック、category固定値検証、category_noteの表示制御。
 
 ## `quiz_launches`
 
@@ -353,7 +354,7 @@ Supabase projectやcloud dataには触れない。
 - index: `(admin_user_id, created_at)`, `(target_type, target_id)`, `(action, created_at)`.
 - FK: `admin_user_id -> profiles.id`.
 - RLS注意: adminのみ参照。insertはadmin API / service roleのみ。
-- API処理: admin操作と同一transactionで記録。ログ失敗時は操作失敗扱いを推奨。
+- API処理: admin操作と同一transactionで記録。ログ失敗時は操作全体を失敗扱いにする。
 
 ### 操作ログ対象
 
@@ -366,5 +367,5 @@ Supabase projectやcloud dataには触れない。
 
 ## 実装前に最終判断する項目
 
-- categoryを固定enumにするかtextにするか。
 - rating reasonsを `text[]` にするかjsonbにするか。
+- `ADMIN_EMAILS` を初期admin付与に使うか。

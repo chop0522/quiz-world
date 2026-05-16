@@ -14,7 +14,7 @@
 - 回答締切は end_at にする。
 - 端末時刻は順位判定に使わない。
 - MVP Phase 1は `/home` の15秒ポーリングによる画面内通知で開始する。
-- Phase 1.5でSupabase Realtime化を検討する。
+- Phase 1.5では `/home` の届いたクイズ一覧、つまり本人宛 quiz_recipients の新着だけRealtime化を検討する。
 - Phase 2でWeb Pushを検討する。
 
 ## 通知から回答までの体験
@@ -130,13 +130,15 @@ Phase 1ではこのAPIを15秒間隔で呼び、新着の quiz_recipients と状
 
 10人テストで15秒ポーリングの反応が遅い、またはクイズ到着体験が弱い場合、Supabase Realtime化を検討する。
 
-Realtime化の候補は次の通り。
+Realtime化の対象は `/home` の届いたクイズ一覧に限定する。
 
 - quiz_recipients の本人宛insert/update。
-- quiz_launches のstatus/update。
-- answers集計後の結果更新。
+- `/home` 上の新着表示。
+- 開始前、回答可能、回答済み、終了済みの状態更新。
 
 Phase 1.5でも、権限と返却フィールドはAPI設計と同じ境界を維持する。
+
+結果画面のRealtime更新、answer一覧のRealtime反映、rankingのRealtime集計はMVP後回しにする。
 
 ## Phase 2: Web Push候補
 
@@ -194,7 +196,7 @@ MVPでは、結果通知は必須ではない。
 | 段階 | 方針 |
 | --- | --- |
 | Phase 1 | `/home` の15秒ポーリングによる画面内通知。 |
-| Phase 1.5 | Supabase Realtime化を検討。 |
+| Phase 1.5 | `/home` の本人宛 quiz_recipients 新着だけSupabase Realtime化を検討。 |
 | Phase 2 | Web Pushを検討。 |
 | 30〜100人 | 通知キュー、失敗ログ、再送制御を追加。 |
 | 本格版 | Expo / React Native + APNs / FCM / Expo Push を検討。 |

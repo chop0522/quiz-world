@@ -23,6 +23,8 @@
 - admin APIは `profiles.role = admin` のみ許可する。
 - suspended userは出題、回答、評価、通報、ブロック作成などの主要操作を制限する。
 - 管理者操作は admin_audit_logs に必ず記録する。
+- admin操作とadmin_audit_logs記録は同一transaction扱いにし、ログ記録に失敗した場合は操作全体を失敗扱いにする。
+- `category_note` は `その他` 選択時のみ許可し、回答者向けAPIや結果APIには返さない。
 - RLSだけに任せず、重要処理はAPI route / server function側でも検証する。
 
 ## 共通HTTPステータス
@@ -245,12 +247,14 @@
 - correctChoiceId は choices に含まれる。
 - 難易度は許可範囲内。
 - カテゴリは固定カテゴリから選ぶ。その他の場合のみ補足テキストを許可する。
+- `その他` 以外の category_note は保存しない、またはサーバー側で無視する。
 
 ### サーバー側で必ず行う判定
 
 - ユーザーが停止中でない。
 - author_id は認証ユーザーから設定する。
 - 不適切内容の初期チェック。
+- category_note は出題者本人とadmin向けにだけ返す。
 
 ### エラー
 

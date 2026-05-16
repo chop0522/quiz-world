@@ -133,11 +133,10 @@ MVPの主要仕様が実装時に壊れないよう、unit / integration / E2E /
 - DM、コメント、タイムライン。
 - 本番cloud負荷試験。
 
-## 実装前に決めること
+## Phase 0で決めること
 
 - テストランナー。
 - E2Eで使うseedデータ。
 - adminユーザーの作り方。
 - RLS policy testをどの環境で実行するか。
-- Realtimeを使う場合のテスト範囲。
-
+- Phase 1.5 Realtime testは `/home` の本人宛 quiz_recipients 新着に限定する。

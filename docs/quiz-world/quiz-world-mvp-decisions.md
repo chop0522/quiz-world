@@ -100,7 +100,7 @@ MVPの通知は段階導入にする。
 | Phase | 方針 |
 | --- | --- |
 | Phase 1 | `/home` の15秒ポーリングによる画面内通知で検証する。 |
-| Phase 1.5 | Supabase Realtime化を検討する。 |
+| Phase 1.5 | `/home` の本人宛 quiz_recipients 新着だけSupabase Realtime化を検討する。 |
 | Phase 2 | Web Pushを検討する。 |
 
 ### Phase 1
@@ -229,6 +229,7 @@ admin_audit_logs をMVP初期データモデルに正式追加する。
 | created_at | 作成日時。 |
 
 対象操作は、ユーザー停止、クイズ配信停止、参加枠変更、招待コード発行、通報対応、waitlist操作とする。
+admin操作とadmin_audit_logs記録は同一transaction扱いにし、ログ記録に失敗した場合は管理操作全体を失敗扱いにする。
 
 ## カテゴリ
 
@@ -246,7 +247,9 @@ MVPカテゴリは固定カテゴリ + その他にする。
 | 謎解き |
 | その他 |
 
-その他を選んだ場合のみ、任意の補足テキストを許可する。
+その他を選んだ場合のみ、任意の補足テキスト `category_note` を許可する。
+`category_note` は出題者本人とadminのみ閲覧できる。
+回答者にはカテゴリ `その他` のみを表示し、MVPの結果画面には表示しない。
 
 ## 通報対応基準
 
@@ -280,11 +283,11 @@ MVPではadmin確認ベースで運用する。
 | 評価方式 | 3段階評価 + 理由タグ。 |
 | start_at | 通知作成から15秒後。 |
 | end_at | start_atから60秒後。 |
-| 通知 | Phase 1は15秒ポーリングの画面内通知、Phase 1.5でRealtime検討、Phase 2でWeb Push。 |
+| 通知 | Phase 1は15秒ポーリングの画面内通知、Phase 1.5は `/home` の本人宛 quiz_recipients 新着だけRealtime検討、Phase 2でWeb Push。 |
 | ランク | MVPはシンプルなスコア式。見逃しペナルティなし。 |
 | 管理画面 | MVPでは簡易adminを用意。 |
 | admin role | profiles.role = admin を主判定にする。 |
-| admin_audit_logs | MVP初期データモデルに正式追加。 |
-| カテゴリ | 固定カテゴリ + その他。 |
+| admin_audit_logs | MVP初期データモデルに正式追加。ログ記録失敗時は管理操作全体を失敗扱い。 |
+| カテゴリ | 固定カテゴリ + その他。category_noteは出題者本人とadminのみ閲覧可。 |
 | 通報基準 | admin確認ベースの初期基準を採用。 |
 | 追加API | `/home`一覧、block解除、admin invite/waitlist/audit logsを追加。 |

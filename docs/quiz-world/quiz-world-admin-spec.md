@@ -27,6 +27,8 @@ MVP管理画面の目的は、10人テストを安全に運用することであ
 - 通報対応では `question.status = review_required / suspended` を使う。
 - `profiles.status = suspended` でログイン後の出題、回答、主要操作を制限する。
 - 参加枠変更はadminのみ。
+- admin操作と admin_audit_logs 記録は同一transaction扱いにする。
+- admin_audit_logs を残せない場合、管理操作全体を失敗扱いにする。
 - cloud dataを直接手動削除する運用を避ける。
 
 ## admin_audit_logs
@@ -55,7 +57,7 @@ admin_audit_logs はMVP初期データモデルに正式追加する。
 - 通報対応
 - waitlist操作
 
-操作ログ記録に失敗した場合は、管理操作自体を失敗扱いにする方針を推奨する。
+操作ログ記録に失敗した場合は、管理操作自体を失敗扱いにする。
 
 ## 通報対応基準
 
@@ -172,7 +174,7 @@ MVPではadmin確認ベースで運用する。
 ### 失敗時の扱い
 
 - status変更失敗時は何も変更しない。
-- 部分更新を避けるため、実装時はtransactionを検討する。
+- 部分更新を避けるため、status変更、関連launch停止、admin_audit_logs記録は同一transaction扱いにする。
 
 ## ユーザー停止
 
@@ -209,6 +211,7 @@ MVPではadmin確認ベースで運用する。
 
 - status変更に失敗した場合は操作なし。
 - 関連停止が失敗した場合はadminへ警告を出す。
+- admin_audit_logs記録失敗時は停止操作全体を失敗扱いにする。
 
 ## waitlist一覧・操作
 
@@ -307,7 +310,7 @@ MVPではadmin確認ベースで運用する。
 ### 失敗時の扱い
 
 - 不正な値は保存しない。
-- admin_audit_logs記録失敗時は変更失敗扱いを推奨する。
+- admin_audit_logs記録失敗時は変更失敗扱いにする。
 
 ## world status確認
 
@@ -418,4 +421,3 @@ MVPではadmin確認ベースで運用する。
 - legal pageの本番反映。
 - 自動AIモデレーション。
 - 大規模な権限管理。
-

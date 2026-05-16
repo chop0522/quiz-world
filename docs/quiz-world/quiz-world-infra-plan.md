@@ -131,14 +131,23 @@ MVP初期では次を行わない。
 - DB migration 作成
 - 実装コード作成
 
-## インフラ上の未確定事項
+## インフラ上の固定事項と残課題
 
-- 新規Supabase projectを作るか、ローカル検証から始めるか。
-- PWA通知を最初から実装するか、メール通知や画面内通知で先に体験検証するか。
-- Vercelに出すタイミング。
-- 管理画面をMVPに含める範囲。
+### 固定事項
+
+- Phase 0〜Phase 3はSupabase localを推奨する。
+- Supabase localが難しい場合のみ、Quiz World専用の新規development projectを使う。
+- Phase 0ではVercel不要。
+- localで主要機能が動いてからQuiz World専用の新規Vercel Preview projectを作る。
+- 10人テスト直前にSupabase Production projectとVercel Productionを有効化する。
+- Phase 1は15秒ポーリングの画面内通知。
+- Phase 1.5は `/home` の本人宛 quiz_recipients 新着だけRealtime化を検討する。
+- Phase 2でWeb Pushを検討する。
+- admin操作とadmin_audit_logs記録は同一transaction扱いにする。
+
+### 残課題
+
 - 通知キューをいつ導入するか。
 - Expo / React Native へ移行する判断基準。
-- RLS policy の詳細。
-- 監査ログの保存範囲。
-
+- RLS policy の詳細実装。
+- 監査ログの保存期間。
