@@ -1,0 +1,9 @@
+{
+  "name": "通知型早押しクイズワールド",
+  "short_name": "Quiz World",
+  "description": "少人数招待制の通知型早押しクイズゲーム",
+  "start_url": "/home",
+  "display": "standalone",
+  "background_color": "#f7f3e8",
+  "theme_color": "#3f6f5f"
+}
