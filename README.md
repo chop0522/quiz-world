@@ -2,7 +2,7 @@
 
 通知型早押しクイズワールドの専用リポジトリです。
 
-Phase 1の signup/auth ローカル実装は完了・push・tag済みです。Phase 2の四択クイズ作成local実装も完了・push・tag済みです。Phase 3 quiz launch / recipients local実装も完了・push・tag済みです。Phase 4 answer submission / ranking のlocal実装は検証済みです。既存Smart Buzzerとは別プロジェクトとして扱います。
+Phase 1の signup/auth ローカル実装は完了・push・tag済みです。Phase 2の四択クイズ作成local実装も完了・push・tag済みです。Phase 3 quiz launch / recipients local実装も完了・push・tag済みです。Phase 4 answer submission / ranking local実装も完了・push・tag済みです。現在はPhase 5 result / rating / reports の計画中です。既存Smart Buzzerとは別プロジェクトとして扱います。
 
 Smart Buzzer の production / Stripe / Vercel / Supabase / env / legal page / cleanup / live key には触れません。
 
@@ -163,6 +163,36 @@ Phase 4ではまだ作らないもの:
 - Stripe連携
 - production deploy
 
+## Phase 5 Scope
+
+Phase 5では、回答後の結果表示、3段階評価、通報導線を扱います。
+
+- `/result/[launchId]`
+- `GET /api/quiz-launches/[id]/result`
+- `POST /api/quiz-launches/[id]/rating`
+- `POST /api/reports`
+- `question_ratings` テーブル
+- `reports` テーブル
+- 自分の正誤、`answer_rank`、`correct_rank`
+- 全回答者一覧
+- 未回答者一覧
+- 3段階評価: 良問 / 普通 / 微妙
+- 理由タグ: 面白い / 難易度がちょうどいい / 答えが曖昧 / 難しすぎる / 簡単すぎる / 不適切
+- 通報導線
+
+Phase 5ではまだ作らないもの:
+
+- Web Push
+- Realtime
+- admin本実装
+- rank_events本格反映
+- 出題者ランク自動更新
+- 回答者ランク自動更新
+- Supabase cloud project
+- Vercel project
+- Stripe連携
+- production deploy
+
 ## Environment
 
 `.env.example` を `.env.local` にコピーして使います。
@@ -178,6 +208,7 @@ Smart Buzzer のSupabase/Vercel/Stripe/envとは混ぜません。
 - [Phase 2 question authoring plan](docs/quiz-world/quiz-world-phase-2-question-authoring-plan.md)
 - [Phase 3 quiz launch plan](docs/quiz-world/quiz-world-phase-3-quiz-launch-plan.md)
 - [Phase 4 answer submission plan](docs/quiz-world/quiz-world-phase-4-answer-submission-plan.md)
+- [Phase 5 result rating reports plan](docs/quiz-world/quiz-world-phase-5-result-rating-plan.md)
 
 ## Current Status
 
@@ -188,11 +219,16 @@ Smart Buzzer のSupabase/Vercel/Stripe/envとは混ぜません。
 - Phase 2完了地点は `v0.3.0-phase2-question-authoring` タグで固定済みです。
 - Phase 3 quiz launch / recipients local実装は、Supabase local DB込みで検証済み、commit・push済みです。
 - Phase 3完了地点は `v0.4.0-phase3-quiz-launch` タグで固定済みです。
-- Phase 4 answer submission / ranking はSupabase local DB込みで検証済みです。
+- Phase 4 answer submission / ranking local実装は、Supabase local DB込みで検証済み、commit・push済みです。
+- Phase 4完了地点は `v0.5.0-phase4-answer-submission` タグで固定済みです。
 - Phase 4の順位採番方式はDB function / RPC方式に固定済みです。
+- Phase 5 result / rating / reports は計画中です。
 - Supabase / Vercel / Stripe のcloud環境はまだ作成しません。
 
 ## Next Work
 
-- Phase 4完了地点をtagで固定する
-- result完全表示 / rating / reports / rank_events本格反映 / Web Push / Realtime / admin本実装 / cloud環境はまだ作らない
+- Phase 5計画docsをレビューする
+- rating理由タグを1つにするか複数にするかを決める
+- report 2件以上時に `question.status = review_required` を自動更新するか、admin候補表示に留めるかを決める
+- Phase 5 local実装へ進む
+- rank_events本格反映 / Web Push / Realtime / admin本実装 / cloud環境はまだ作らない
