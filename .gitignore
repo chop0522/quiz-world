@@ -23,3 +23,7 @@ pnpm-debug.log*
 
 # typescript
 *.tsbuildinfo
+
+# supabase local
+supabase/.temp/
+supabase/.branches/

@@ -9,6 +9,7 @@ import {
   TextInput
 } from "@/components/ui";
 import { userSummary } from "@/lib/quiz-world";
+import { ProfileSession } from "@/app/profile/profile-session";
 
 export const metadata = {
   title: "プロフィール"
@@ -28,6 +29,8 @@ export default function ProfilePage() {
         <Metric label="回答ランク" value={userSummary.answerRank} />
         <Metric label="通知上限" value={`${userSummary.maxDailyNotifications}/日`} />
       </section>
+
+      <ProfileSession />
 
       <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
         <Surface>

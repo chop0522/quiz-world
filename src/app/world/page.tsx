@@ -1,6 +1,7 @@
 import { Globe2 } from "lucide-react";
-import { Metric, PageHeader, ProgressBar, Section, Surface } from "@/components/ui";
+import { PageHeader, ProgressBar, Section, Surface } from "@/components/ui";
 import { worldSnapshot } from "@/lib/quiz-world";
+import { WorldStatus } from "@/app/world/world-status";
 
 export const metadata = {
   title: "ワールド"
@@ -16,12 +17,7 @@ export default function WorldPage() {
         eyebrow="World"
         title={worldSnapshot.name}
       />
-      <section className="grid gap-4 md:grid-cols-4">
-        <Metric label="現在の参加人数" value={worldSnapshot.members} />
-        <Metric label="参加枠" value={worldSnapshot.memberLimit} />
-        <Metric label="累計出題" value={worldSnapshot.questions} />
-        <Metric label="累計回答" value={worldSnapshot.answers} />
-      </section>
+      <WorldStatus />
 
       <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
         <Surface>

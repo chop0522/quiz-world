@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { ReactNode } from "react";
+import type { InputHTMLAttributes, ReactNode } from "react";
 import type { LucideIcon } from "lucide-react";
 
 type PageHeaderProps = {
@@ -168,17 +168,13 @@ export function Field({
 }
 
 export function TextInput({
-  placeholder,
-  type = "text"
-}: {
-  placeholder?: string;
-  type?: string;
-}) {
+  className = "",
+  ...props
+}: InputHTMLAttributes<HTMLInputElement>) {
   return (
     <input
-      className="focus-ring min-h-11 rounded-md border border-[color:var(--line)] bg-white px-3 text-sm"
-      placeholder={placeholder}
-      type={type}
+      className={`focus-ring min-h-11 rounded-md border border-[color:var(--line)] bg-white px-3 text-sm disabled:bg-stone-100 disabled:text-stone-500 ${className}`}
+      {...props}
     />
   );
 }

@@ -1,8 +1,8 @@
 # Quiz World
 
-通知型早押しクイズワールドの企画・設計ドキュメント用リポジトリです。
+通知型早押しクイズワールドの専用リポジトリです。
 
-現在はPhase 0のローカル開発用プロジェクト土台です。既存Smart Buzzerとは別プロジェクトとして扱います。
+現在はPhase 1の signup/auth ローカル実装段階です。既存Smart Buzzerとは別プロジェクトとして扱います。
 
 Smart Buzzer の production / Stripe / Vercel / Supabase / env / legal page / cleanup / live key には触れません。
 
@@ -10,6 +10,7 @@ Smart Buzzer の production / Stripe / Vercel / Supabase / env / legal page / cl
 
 ```bash
 npm install
+cp .env.example .env.local
 npm run dev
 ```
 
@@ -20,42 +21,81 @@ npm run dev
 ```bash
 npm run typecheck
 npm run lint
+npm run test
 npm run build
 ```
 
-## Phase 0 Scope
+## Supabase Local
+
+Phase 1ではSupabase cloud projectを作らず、Supabase localを使います。
+Supabase localの起動にはDocker DesktopまたはDocker互換runtimeが必要です。
+
+```bash
+npx supabase start
+npx supabase status
+```
+
+`npx supabase status` で表示された local の key を `.env.local` に入れます。
+Supabase CLIのバージョンにより `anon key` / `service_role key` ではなく `Publishable` / `Secret` と表示される場合があります。Phase 1 localでは `Publishable` を `NEXT_PUBLIC_SUPABASE_ANON_KEY`、`Secret` を `SUPABASE_SERVICE_ROLE_KEY` に入れます。
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
+NEXT_PUBLIC_SUPABASE_ANON_KEY=...
+SUPABASE_SERVICE_ROLE_KEY=...
+ADMIN_EMAILS=admin@example.com
+QUIZ_WORLD_ID=00000000-0000-4000-8000-000000000001
+MAX_INITIAL_MEMBERS=10
+```
+
+local DBには次を用意しています。
+
+- migration: `supabase/migrations/20260516000100_phase1_signup_auth.sql`
+- seed: `supabase/seed.sql`
+- 初期world: `クイズワールド`
+- 初期invite code: `SEASON0-TEST-001`
+
+## Phase 1 Scope
 
 - Next.js App Router / TypeScript / Tailwind CSS の初期構成
-- mobile-first の静的UI
-- `/`、`/login`、`/signup`、`/home`、`/create`、`/quiz/[launchId]`、`/result/[launchId]`
-- `/profile`、`/world`、`/invite`、`/admin`
-- `/legal/terms`、`/legal/privacy`
+- Supabase local前提の最小schema
+- `/signup` のemail/password登録
+- 18歳以上確認、利用規約同意、プライバシーポリシー同意
+- 招待コード検証
+- 参加枠確認
+- 満員時のwaitlist誘導
+- `/login` のemail/passwordログイン
+- Phase 1 API: `/api/signup`, `/api/invites/validate`, `/api/waitlist`, `/api/world`, `/api/profile`
 - `.env.example`
 
 まだ作らないもの:
 
-- DB migration SQL
 - Supabase cloud project
 - Vercel project
 - Stripe連携
 - Web Push
-- 本格API処理
-- 本格RLS
+- クイズ作成API
+- quiz_launches / quiz_recipients / answers
+- ranking
+- admin本実装
+- Realtime
 - production deploy
 
 ## Environment
 
 `.env.example` を `.env.local` にコピーして使います。
 
-Phase 0では実際のDB接続は行いません。Supabase localは次Phase以降で利用できるようにenv名だけ準備しています。
+Phase 1では実際のDB接続はSupabase localだけに限定します。
+Smart Buzzer のSupabase/Vercel/Stripe/envとは混ぜません。
 
 ## Docs
 
 - [Quiz World docs README](docs/quiz-world/README.md)
 - [実装前最終決定](docs/quiz-world/quiz-world-pre-implementation-decisions.md)
+- [Phase 1 signup/auth plan](docs/quiz-world/quiz-world-phase-1-signup-auth-plan.md)
 
 ## Current Status
 
 - MVP初期方針はほぼ固定済みです。
-- Phase 0ではローカル土台、ルーティング、静的画面、型の骨組みまでを扱います。
-- 実際のDB接続や本格API実装は次Phaseで行います。
+- Phase 1では signup / login / 18歳以上確認 / 規約同意 / 招待コード / 参加枠 / waitlist までを扱います。
+- Phase 1 signup/auth local実装は、Supabase local DB込みで検証済みです。
+- Supabase / Vercel / Stripe のcloud環境はまだ作成しません。
