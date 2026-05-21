@@ -1,5 +1,10 @@
 import Link from "next/link";
-import type { InputHTMLAttributes, ReactNode } from "react";
+import type {
+  InputHTMLAttributes,
+  ReactNode,
+  SelectHTMLAttributes,
+  TextareaHTMLAttributes
+} from "react";
 import type { LucideIcon } from "lucide-react";
 
 type PageHeaderProps = {
@@ -179,19 +184,29 @@ export function TextInput({
   );
 }
 
-export function SelectInput({ children }: { children: ReactNode }) {
+export function SelectInput({
+  children,
+  className = "",
+  ...props
+}: SelectHTMLAttributes<HTMLSelectElement> & { children: ReactNode }) {
   return (
-    <select className="focus-ring min-h-11 rounded-md border border-[color:var(--line)] bg-white px-3 text-sm">
+    <select
+      className={`focus-ring min-h-11 rounded-md border border-[color:var(--line)] bg-white px-3 text-sm disabled:bg-stone-100 disabled:text-stone-500 ${className}`}
+      {...props}
+    >
       {children}
     </select>
   );
 }
 
-export function TextArea({ placeholder }: { placeholder?: string }) {
+export function TextArea({
+  className = "",
+  ...props
+}: TextareaHTMLAttributes<HTMLTextAreaElement>) {
   return (
     <textarea
-      className="focus-ring min-h-28 rounded-md border border-[color:var(--line)] bg-white px-3 py-3 text-sm"
-      placeholder={placeholder}
+      className={`focus-ring min-h-28 rounded-md border border-[color:var(--line)] bg-white px-3 py-3 text-sm disabled:bg-stone-100 disabled:text-stone-500 ${className}`}
+      {...props}
     />
   );
 }
