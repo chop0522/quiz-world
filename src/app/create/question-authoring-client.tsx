@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { FileQuestion, Pencil, RotateCcw, Save } from "lucide-react";
+import { Bell, FileQuestion, Pencil, RotateCcw, Save } from "lucide-react";
 import {
   Badge,
   Field,
@@ -49,6 +49,13 @@ type ApiResult = {
   errors?: string[];
   question?: QuestionDetail;
   questions?: QuestionListItem[];
+  launch?: {
+    id: string;
+    recipientCount: number;
+    startAt: string;
+    endAt: string;
+    status: string;
+  };
 };
 
 const emptyChoices = (): QuestionChoice[] => [
@@ -70,6 +77,16 @@ function statusTone(status: QuestionListItem["status"]) {
   return "neutral";
 }
 
+function formatDateTime(value: string) {
+  return new Intl.DateTimeFormat("ja-JP", {
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit"
+  }).format(new Date(value));
+}
+
 async function readJson(response: Response): Promise<ApiResult> {
   return await response.json() as ApiResult;
 }
@@ -88,6 +105,7 @@ export function QuestionAuthoringClient() {
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [launchingId, setLaunchingId] = useState<string | null>(null);
 
   const categoryNoteEnabled = category === "その他";
   const bodyCount = useMemo(() => body.trim().length, [body]);
@@ -208,6 +226,32 @@ export function QuestionAuthoringClient() {
     }
   }
 
+  async function launchQuestion(questionId: string) {
+    setLaunchingId(questionId);
+    setErrors([]);
+    setMessage(null);
+
+    try {
+      const response = await fetch("/api/quiz-launches", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ questionId })
+      });
+      const result = await readJson(response);
+
+      if (!response.ok || !result.ok || !result.launch) {
+        setErrors(result.errors ?? ["出題できませんでした。"]);
+        return;
+      }
+
+      setMessage(
+        `出題しました。${result.launch.recipientCount}人に届きます。開始 ${formatDateTime(result.launch.startAt)}`
+      );
+    } finally {
+      setLaunchingId(null);
+    }
+  }
+
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
       <Surface>
@@ -218,7 +262,7 @@ export function QuestionAuthoringClient() {
                 {editingId ? "問題を編集" : "四択クイズを作成"}
               </h2>
               <p className="mt-1 text-sm text-[color:var(--muted)]">
-                Phase 2では保存まで。配信、通知、回答はまだ行いません。
+                Phase 3ではactiveな問題を選んで画面内通知として出題できます。回答、順位、結果表示はまだ行いません。
               </p>
             </div>
             {editingId ? <Badge tone="amber">編集中</Badge> : <Badge>新規</Badge>}
@@ -407,6 +451,20 @@ export function QuestionAuthoringClient() {
                   <Pencil aria-hidden className="size-4" />
                   詳細/編集
                 </button>
+                <button
+                  className="focus-ring mt-2 inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-md bg-[color:var(--accent-strong)] px-3 text-sm font-semibold text-white disabled:bg-stone-400"
+                  disabled={question.status !== "active" || launchingId === question.id}
+                  onClick={() => void launchQuestion(question.id)}
+                  type="button"
+                >
+                  <Bell aria-hidden className="size-4" />
+                  {launchingId === question.id ? "出題中..." : "出題する"}
+                </button>
+                {question.status !== "active" ? (
+                  <p className="mt-2 text-xs text-[color:var(--muted)]">
+                    activeにすると出題できます。
+                  </p>
+                ) : null}
               </div>
             ))}
           </div>

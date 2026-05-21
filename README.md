@@ -2,7 +2,7 @@
 
 通知型早押しクイズワールドの専用リポジトリです。
 
-Phase 1の signup/auth ローカル実装は完了・push済みです。Phase 2の四択クイズ作成local実装も検証済みです。既存Smart Buzzerとは別プロジェクトとして扱います。
+Phase 1の signup/auth ローカル実装は完了・push済みです。Phase 2の四択クイズ作成local実装も完了・push・tag済みです。Phase 3 quiz launch / recipients local実装は検証済みです。既存Smart Buzzerとは別プロジェクトとして扱います。
 
 Smart Buzzer の production / Stripe / Vercel / Supabase / env / legal page / cleanup / live key には触れません。
 
@@ -51,6 +51,7 @@ local DBには次を用意しています。
 
 - migration: `supabase/migrations/20260516000100_phase1_signup_auth.sql`
 - migration: `supabase/migrations/20260521000100_phase2_questions.sql`
+- migration: `supabase/migrations/20260521000200_phase3_quiz_launches.sql`
 - seed: `supabase/seed.sql`
 - 初期world: `クイズワールド`
 - 初期invite code: `SEASON0-TEST-001`
@@ -93,6 +94,41 @@ Phase 2ではまだ作らないもの:
 - Realtime
 - production deploy
 
+## Phase 3 Scope
+
+- 作成済み `active` question の出題
+- `quiz_launches` テーブル
+- `quiz_recipients` テーブル
+- 最小 `blocks` テーブル
+- `POST /api/quiz-launches`
+- `GET /api/quiz-launches`
+- `GET /api/quiz-launches/[id]`
+- `/home` の届いたクイズ一覧
+- 15秒ポーリングの画面内通知
+- `start_at = now + 15秒`
+- `end_at = start_at + 60秒`
+- サーバー側の配信対象者抽選
+- 出題者本人、停止ユーザー、停止member、ブロック関係の除外
+- UTC基準の1日出題回数制限
+- `/home` の一覧では `start_at` 前に問題本文・選択肢を返さない
+
+Phase 3ではまだ作らないもの:
+
+- answers
+- answer_rank / correct_rank
+- result完全表示
+- question_ratings
+- reports
+- Web Push
+- Realtime
+- admin本実装
+- quiet hoursの厳密適用
+- 1日の通知上限
+- Supabase cloud project
+- Vercel project
+- Stripe連携
+- production deploy
+
 ## Environment
 
 `.env.example` を `.env.local` にコピーして使います。
@@ -106,17 +142,20 @@ Smart Buzzer のSupabase/Vercel/Stripe/envとは混ぜません。
 - [実装前最終決定](docs/quiz-world/quiz-world-pre-implementation-decisions.md)
 - [Phase 1 signup/auth plan](docs/quiz-world/quiz-world-phase-1-signup-auth-plan.md)
 - [Phase 2 question authoring plan](docs/quiz-world/quiz-world-phase-2-question-authoring-plan.md)
+- [Phase 3 quiz launch plan](docs/quiz-world/quiz-world-phase-3-quiz-launch-plan.md)
 
 ## Current Status
 
 - MVP初期方針はほぼ固定済みです。
 - Phase 1 signup/auth local実装は、Supabase local DB込みで検証済み、commit・push済みです。
 - Phase 1完了地点は `v0.2.0-phase1-signup-auth` タグで固定済みです。
-- Phase 2 question authoring local実装は、Supabase local DB込みで検証済みです。
+- Phase 2 question authoring local実装は、Supabase local DB込みで検証済み、commit・push済みです。
+- Phase 2完了地点は `v0.3.0-phase2-question-authoring` タグで固定済みです。
+- Phase 3 quiz launch / recipients local実装は、Supabase local DB込みで検証済みです。
 - Supabase / Vercel / Stripe のcloud環境はまだ作成しません。
 
 ## Next Work
 
-- Phase 2実装差分をcommit/pushする
-- Phase 2完了地点を必要に応じてタグで固定する
-- Phase 3のquiz launch / recipient計画をdocs化する
+- Phase 3完了地点を必要に応じてtagで固定する
+- Phase 4回答実装の計画docsを作成する
+- answers / result / ranking / Web Push / Realtime / admin本実装 / cloud環境はまだ作らない
