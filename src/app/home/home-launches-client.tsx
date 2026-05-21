@@ -157,7 +157,7 @@ export function HomeLaunchesClient() {
       </section>
 
       <Section
-        description="Phase 3では/homeが15秒ごとに本人宛のquiz_recipientsを確認します。start_at前は問題本文と選択肢を表示しません。"
+        description="/homeが15秒ごとに本人宛のquiz_recipientsを確認します。start_at前は問題本文と選択肢を表示しません。"
         title="届いたクイズ一覧"
       >
         <div className="grid gap-3">

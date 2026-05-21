@@ -2,7 +2,7 @@
 
 通知型早押しクイズワールドの専用リポジトリです。
 
-Phase 1の signup/auth ローカル実装は完了・push済みです。Phase 2の四択クイズ作成local実装も完了・push・tag済みです。Phase 3 quiz launch / recipients local実装は検証済みです。既存Smart Buzzerとは別プロジェクトとして扱います。
+Phase 1の signup/auth ローカル実装は完了・push・tag済みです。Phase 2の四択クイズ作成local実装も完了・push・tag済みです。Phase 3 quiz launch / recipients local実装も完了・push・tag済みです。Phase 4 answer submission / ranking のlocal実装は検証済みです。既存Smart Buzzerとは別プロジェクトとして扱います。
 
 Smart Buzzer の production / Stripe / Vercel / Supabase / env / legal page / cleanup / live key には触れません。
 
@@ -52,6 +52,7 @@ local DBには次を用意しています。
 - migration: `supabase/migrations/20260516000100_phase1_signup_auth.sql`
 - migration: `supabase/migrations/20260521000100_phase2_questions.sql`
 - migration: `supabase/migrations/20260521000200_phase3_quiz_launches.sql`
+- migration: `supabase/migrations/20260522000100_phase4_answers.sql`
 - seed: `supabase/seed.sql`
 - 初期world: `クイズワールド`
 - 初期invite code: `SEASON0-TEST-001`
@@ -129,6 +130,39 @@ Phase 3ではまだ作らないもの:
 - Stripe連携
 - production deploy
 
+## Phase 4 Scope
+
+Phase 4では、届いたquizに対する四択回答の送信と、回答順位の採番を扱います。
+順位採番方式はDB function / RPC方式に固定済みです。`submit_quiz_answer` 内で `quiz_launches` 行を `FOR UPDATE` ロックし、同時回答時のrank競合を避けます。
+
+- `answers` テーブル
+- `POST /api/quiz-launches/[id]/answer`
+- `GET /api/quiz-launches/[id]` の回答画面向け拡張
+- `/quiz/[launchId]` 回答画面
+- `start_at` 到達後の問題本文・選択肢表示
+- `end_at` 後の回答締切
+- 同一launchへの重複回答防止
+- 四択の正誤判定
+- `answer_rank` のサーバー受信順採番
+- `correct_rank` の正解者内順位採番
+
+Phase 4ではまだ作らないもの:
+
+- question_ratings
+- reports
+- rank_events本格反映
+- 出題者ランク更新
+- 回答者ランク更新
+- result完全表示
+- 全回答者一覧
+- Web Push
+- Realtime
+- admin本実装
+- Supabase cloud project
+- Vercel project
+- Stripe連携
+- production deploy
+
 ## Environment
 
 `.env.example` を `.env.local` にコピーして使います。
@@ -143,6 +177,7 @@ Smart Buzzer のSupabase/Vercel/Stripe/envとは混ぜません。
 - [Phase 1 signup/auth plan](docs/quiz-world/quiz-world-phase-1-signup-auth-plan.md)
 - [Phase 2 question authoring plan](docs/quiz-world/quiz-world-phase-2-question-authoring-plan.md)
 - [Phase 3 quiz launch plan](docs/quiz-world/quiz-world-phase-3-quiz-launch-plan.md)
+- [Phase 4 answer submission plan](docs/quiz-world/quiz-world-phase-4-answer-submission-plan.md)
 
 ## Current Status
 
@@ -151,11 +186,13 @@ Smart Buzzer のSupabase/Vercel/Stripe/envとは混ぜません。
 - Phase 1完了地点は `v0.2.0-phase1-signup-auth` タグで固定済みです。
 - Phase 2 question authoring local実装は、Supabase local DB込みで検証済み、commit・push済みです。
 - Phase 2完了地点は `v0.3.0-phase2-question-authoring` タグで固定済みです。
-- Phase 3 quiz launch / recipients local実装は、Supabase local DB込みで検証済みです。
+- Phase 3 quiz launch / recipients local実装は、Supabase local DB込みで検証済み、commit・push済みです。
+- Phase 3完了地点は `v0.4.0-phase3-quiz-launch` タグで固定済みです。
+- Phase 4 answer submission / ranking はSupabase local DB込みで検証済みです。
+- Phase 4の順位採番方式はDB function / RPC方式に固定済みです。
 - Supabase / Vercel / Stripe のcloud環境はまだ作成しません。
 
 ## Next Work
 
-- Phase 3完了地点を必要に応じてtagで固定する
-- Phase 4回答実装の計画docsを作成する
-- answers / result / ranking / Web Push / Realtime / admin本実装 / cloud環境はまだ作らない
+- Phase 4完了地点をtagで固定する
+- result完全表示 / rating / reports / rank_events本格反映 / Web Push / Realtime / admin本実装 / cloud環境はまだ作らない

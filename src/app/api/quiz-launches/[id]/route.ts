@@ -9,6 +9,14 @@ import {
   type QuizLaunchRow,
   type QuizRecipientRow
 } from "@/lib/phase3-data";
+import {
+  shouldExposeQuestionForAnswer
+} from "@/lib/phase4-validation";
+import {
+  toAnswerResponse,
+  type AnswerRow,
+  type LaunchAnswerQuestionMeta
+} from "@/lib/phase4-data";
 import { getSupabaseAdminClient } from "@/lib/supabase/admin";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -106,7 +114,7 @@ export async function GET(_request: Request, context: RouteContext) {
 
     const { data: questionData, error: questionError } = await admin
       .from("questions")
-      .select("id,category,difficulty")
+      .select("id,body,choices,category,difficulty,status")
       .eq("id", launch.question_id)
       .single();
 
@@ -124,16 +132,69 @@ export async function GET(_request: Request, context: RouteContext) {
       throw authorError;
     }
 
+    const question = questionData as LaunchAnswerQuestionMeta;
     const base = toLaunchListResponse({
       launch,
-      question: questionData as LaunchQuestionMeta,
+      question: {
+        id: question.id,
+        category: question.category,
+        difficulty: question.difficulty
+      } as LaunchQuestionMeta,
       author: authorData as LaunchAuthorMeta,
       notificationStatus: recipient?.notification_status
+    });
+    const now = new Date();
+    const startAt = new Date(launch.start_at);
+    const endAt = new Date(launch.end_at);
+    const hasStarted = now.getTime() >= startAt.getTime();
+    const hasEnded = now.getTime() >= endAt.getTime();
+    let answer: AnswerRow | null = null;
+
+    if (viewerRole === "recipient") {
+      const { data: answerData, error: answerError } = await admin
+        .from("answers")
+        .select("*")
+        .eq("launch_id", launch.id)
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (answerError) {
+        throw answerError;
+      }
+
+      answer = answerData as AnswerRow | null;
+    }
+
+    const hasAnswered = answer !== null;
+    const canAnswer = viewerRole === "recipient"
+      && hasStarted
+      && !hasEnded
+      && !hasAnswered
+      && launch.status !== "cancelled"
+      && question.status === "active";
+    const exposeQuestion = shouldExposeQuestionForAnswer({
+      viewerRole,
+      hasStarted
     });
 
     return NextResponse.json({
       ok: true,
-      launch: toLaunchDetailResponse(base, viewerRole)
+      launch: toLaunchDetailResponse(base, viewerRole),
+      question: exposeQuestion
+        ? {
+            id: question.id,
+            body: question.body,
+            choices: question.choices
+          }
+        : null,
+      answer: answer ? toAnswerResponse(answer) : null,
+      state: {
+        isRecipient: viewerRole === "recipient",
+        hasStarted,
+        hasEnded,
+        hasAnswered,
+        canAnswer
+      }
     });
   } catch (error) {
     return NextResponse.json(
