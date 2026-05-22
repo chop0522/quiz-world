@@ -2,7 +2,7 @@
 
 通知型早押しクイズワールドの専用リポジトリです。
 
-Phase 1の signup/auth ローカル実装は完了・push・tag済みです。Phase 2の四択クイズ作成local実装も完了・push・tag済みです。Phase 3 quiz launch / recipients local実装も完了・push・tag済みです。Phase 4 answer submission / ranking local実装も完了・push・tag済みです。Phase 5 result / rating / reports のlocal実装は検証済みです。既存Smart Buzzerとは別プロジェクトとして扱います。
+Phase 1の signup/auth ローカル実装は完了・push・tag済みです。Phase 2の四択クイズ作成local実装も完了・push・tag済みです。Phase 3 quiz launch / recipients local実装も完了・push・tag済みです。Phase 4 answer submission / ranking local実装も完了・push・tag済みです。Phase 5 result / rating / reports のlocal実装も完了・push・tag済みです。現在はPhase 6 rank_events / ranking の計画中です。既存Smart Buzzerとは別プロジェクトとして扱います。
 
 Smart Buzzer の production / Stripe / Vercel / Supabase / env / legal page / cleanup / live key には触れません。
 
@@ -201,6 +201,40 @@ Phase 5ではまだ作らないもの:
 - Stripe連携
 - production deploy
 
+## Phase 6 Scope
+
+Phase 6では、回答結果とクイズ評価を `rank_events` として記録し、MVP向けのシンプルな回答者/出題者スコア更新を扱います。
+
+- `rank_events` テーブル
+- `profiles.answer_score`
+- `profiles.questioner_score`
+- `profiles.answer_rank`
+- `profiles.questioner_rank`
+- 回答者向け加点
+- 出題者向け加点
+- 正解 / 不正解
+- `correct_rank`
+- `difficulty`
+- `rating`
+- `reason`
+- 同一answer/rating由来のrank event重複防止
+- score更新とrank event作成のtransaction相当処理
+
+Phase 6ではまだ作らないもの:
+
+- シーズンランキング
+- ギルドランキング
+- ELO/レート
+- デイリーランキング
+- 通知連携
+- Web Push
+- Realtime
+- admin本実装
+- production deploy
+- Supabase cloud project
+- Vercel project
+- Stripe連携
+
 ## Environment
 
 `.env.example` を `.env.local` にコピーして使います。
@@ -217,6 +251,7 @@ Smart Buzzer のSupabase/Vercel/Stripe/envとは混ぜません。
 - [Phase 3 quiz launch plan](docs/quiz-world/quiz-world-phase-3-quiz-launch-plan.md)
 - [Phase 4 answer submission plan](docs/quiz-world/quiz-world-phase-4-answer-submission-plan.md)
 - [Phase 5 result rating reports plan](docs/quiz-world/quiz-world-phase-5-result-rating-plan.md)
+- [Phase 6 rank events plan](docs/quiz-world/quiz-world-phase-6-rank-events-plan.md)
 
 ## Current Status
 
@@ -230,14 +265,17 @@ Smart Buzzer のSupabase/Vercel/Stripe/envとは混ぜません。
 - Phase 4 answer submission / ranking local実装は、Supabase local DB込みで検証済み、commit・push済みです。
 - Phase 4完了地点は `v0.5.0-phase4-answer-submission` タグで固定済みです。
 - Phase 4の順位採番方式はDB function / RPC方式に固定済みです。
-- Phase 5 result / rating / reports local実装は、Supabase local DB込みで検証済みです。
+- Phase 5 result / rating / reports local実装は、Supabase local DB込みで検証済み、commit・push済みです。
+- Phase 5完了地点は `v0.6.0-phase5-result-rating` タグで固定済みです。
 - Phase 5のrating理由タグは1つだけ保存し、rating更新はMVPでは不可です。
 - Phase 5のreport重複防止単位は `question_id` / `launch_id` / `reporter_id` / `reason` です。
 - Phase 5では `question.status = review_required` の自動更新は行わず、admin候補表示またはreport count表示に留めます。
+- Phase 6 rank_events / ranking は計画中です。
 - Supabase / Vercel / Stripe のcloud環境はまだ作成しません。
 
 ## Next Work
 
-- Phase 5完了地点をtagで固定する
-- Phase 6 rank_events / ranking の計画docsへ進む
-- rank_events本格反映 / Web Push / Realtime / admin本実装 / cloud環境はまだ作らない
+- Phase 6計画docsをレビューする
+- rank_eventsの発火タイミング、rank閾値、score下限、既存answer/ratingのbackfill有無を決める
+- Phase 6 local実装へ進む
+- Web Push / Realtime / admin本実装 / cloud環境はまだ作らない
