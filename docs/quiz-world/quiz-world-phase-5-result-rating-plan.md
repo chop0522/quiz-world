@@ -47,7 +47,7 @@ Phase 5は結果確認とフィードバック導線のPhaseである。
 | `question_id` | `uuid` | no | `questions.id` への外部キー。 |
 | `rater_id` | `uuid` | no | 評価者。`profiles.id` / auth user id。 |
 | `rating` | `text` | no | `good` / `normal` / `weak`。 |
-| `reason` | `text` | yes | 理由タグ。複数タグを許可する場合は `reasons jsonb` も検討。 |
+| `reason` | `text` | yes | 理由タグ。MVP初期は1つだけ保存する。 |
 | `created_at` | `timestamptz` | no | 作成時刻。 |
 
 制約方針:
@@ -56,6 +56,8 @@ Phase 5は結果確認とフィードバック導線のPhaseである。
 - `rating in ('good', 'normal', 'weak')`
 - `rater_id` は `quiz_recipients` に含まれる本人のみ
 - author本人は自分の問題を評価できない
+- ratingの更新はMVPでは不可
+- 複数タグ `jsonb` は将来拡張とする
 
 評価ラベル:
 
@@ -74,10 +76,13 @@ Phase 5は結果確認とフィードバック導線のPhaseである。
 - 簡単すぎる
 - 不適切
 
-実装前の判断点:
+固定方針:
 
-- Phase 5では理由タグを1つだけ保存するか、複数選択を `reasons jsonb` で保存するかを決める
-- 既存データモデルの `reason text` に合わせるなら、MVP初期は1タグに限定する
+- MVP初期は理由タグを1つだけ保存する
+- `question_ratings.reason text` を使う
+- 同一 `launch_id` / `rater_id` は1件のみ
+- ratingの更新はMVPでは不可
+- 変更したい場合は後続Phaseで検討する
 
 ## 4. reports テーブル方針
 
@@ -98,7 +103,10 @@ Phase 5は結果確認とフィードバック導線のPhaseである。
 
 - `status default 'open'`
 - `reason` は固定理由から選ぶ
-- 同一 `launch_id` / `reporter_id` / `reason` の重複を防ぐかは実装前に決める
+- 同一 `question_id` / `launch_id` / `reporter_id` / `reason` の重複を防ぐ
+- 同じreportを連打した場合は `409` を返す
+- admin本実装までは `status = open` のまま保存してよい
+- update/delete APIは作らない
 - 完全削除ではなくstatus管理を優先する
 
 通報できるユーザー:
@@ -109,9 +117,11 @@ Phase 5は結果確認とフィードバック導線のPhaseである。
 admin確認ベース:
 
 - 1件目: `reports.status = open`
-- 同一問題に2件以上: `question.status = review_required` 候補
+- 同一問題に2件以上: admin候補表示、またはreport count表示に留める
+- Phase 5では `question.status = review_required` へ自動更新しない
 - admin判断で不適切: `question.status = suspended`
-- MVPでは自動停止は慎重に扱い、admin判断を優先する
+- `review_required` 自動更新はadmin本実装Phaseで検討する
+- 自動停止はMVPでは行わない
 
 ## 5. API仕様
 
@@ -137,6 +147,7 @@ admin確認ベース:
 - `start_at` 前は結果を返さない
 - recipientは、自分が回答済み、または `end_at` 後に結果を見られる
 - authorは `start_at` 後に結果を見られる
+- `start_at` 前は誰にもresultを見せない
 
 response案:
 
@@ -223,6 +234,7 @@ validation:
 - recipient本人のみ
 - author本人は不可
 - 同一 `launch_id` / `rater_id` は1件のみ
+- ratingの更新はMVPでは不可
 - `rating` は `good` / `normal` / `weak`
 - `reason` は固定理由タグ
 - `question.status` が `active` または `review_required` 相当であること
@@ -264,7 +276,10 @@ validation:
 - reporterはlaunch recipientまたはlaunch author
 - `reason` は固定通報理由
 - `question_id` と `launch_id` の対応をサーバー側で確認する
-- 同一reportの重複防止方針を実装前に決める
+- 同一 `question_id` / `launch_id` / `reporter_id` / `reason` の重複を防ぐ
+- 同じreportを連打した場合は `409` を返す
+- `reports.status` は `open` で作成する
+- admin本実装まではupdate/deleteしない
 
 HTTPステータス例:
 
@@ -376,6 +391,7 @@ HTTPステータス例:
 
 Phase 5では、評価を保存するところまで扱う。
 出題者ランクへの本格反映はPhase 6以降に分ける。
+ratingの更新はMVPでは不可とし、変更機能は後続Phaseで検討する。
 
 ## 9. 通報ルール
 
@@ -399,10 +415,12 @@ Phase 5では、評価を保存するところまで扱う。
 初期対応方針:
 
 - report作成後はadmin確認待ち
-- 同一問題に2件以上のreportがあれば `review_required` 候補にする
-- Phase 5で自動的に `question.status = review_required` にするか、admin画面実装まで候補表示に留めるかは実装前に決める
+- 同一問題に2件以上のreportがあっても、Phase 5では `question.status = review_required` に自動更新しない
+- Phase 5ではadmin候補表示、またはreport count表示に留める
+- `review_required` 自動更新はadmin本実装Phaseで検討する
 - 自動停止はMVPでは行わない
 - `question.status = suspended` はadmin判断のみ
+- `reports.status` は初期値 `open` とし、admin本実装までは `open` のまま保存してよい
 
 ## 10. RLS方針
 
@@ -412,7 +430,7 @@ Phase 5では、評価を保存するところまで扱う。
 | --- | --- |
 | `SELECT` | 本人のrating、authorの自分のquestionに対する集計、admin。Phase 5 APIでは必要最小限だけ返す。 |
 | `INSERT` | recipient本人のみ。実装はAPI route経由を優先。 |
-| `UPDATE` | MVPでは不可、または本人が短時間内に上書き可能にするか実装前に決める。 |
+| `UPDATE` | MVPでは不可。変更機能は後続Phaseで検討する。 |
 | `DELETE` | MVPでは不可。 |
 
 ### reports
@@ -457,7 +475,8 @@ report作成:
 - recipientまたはauthor
 - `question_id` と `launch_id` の対応確認
 - reasonは固定理由
-- 同一report重複の扱いを確認
+- 同一 `question_id` / `launch_id` / `reporter_id` / `reason` の重複は `409`
+- `status = open` で作成
 
 ## 12. テスト方針
 
@@ -482,7 +501,8 @@ unit / integrationで確認すること:
 - 不正rating/reasonは `422`
 - recipientまたはauthorはreport作成可
 - 権限外ユーザーはreport不可
-- report重複方針に沿って制御される
+- 同一report重複は `409`
+- reportが2件以上でもPhase 5では `question.status = review_required` に自動更新しない
 
 ## 13. Phase 5で作らないもの
 
@@ -524,7 +544,7 @@ Phase 6へ進む前に、以下を満たす。
 - 全回答者一覧と未回答者一覧の表示条件が破綻していない
 - rating重複防止がDB/APIで効いている
 - report作成権限がDB/APIで効いている
-- `question.status = review_required` の自動更新有無が決まっている
+- Phase 5で `question.status = review_required` を自動更新しない方針が実装に反映されている
 
 Phase 6で検討するもの:
 

@@ -2,7 +2,7 @@
 
 通知型早押しクイズワールドの専用リポジトリです。
 
-Phase 1の signup/auth ローカル実装は完了・push・tag済みです。Phase 2の四択クイズ作成local実装も完了・push・tag済みです。Phase 3 quiz launch / recipients local実装も完了・push・tag済みです。Phase 4 answer submission / ranking local実装も完了・push・tag済みです。現在はPhase 5 result / rating / reports の計画中です。既存Smart Buzzerとは別プロジェクトとして扱います。
+Phase 1の signup/auth ローカル実装は完了・push・tag済みです。Phase 2の四択クイズ作成local実装も完了・push・tag済みです。Phase 3 quiz launch / recipients local実装も完了・push・tag済みです。Phase 4 answer submission / ranking local実装も完了・push・tag済みです。Phase 5 result / rating / reports のlocal実装は検証済みです。既存Smart Buzzerとは別プロジェクトとして扱います。
 
 Smart Buzzer の production / Stripe / Vercel / Supabase / env / legal page / cleanup / live key には触れません。
 
@@ -53,6 +53,7 @@ local DBには次を用意しています。
 - migration: `supabase/migrations/20260521000100_phase2_questions.sql`
 - migration: `supabase/migrations/20260521000200_phase3_quiz_launches.sql`
 - migration: `supabase/migrations/20260522000100_phase4_answers.sql`
+- migration: `supabase/migrations/20260522000200_phase5_result_rating_reports.sql`
 - seed: `supabase/seed.sql`
 - 初期world: `クイズワールド`
 - 初期invite code: `SEASON0-TEST-001`
@@ -178,6 +179,13 @@ Phase 5では、回答後の結果表示、3段階評価、通報導線を扱い
 - 未回答者一覧
 - 3段階評価: 良問 / 普通 / 微妙
 - 理由タグ: 面白い / 難易度がちょうどいい / 答えが曖昧 / 難しすぎる / 簡単すぎる / 不適切
+- MVP初期はrating理由タグを1つだけ `question_ratings.reason text` に保存する
+- 同一 `launch_id` / `rater_id` のratingは1件のみ、更新はMVPでは不可
+- 同一 `question_id` / `launch_id` / `reporter_id` / `reason` のreport重複は `409`
+- Phase 5では2件以上のreportがあっても `question.status = review_required` へ自動更新しない
+- `reports.status` は初期値 `open` とし、admin本実装までは更新/削除しない
+- resultはrecipientが回答済みまたは `end_at` 後、authorが `start_at` 後に見られる
+- resultでは `correctChoiceId` を返してよいが、回答受付中の `/quiz/[launchId]` APIでは返さない
 - 通報導線
 
 Phase 5ではまだ作らないもの:
@@ -222,13 +230,14 @@ Smart Buzzer のSupabase/Vercel/Stripe/envとは混ぜません。
 - Phase 4 answer submission / ranking local実装は、Supabase local DB込みで検証済み、commit・push済みです。
 - Phase 4完了地点は `v0.5.0-phase4-answer-submission` タグで固定済みです。
 - Phase 4の順位採番方式はDB function / RPC方式に固定済みです。
-- Phase 5 result / rating / reports は計画中です。
+- Phase 5 result / rating / reports local実装は、Supabase local DB込みで検証済みです。
+- Phase 5のrating理由タグは1つだけ保存し、rating更新はMVPでは不可です。
+- Phase 5のreport重複防止単位は `question_id` / `launch_id` / `reporter_id` / `reason` です。
+- Phase 5では `question.status = review_required` の自動更新は行わず、admin候補表示またはreport count表示に留めます。
 - Supabase / Vercel / Stripe のcloud環境はまだ作成しません。
 
 ## Next Work
 
-- Phase 5計画docsをレビューする
-- rating理由タグを1つにするか複数にするかを決める
-- report 2件以上時に `question.status = review_required` を自動更新するか、admin候補表示に留めるかを決める
-- Phase 5 local実装へ進む
+- Phase 5完了地点をtagで固定する
+- Phase 6 rank_events / ranking の計画docsへ進む
 - rank_events本格反映 / Web Push / Realtime / admin本実装 / cloud環境はまだ作らない

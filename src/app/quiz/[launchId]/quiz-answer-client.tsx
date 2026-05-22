@@ -328,6 +328,11 @@ export function QuizAnswerClient({ launchId }: { launchId: string }) {
                     </dd>
                   </div>
                 </dl>
+                <div className="mt-4">
+                  <ButtonLink href={`/result/${launchId}`} variant="secondary">
+                    結果を見る
+                  </ButtonLink>
+                </div>
               </div>
             ) : null}
           </div>
