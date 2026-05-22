@@ -13,7 +13,12 @@ export const questionCategories = [
 ] as const;
 
 export const questionStatuses = ["draft", "active"] as const;
-export const allQuestionStatuses = ["draft", "active", "suspended"] as const;
+export const allQuestionStatuses = [
+  "draft",
+  "active",
+  "review_required",
+  "suspended"
+] as const;
 
 export const questionLimits = {
   bodyMaxLength: 300,

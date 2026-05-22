@@ -28,7 +28,7 @@ type QuestionListItem = {
   difficulty: number;
   category: QuestionCategory;
   categoryNote: string | null;
-  status: "draft" | "active" | "suspended";
+  status: "draft" | "active" | "review_required" | "suspended";
   createdAt: string;
   updatedAt: string;
 };
@@ -41,7 +41,7 @@ type QuestionDetail = {
   difficulty: number;
   category: QuestionCategory;
   categoryNote: string | null;
-  status: "draft" | "active" | "suspended";
+  status: "draft" | "active" | "review_required" | "suspended";
 };
 
 type ApiResult = {
@@ -68,6 +68,10 @@ const emptyChoices = (): QuestionChoice[] => [
 function statusTone(status: QuestionListItem["status"]) {
   if (status === "active") {
     return "green";
+  }
+
+  if (status === "review_required") {
+    return "amber";
   }
 
   if (status === "suspended") {

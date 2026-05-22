@@ -2,7 +2,7 @@
 
 通知型早押しクイズワールドの専用リポジトリです。
 
-Phase 1の signup/auth ローカル実装は完了・push・tag済みです。Phase 2の四択クイズ作成local実装も完了・push・tag済みです。Phase 3 quiz launch / recipients local実装も完了・push・tag済みです。Phase 4 answer submission / ranking local実装も完了・push・tag済みです。Phase 5 result / rating / reports のlocal実装も完了・push・tag済みです。Phase 6 rank_events / ranking local実装も完了・push・tag済みです。現在はPhase 7 admin / moderation の実装計画中です。既存Smart Buzzerとは別プロジェクトとして扱います。
+Phase 1の signup/auth ローカル実装は完了・push・tag済みです。Phase 2の四択クイズ作成local実装も完了・push・tag済みです。Phase 3 quiz launch / recipients local実装も完了・push・tag済みです。Phase 4 answer submission / ranking local実装も完了・push・tag済みです。Phase 5 result / rating / reports のlocal実装も完了・push・tag済みです。Phase 6 rank_events / ranking local実装も完了・push・tag済みです。Phase 7 admin / moderation のlocal実装も完了・push・tag済みです。既存Smart Buzzerとは別プロジェクトとして扱います。
 
 Smart Buzzer の production / Stripe / Vercel / Supabase / env / legal page / cleanup / live key には触れません。
 
@@ -55,6 +55,7 @@ local DBには次を用意しています。
 - migration: `supabase/migrations/20260522000100_phase4_answers.sql`
 - migration: `supabase/migrations/20260522000200_phase5_result_rating_reports.sql`
 - migration: `supabase/migrations/20260522000300_phase6_rank_events.sql`
+- migration: `supabase/migrations/20260522000400_phase7_admin_moderation.sql`
 - seed: `supabase/seed.sql`
 - 初期world: `クイズワールド`
 - 初期invite code: `SEASON0-TEST-001`
@@ -255,7 +256,7 @@ Phase 6ではまだ作らないもの:
 
 ## Phase 7 Scope
 
-Phase 7では、10人テストを安全に運用するための簡易admin / moderation機能を計画します。
+Phase 7では、10人テストを安全に運用するための簡易admin / moderation機能をlocalで実装します。
 
 - `/admin` 画面
 - admin role判定: `profiles.role = admin`
@@ -265,6 +266,7 @@ Phase 7では、10人テストを安全に運用するための簡易admin / mod
 - user moderation: `profiles.status = suspended`
 - waitlist一覧 / status更新
 - invite code発行
+- admin API: reports / questions / users / waitlist / invites / audit logs
 - world member / profile状態確認
 - 管理操作の確認ダイアログ
 - 管理操作ログ
@@ -278,6 +280,12 @@ Phase 7の固定方針:
 - 完全削除はMVPでは行わず、question / user は停止を優先する
 - 2件以上reportがあるquestionはadmin画面で `review_required` 候補として表示する
 - Phase 7では自動停止や通報によるscore減点は行わない
+- `review_required` questionは新規launch不可、admin画面で優先表示、既存result閲覧は維持する
+- `suspended` questionは新規launch不可、回答、rating、通常表示から除外し、既存ログやresult用データは監査目的で残す
+- user停止時は `profiles.status` と `world_members.status` を同時に `suspended` へ更新する
+- report status更新APIとして `PATCH /api/admin/reports/[id]` を追加する
+- invite codeはadmin入力を許可し、未入力ならserver側で `SEASON0-XXXXXX` 形式で生成する
+- waitlistは `waiting` / `invited` / `joined` / `rejected` を使い、`rejected` はreason必須にする
 
 Phase 7ではまだ作らないもの:
 
@@ -334,12 +342,13 @@ Smart Buzzer のSupabase/Vercel/Stripe/envとは混ぜません。
 - Phase 6完了地点は `v0.7.0-phase6-rank-events` タグで固定済みです。
 - Phase 6では0点イベントを作らず、score下限0、score閾値によるrank再計算、answer/rating後の専用RPC方針で実装済みです。
 - Phase 6では正解率/参加率ボーナス、通報による減点、既存データ自動backfillは作っていません。
-- Phase 7 admin / moderation は実装計画中です。
+- Phase 7 admin / moderation local実装は、Supabase local DB込みで検証済み、commit・push済みです。
+- Phase 7完了地点は `v0.8.0-phase7-admin-moderation` タグで固定済みです。
+- Phase 7では `/admin`、admin API、`admin_audit_logs`、question/user moderation、invite/waitlist管理を実装済みです。
 - Supabase / Vercel / Stripe のcloud環境はまだ作成しません。
 
 ## Next Work
 
-- Phase 7 admin / moderation planをレビューする
-- Phase 7実装前の小さな未確定事項を固定する
-- 実装に進む場合はSupabase localでadmin_audit_logsとadmin APIを追加する
-- Web Push / Realtime / admin本実装 / cloud環境はまだ作らない
+- Phase 8 10-user local smoke / ops rehearsal の計画へ進むか判断する
+- 10人テスト前のlocal運用リハーサル範囲を整理する
+- Web Push / Realtime / cloud環境 / production deploy はまだ作らない

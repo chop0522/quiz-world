@@ -31,6 +31,36 @@ async function readJsonBody(request: Request) {
   }
 }
 
+async function canCreateUserContent(admin: ReturnType<typeof getSupabaseAdminClient>, userId: string) {
+  const { data: profile, error: profileError } = await admin
+    .from("profiles")
+    .select("id,status")
+    .eq("id", userId)
+    .maybeSingle();
+
+  if (profileError) {
+    throw profileError;
+  }
+
+  if (!profile || (profile as { status: string }).status !== "active") {
+    return false;
+  }
+
+  const { data: member, error: memberError } = await admin
+    .from("world_members")
+    .select("id")
+    .eq("user_id", userId)
+    .eq("status", "active")
+    .limit(1)
+    .maybeSingle();
+
+  if (memberError) {
+    throw memberError;
+  }
+
+  return member !== null;
+}
+
 export async function POST(request: Request) {
   try {
     const user = await getAuthenticatedUser();
@@ -53,6 +83,14 @@ export async function POST(request: Request) {
     }
 
     const admin = getSupabaseAdminClient();
+
+    if (!await canCreateUserContent(admin, user.id)) {
+      return NextResponse.json(
+        { ok: false, errors: ["停止中のユーザーは通報できません。"] },
+        { status: 403 }
+      );
+    }
+
     const access = await getResultAccessContext(admin, user.id, parsed.data.launchId);
 
     if (!access.ok) {

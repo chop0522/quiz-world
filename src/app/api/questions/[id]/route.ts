@@ -145,9 +145,12 @@ export async function PATCH(request: Request, context: RouteContext) {
       );
     }
 
-    if (existing.status === "suspended") {
+    if (!["draft", "active"].includes(existing.status as string)) {
       return NextResponse.json(
-        { ok: false, errors: ["停止中の問題はユーザーAPIから編集できません。"] },
+        {
+          ok: false,
+          errors: ["レビュー中または停止中の問題はユーザーAPIから編集できません。"]
+        },
         { status: 403 }
       );
     }

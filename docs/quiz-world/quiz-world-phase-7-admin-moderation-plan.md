@@ -40,6 +40,7 @@ Phase 7で扱うAPI:
 
 - `GET /api/admin/reports`
 - `GET /api/admin/reports/[id]`
+- `PATCH /api/admin/reports/[id]`
 - `PATCH /api/admin/questions/[id]/moderation`
 - `PATCH /api/admin/users/[id]/suspend`
 - `GET /api/admin/waitlist`
@@ -413,6 +414,47 @@ response:
 - admin向けなのでcorrect choiceを表示してよい。
 - emailは必要最小限にし、MVPでは基本表示しない。
 
+### `PATCH /api/admin/reports/[id]`
+
+目的:
+
+- report単体のstatusを更新する。
+- question moderation APIとは独立して、report確認だけを完了できるようにする。
+- 必ず `admin_audit_logs` に `report_reviewed` として記録する。
+
+request:
+
+```json
+{
+  "status": "reviewing",
+  "reason": "通報内容を確認中"
+}
+```
+
+validation:
+
+- `status` は `reviewing` / `resolved` / `dismissed`
+- `reason` は必須
+- `reason` は1〜500文字
+- 対象reportが存在する
+- 既に同じstatusの場合は409またはidempotent responseを検討する
+
+transaction相当で行う処理:
+
+1. admin確認
+2. report行をロックする
+3. `reports.status` を更新する
+4. `admin_audit_logs` をinsertする
+
+audit action:
+
+- `report_reviewed`
+
+補足:
+
+- question moderation APIにも `reportId` を渡せる。
+- report単体のstatus更新APIは独立して持つ。
+
 ### `PATCH /api/admin/questions/[id]/moderation`
 
 目的:
@@ -477,7 +519,7 @@ transaction相当で行う処理:
 1. admin確認
 2. profile行をロックする
 3. `profiles.status = suspended` に更新する
-4. 対象ユーザーの `world_members.status` も `suspended` にするかは実装前に最終確認する
+4. 対象ユーザーの `world_members.status` も `suspended` に更新する
 5. `admin_audit_logs` をinsertする
 
 audit action:
@@ -487,6 +529,9 @@ audit action:
 Phase 7固定方針:
 
 - `profiles.status = suspended` を主要な停止判定に使う。
+- 対象ユーザーの `world_members.status` も同時に `suspended` へ更新する。
+- admin操作と `admin_audit_logs` は同一transaction相当にする。
+- 自分自身の停止は禁止する。
 - Phase 7では解除APIは作らない。解除は後続Phaseで検討する。
 
 ### `GET /api/admin/waitlist`
@@ -597,11 +642,13 @@ request:
 validation:
 
 - `worldId` は存在するactive world
-- `code` は必須、trim後大文字化
+- `code` は任意。入力された場合はtrim後大文字化する
+- `code` が未入力の場合はserver側で `SEASON0-XXXXXX` 形式のcodeを生成する
 - `code` はunique
 - `maxUses` は1以上
 - `expiresAt` はnullまたは未来日時
 - `reason` は必須
+- unique制約に違反した場合、server生成時は再生成し、admin入力時は409を返す
 
 audit action:
 
@@ -794,14 +841,20 @@ adminが変更できるstatus:
 
 | status | 効果 |
 | --- | --- |
-| `review_required` | admin確認が必要な状態。通常ユーザーの新規出題対象から外すかは実装前に最終確認する。 |
-| `suspended` | 今後の出題、回答、rating、通常表示から除外する。 |
+| `review_required` | admin確認が必要な状態。新規launch不可、admin画面で優先表示、既存result閲覧は維持する。 |
+| `suspended` | 新規launch不可。回答、rating、通常表示から除外する。既存ログやresult用データは監査目的で残す。 |
 
 Phase 7初期方針:
 
-- `suspended` questionは既存の出題/回答/評価フローから除外する。
-- `review_required` questionの扱いは「admin画面で優先表示し、通常ユーザーの新規出題は止める」方針を基本案にする。
-- 関連する未開始launchの停止は、Phase 7で実装するか実装前に最終確認する。
+- `review_required` questionは新規launch不可にする。
+- `review_required` questionはadmin画面で優先表示する。
+- `review_required` questionの既存result閲覧は維持する。
+- `review_required` questionの既存回答済みデータは削除しない。
+- `review_required` questionは通常ユーザーの新規出題対象から外す。
+- `suspended` questionは新規launch不可にする。
+- `suspended` questionは回答、rating、通常表示から除外する。
+- `suspended` questionも完全削除はしない。
+- `suspended` questionの既存ログやresult用データは監査目的で残す。
 
 ## 8. user suspension 方針
 
@@ -825,10 +878,11 @@ Phase 7初期方針:
 Phase 7初期方針:
 
 - 停止時は `profiles.status = suspended` を更新する
-- `world_members.status` も同時に `suspended` にするかは実装前に最終確認する
+- 同時に対象ユーザーの `world_members.status` も `suspended` に更新する
+- admin操作と `admin_audit_logs` は同一transaction相当にする
 - 自分自身の停止は禁止する
 - adminを停止できるかはMVPでは原則禁止または追加確認を必須にする
-- 解除APIはPhase 7では作らない
+- 解除API / 復帰APIはPhase 7では作らない
 
 ## 9. invite / waitlist 管理方針
 
@@ -837,6 +891,11 @@ Phase 7初期方針:
 - Season 0はadmin発行invite code制を維持する
 - 一般ユーザーによるinvite発行はMVPでは不可
 - adminだけが `POST /api/admin/invites` を使える
+- admin入力のinvite codeを許可する
+- code未入力ならserver側で `SEASON0-XXXXXX` 形式のcodeを生成する
+- codeはtrim + uppercaseする
+- unique制約に違反した場合、server生成時は再生成し、admin入力時は409を返す
+- reasonは必須にする
 - invite作成は `admin_audit_logs` に残す
 - invite失効や削除はPhase 7では作らず、必要なら後続Phaseで扱う
 
@@ -846,6 +905,7 @@ Phase 7初期方針:
 - waitlist statusはadminだけが更新できる
 - status更新は `admin_audit_logs` に残す
 - waitlist emailは必要最小限のadmin画面だけに表示する
+- `rejected` の場合はreasonを必須にする
 
 waitlist status:
 
@@ -881,6 +941,7 @@ admin APIでservice role経由にする処理:
 - waitlist status変更
 - invite作成
 - report status変更
+- user / question / report / invite / waitlist の完全削除は行わず、status管理を優先する
 - admin_audit_logs作成
 
 ## 11. validation
@@ -914,10 +975,12 @@ user suspension:
 
 invite:
 
-- code必須
+- codeは任意。未入力ならserver側で `SEASON0-XXXXXX` 形式のcodeを生成する
+- 入力されたcodeはtrim + uppercaseする
 - code unique
 - maxUsesは1以上
 - expiresAtはnullまたは未来日時
+- reason必須
 
 ## 12. テスト方針
 
@@ -940,6 +1003,10 @@ integration test:
 - adminはuserを `suspended` にできる
 - adminはwaitlist statusを更新できる
 - adminはinvite codeを発行できる
+- `PATCH /api/admin/reports/[id]` でreport statusを更新できる
+- `review_required` questionは新規launch不可になる
+- `suspended` questionは新規launch、回答、rating、通常表示から除外される
+- user停止時に `profiles.status` と `world_members.status` が同時に `suspended` になる
 - admin操作ごとに `admin_audit_logs` が作成される
 - audit log作成に失敗した場合、管理操作も失敗する
 
@@ -978,6 +1045,7 @@ manual local smoke:
 - admin解除API
 - user復帰API
 - invite失効API
+- 削除API
 - legal本番反映
 
 ## 14. Phase 7完了条件
@@ -990,6 +1058,8 @@ Phase 7 local実装の完了条件:
 - reports一覧とreport詳細を確認できる
 - questionを `review_required` / `suspended` にできる
 - userを `suspended` にできる
+- user停止時に `world_members.status` も `suspended` へ更新される
+- `PATCH /api/admin/reports/[id]` でreport statusを更新できる
 - waitlist一覧を確認し、statusを更新できる
 - invite codeを発行できる
 - すべてのadmin操作で `admin_audit_logs` が作成される
@@ -1015,14 +1085,16 @@ Phase 8へ進む前に確認すること:
 - 10人テスト前にまだcloud環境を作らない方針を維持するか確認する
 - Realtime / Web Push / production deployへ進むかは別Phaseで判断する
 
-## Phase 7実装前に決めるべきこと
+## Phase 7実装前固定事項
 
-実装前に最終確認したい小さな事項:
+Phase 7 local実装前の未確定事項は、MVP初期方針として以下で固定する。
 
-| 項目 | 推奨初期方針 |
+| 項目 | 固定方針 |
 | --- | --- |
-| `review_required` questionの通常ユーザー扱い | 新規launch不可、admin画面で優先表示。既存result閲覧は維持。 |
-| user停止時の `world_members.status` | `profiles.status` と同時に `suspended` へ更新する案を優先。 |
-| report status更新API | `GET /api/admin/reports/[id]` と同じ階層で `PATCH /api/admin/reports/[id]` を追加するか、question moderation APIに含めるか決める。 |
-| invite code生成 | admin入力を許可しつつ、未入力ならserver側生成にする案を優先。 |
-| self-admin停止 | MVPでは禁止。複数admin運用前に解除/復帰設計を検討する。 |
+| `review_required` question | 新規launch不可、admin画面で優先表示、既存result閲覧は維持、既存回答済みデータは削除しない、通常ユーザーの新規出題対象からは外す。 |
+| `suspended` question | 新規launch不可、回答、rating、通常表示から除外、完全削除なし、既存ログやresult用データは監査目的で残す。 |
+| user suspension | `profiles.status = suspended` を主判定にし、対象ユーザーの `world_members.status` も同時に `suspended` へ更新する。自分自身の停止は禁止。解除API / 復帰APIはPhase 7では作らない。 |
+| report status更新API | `PATCH /api/admin/reports/[id]` を追加する。`status` は `reviewing` / `resolved` / `dismissed`、reason必須、`admin_audit_logs` に `report_reviewed` として記録する。 |
+| invite code生成 | admin入力を許可し、未入力ならserver側で `SEASON0-XXXXXX` 形式のcodeを生成する。codeはtrim + uppercase。unique違反時は再生成または409。reason必須。 |
+| waitlist | `waiting` / `invited` / `joined` / `rejected` を使う。`rejected` の場合はreason必須。status更新は `admin_audit_logs` に記録する。 |
+| 完全削除 | Phase 7では削除APIを作らない。user / question / report / invite / waitlist はstatus管理を優先する。 |
