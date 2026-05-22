@@ -2,7 +2,6 @@ import { BellOff, ShieldCheck } from "lucide-react";
 import {
   Badge,
   Field,
-  Metric,
   PageHeader,
   SelectInput,
   Surface,
@@ -19,16 +18,10 @@ export default function ProfilePage() {
   return (
     <>
       <PageHeader
-        description="出題ランク、回答ランク、通知設定、同意状態を確認する静的画面です。保存処理は次Phaseで実装します。"
+        description="ログイン中のscore/rank、直近rank_events、通知設定、同意状態を確認します。通知設定の保存処理は次Phaseで実装します。"
         eyebrow="Profile"
         title="ランクと通知設定"
       />
-      <section className="grid gap-4 md:grid-cols-4">
-        <Metric label="表示名" value={userSummary.displayName} />
-        <Metric label="出題ランク" value={userSummary.questionerRank} />
-        <Metric label="回答ランク" value={userSummary.answerRank} />
-        <Metric label="通知上限" value={`${userSummary.maxDailyNotifications}/日`} />
-      </section>
 
       <ProfileSession />
 

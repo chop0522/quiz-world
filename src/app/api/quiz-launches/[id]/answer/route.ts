@@ -6,6 +6,7 @@ import {
   validateAnswerPayload
 } from "@/lib/phase4-validation";
 import type { SubmitAnswerRpcResponse } from "@/lib/phase4-data";
+import type { ApplyRankEventsRpcResponse } from "@/lib/phase6-data";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 
 type RouteContext = {
@@ -92,11 +93,23 @@ export async function POST(request: Request, context: RouteContext) {
       throw new Error("回答結果を取得できませんでした。");
     }
 
+    const { data: rankEventData, error: rankEventError } = await server.rpc(
+      "apply_answer_rank_events",
+      {
+        p_answer_id: result.answer.id
+      }
+    );
+
+    if (rankEventError) {
+      throw rankEventError;
+    }
+
     return NextResponse.json(
       {
         ok: true,
         status: statusValue,
-        answer: result.answer
+        answer: result.answer,
+        rankEvents: rankEventData as ApplyRankEventsRpcResponse | null
       },
       { status: httpStatus }
     );

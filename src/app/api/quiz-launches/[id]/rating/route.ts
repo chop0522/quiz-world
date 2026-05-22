@@ -6,6 +6,7 @@ import {
   type QuestionRatingRow
 } from "@/lib/phase5-data";
 import { validateRatingPayload } from "@/lib/phase5-validation";
+import type { ApplyRankEventsRpcResponse } from "@/lib/phase6-data";
 import { getSupabaseAdminClient } from "@/lib/supabase/admin";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -142,6 +143,16 @@ export async function POST(request: Request, context: RouteContext) {
     }
 
     const rating = ratingData as QuestionRatingRow;
+    const { data: rankEventData, error: rankEventError } = await admin.rpc(
+      "apply_rating_rank_events",
+      {
+        p_rating_id: rating.id
+      }
+    );
+
+    if (rankEventError) {
+      throw rankEventError;
+    }
 
     return NextResponse.json(
       {
@@ -154,7 +165,8 @@ export async function POST(request: Request, context: RouteContext) {
           rating: rating.rating,
           reason: rating.reason,
           createdAt: rating.created_at
-        }
+        },
+        rankEvents: rankEventData as ApplyRankEventsRpcResponse | null
       },
       { status: 201 }
     );

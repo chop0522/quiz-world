@@ -1,4 +1,8 @@
 import { NextResponse } from "next/server";
+import {
+  toRankEventResponse,
+  type RankEventRow
+} from "@/lib/phase6-data";
 import { getSupabaseAdminClient } from "@/lib/supabase/admin";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -7,6 +11,10 @@ type ProfileRow = {
   display_name: string;
   role: string;
   status: string;
+  answer_rank: number;
+  answer_score: number;
+  questioner_rank: number;
+  questioner_score: number;
   age_confirmed_at: string;
   terms_accepted_at: string;
   privacy_accepted_at: string;
@@ -37,7 +45,7 @@ export async function GET() {
     const admin = getSupabaseAdminClient();
     const { data: profileData, error: profileError } = await admin
       .from("profiles")
-      .select("id,display_name,role,status,age_confirmed_at,terms_accepted_at,privacy_accepted_at")
+      .select("id,display_name,role,status,answer_rank,answer_score,questioner_rank,questioner_score,age_confirmed_at,terms_accepted_at,privacy_accepted_at")
       .eq("id", user.id)
       .maybeSingle();
 
@@ -65,6 +73,18 @@ export async function GET() {
     }
 
     const member = memberData as WorldMemberRow | null;
+    const { data: rankEventData, error: rankEventError } = await admin
+      .from("rank_events")
+      .select("id,user_id,type,points,reason,source_type,source_id,metadata,created_at")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false })
+      .limit(10);
+
+    if (rankEventError) {
+      throw rankEventError;
+    }
+
+    const rankEvents = (rankEventData as RankEventRow[] | null) ?? [];
 
     return NextResponse.json({
       ok: true,
@@ -77,6 +97,10 @@ export async function GET() {
         displayName: profile.display_name,
         role: profile.role,
         status: profile.status,
+        answerRank: profile.answer_rank,
+        answerScore: profile.answer_score,
+        questionerRank: profile.questioner_rank,
+        questionerScore: profile.questioner_score,
         ageConfirmedAt: profile.age_confirmed_at,
         termsAcceptedAt: profile.terms_accepted_at,
         privacyAcceptedAt: profile.privacy_accepted_at
@@ -88,7 +112,8 @@ export async function GET() {
             status: member.status,
             joinedAt: member.joined_at
           }
-        : null
+        : null,
+      rankEvents: rankEvents.map(toRankEventResponse)
     });
   } catch (error) {
     return NextResponse.json(
