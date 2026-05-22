@@ -321,6 +321,7 @@ Smart Buzzer のSupabase/Vercel/Stripe/envとは混ぜません。
 - [Phase 6 rank events plan](docs/quiz-world/quiz-world-phase-6-rank-events-plan.md)
 - [Phase 7 admin moderation plan](docs/quiz-world/quiz-world-phase-7-admin-moderation-plan.md)
 - [Phase 8 local smoke ops plan](docs/quiz-world/quiz-world-phase-8-local-smoke-ops-plan.md)
+- [Phase 8 local smoke results](docs/quiz-world/quiz-world-phase-8-local-smoke-results.md)
 
 ## Current Status
 
@@ -349,11 +350,12 @@ Smart Buzzer のSupabase/Vercel/Stripe/envとは混ぜません。
 - Phase 8 10-user local smoke / ops rehearsal planを作成済みです。
 - Phase 8では機能追加ではなく、Phase 1〜7のMVP主要ループをSupabase localだけで通し確認する方針です。
 - Phase 8で確認するものはsignup、invite/waitlist、question、launch、/home polling、answer、result、rating/report、rank_events、admin moderation、admin_audit_logsです。
+- Phase 8 local smoke / ops rehearsalは89チェックpass、実行後DB reset済みです。
 - Phase 8ではSupabase cloud / Vercel / Stripe / production deploy / Web Push / Realtimeは作りません。
 - Supabase / Vercel / Stripe のcloud環境はまだ作成しません。
 
 ## Next Work
 
-- Phase 8 10-user local smoke / ops rehearsal planをレビューする
-- Phase 8を実行する場合は、Supabase localだけで10人テスト前の運用リハーサルを行う
+- Phase 8 local smoke resultsをレビューする
+- Phase 9 Preview環境検討へ進むか、先に人間操作での最終UI rehearsalを行うか判断する
 - Web Push / Realtime / cloud環境 / production deploy はまだ作らない
