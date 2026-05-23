@@ -2,7 +2,7 @@
 
 通知型早押しクイズワールドの専用リポジトリです。
 
-Phase 1の signup/auth ローカル実装は完了・push・tag済みです。Phase 2の四択クイズ作成local実装も完了・push・tag済みです。Phase 3 quiz launch / recipients local実装も完了・push・tag済みです。Phase 4 answer submission / ranking local実装も完了・push・tag済みです。Phase 5 result / rating / reports のlocal実装も完了・push・tag済みです。Phase 6 rank_events / ranking local実装も完了・push・tag済みです。Phase 7 admin / moderation のlocal実装も完了・push・tag済みです。Phase 8 10-user local smoke / ops rehearsalは89チェックpass、DB reset済みです。現在は人間操作による最終UI rehearsalの計画段階です。既存Smart Buzzerとは別プロジェクトとして扱います。
+Phase 1の signup/auth ローカル実装は完了・push・tag済みです。Phase 2の四択クイズ作成local実装も完了・push・tag済みです。Phase 3 quiz launch / recipients local実装も完了・push・tag済みです。Phase 4 answer submission / ranking local実装も完了・push・tag済みです。Phase 5 result / rating / reports のlocal実装も完了・push・tag済みです。Phase 6 rank_events / ranking local実装も完了・push・tag済みです。Phase 7 admin / moderation のlocal実装も完了・push・tag済みです。Phase 8 10-user local smoke / ops rehearsalは89チェックpass、DB reset済みです。Phase 8 manual UI rehearsalもSupabase localのみで実行済みです。既存Smart Buzzerとは別プロジェクトとして扱います。
 
 Smart Buzzer の production / Stripe / Vercel / Supabase / env / legal page / cleanup / live key には触れません。
 
@@ -323,6 +323,7 @@ Smart Buzzer のSupabase/Vercel/Stripe/envとは混ぜません。
 - [Phase 8 local smoke ops plan](docs/quiz-world/quiz-world-phase-8-local-smoke-ops-plan.md)
 - [Phase 8 local smoke results](docs/quiz-world/quiz-world-phase-8-local-smoke-results.md)
 - [Phase 8 manual UI rehearsal plan](docs/quiz-world/quiz-world-phase-8-manual-ui-rehearsal-plan.md)
+- [Phase 8 manual UI rehearsal results](docs/quiz-world/quiz-world-phase-8-manual-ui-rehearsal-results.md)
 
 ## Current Status
 
@@ -353,12 +354,13 @@ Smart Buzzer のSupabase/Vercel/Stripe/envとは混ぜません。
 - Phase 8で確認するものはsignup、invite/waitlist、question、launch、/home polling、answer、result、rating/report、rank_events、admin moderation、admin_audit_logsです。
 - Phase 8 local smoke / ops rehearsalは89チェックpass、実行後DB reset済みです。
 - Phase 8 manual UI rehearsal planを作成済みです。自動smokeではなく、人間がブラウザで操作したときの導線、表示、分かりやすさをSupabase localだけで確認します。
+- Phase 8 manual UI rehearsalはSupabase localのみで実行済みです。P0はなし、P1は古いPhase文言とadmin危険操作UI、P2はrating/report送信後状態、rank説明、world補助指標、legal文言です。
 - Phase 8ではSupabase cloud / Vercel / Stripe / production deploy / Web Push / Realtimeは作りません。
 - Supabase / Vercel / Stripe のcloud環境はまだ作成しません。
 
 ## Next Work
 
-- Phase 8 local smoke resultsとmanual UI rehearsal planをレビューする
-- 人間操作での最終UI rehearsalをSupabase localだけで実行する
-- Phase 9 Preview環境検討へ進むか、UI rehearsal後に判断する
+- Phase 8 manual UI rehearsal resultsをレビューする
+- P1を修正するか、10人テスト前の既知制約として明文化する
+- Phase 9 Preview環境検討へ進むか、P1整理後に判断する
 - Web Push / Realtime / cloud環境 / production deploy はまだ作らない
