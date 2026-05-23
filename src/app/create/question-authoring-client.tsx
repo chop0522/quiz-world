@@ -266,7 +266,7 @@ export function QuestionAuthoringClient() {
                 {editingId ? "問題を編集" : "四択クイズを作成"}
               </h2>
               <p className="mt-1 text-sm text-[color:var(--muted)]">
-                Phase 3ではactiveな問題を選んで画面内通知として出題できます。回答、順位、結果表示はまだ行いません。
+                activeな問題は作成済み問題一覧から出題できます。回答、順位、結果、評価、通報、rank eventsは後続画面で確認できます。
               </p>
             </div>
             {editingId ? <Badge tone="amber">編集中</Badge> : <Badge>新規</Badge>}

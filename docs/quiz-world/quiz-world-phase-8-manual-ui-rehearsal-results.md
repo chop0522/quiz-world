@@ -143,6 +143,31 @@ reset前のlocal確認用データ:
 | 古いPhase文言 | global footerに「Phase 4はSupabase localの回答送信実装」と出る。`/create` には「配信、通知、回答、結果表示はまだ実装しません」「Phase 3では...回答、順位、結果表示はまだ行いません」という古い文言が残っている。 | 10人テスト前にMVP現在状態の説明へ更新する。 |
 | admin危険操作UI | 停止・moderationのreason入力がnative prompt中心。実行前に対象、操作、reasonを画面内で見直すUIではない。 | 10人テスト前に直すか、admin運用上の既知制約として明記する。 |
 
+P1対応状況:
+
+- 2026-05-23にglobal footerと `/create` の古いPhase文言を現在のMVP local状態へ更新した。
+- 2026-05-23にadmin危険操作UIをnative prompt/confirm中心から、対象、操作、reasonを画面内で見直してから実行する簡易確認UIへ最小改善した。
+- 完全なadmin UX改善ではなく、10人テスト前の誤操作リスクを下げるためのMVP最小改善として扱う。
+
+P1再確認結果:
+
+| 項目 | 結果 | メモ |
+| --- | --- | --- |
+| 実行日時 | pass | 2026-05-23 16:19:40 JST |
+| 実行環境 | pass | Supabase localのみ。cloud環境、production deploy、Vercel、Stripeは未作成。 |
+| `npm run typecheck` | pass | `tsc --noEmit` 通過。 |
+| `npm run lint` | pass | `eslint .` 通過。 |
+| `npm run test` | pass | 7 files / 43 tests passed。 |
+| `npm run build` | pass | Next.js build 通過。 |
+| global footer | pass | 「Phase 4はSupabase localの回答送信実装」は残っていない。現在状態の文言を表示。 |
+| `/create` header | pass | 「配信、通知、回答、結果表示はまだ実装しません」は残っていない。 |
+| `/create` form説明 | pass | 「Phase 3では...回答、順位、結果表示はまだ行いません」は残っていない。 |
+| admin確認UI | pass | user停止前に対象、操作、reason、実行、キャンセルを画面内で確認できる。 |
+| native prompt / confirm依存 | pass | P1確認対象のuser停止ではnative prompt/confirmに依存しない。 |
+| admin操作 | pass | `P1Target` を `suspended` に更新でき、既存admin操作は壊れていない。 |
+| admin_audit_logs | pass | `user_suspended` / `user` のaudit logが作成され、reasonも保存された。 |
+| 実行後DB reset | pass | P1再確認後に `npx supabase db reset` でseed状態へ戻した。 |
+
 ### P2
 
 | 項目 | 内容 | 推奨対応 |
@@ -152,25 +177,34 @@ reset前のlocal確認用データ:
 | `/world` の補助指標 | 参加人数/参加枠は実データだが、平均評価や進捗の一部はサンプル的に見える。 | 実データ化するまで「MVP参考値」などを明示する。 |
 | legal文言 | termsに「Phase 1は画面内通知」とある。signup前提とは矛盾しないが、現在Phaseとはずれる。 | 「MVP初期は画面内通知」などに言い換える。 |
 
+P2対応状況:
+
+- 2026-05-23にrating送信後の「評価済み」表示、rating UIのdisabled化、「MVPでは評価の変更はできません」の明示を追加した。
+- 2026-05-23にreport送信後の「通報済み」表示、report UIのdisabled化、重複通報できない旨の明示を追加した。
+- 2026-05-23に利用規約草案の「Phase 1は画面内通知」を「MVP初期は画面内通知」に修正した。
+- `profile` のrank説明と `/world` の補助指標は、10人テスト前の既知制約として残す。
+
 ## 10人テスト前に必須修正する項目
 
 P0はない。
 
-10人テスト前には、少なくとも以下を直すか、既知制約として明文化する。
+P1は2026-05-23に最小修正済み。
 
-- 古いPhase文言の更新。
-- admin危険操作UIを画面内確認形式にするか、10人テスト中のadmin操作手順に制限を明記する。
+10人テスト前には、必要に応じてP1修正後の限定的なmanual UI再確認を行う。
+P2のうちrating/report送信後状態とlegal文言は2026-05-23に最小修正済み。
+`profile` のrank説明と `/world` の補助指標は、10人テスト前の既知制約として扱う。
 
 ## Phase 9 Preview環境へ進めるか
 
 現時点では、機能の主要ループ自体はlocalで通っている。
 
-ただしP1が残っているため、Phase 9 Preview環境へ進む前に以下のどちらかを選ぶ。
+P1は最小修正済みのため、Phase 9 Preview環境へ進む前に以下を確認する。
 
-1. P1を修正して再度manual UI rehearsalを行う。
-2. P1を10人テスト前の既知制約として明文化し、Preview環境では限定確認だけ行う。
+1. 古いPhase文言が残っていないことを確認する。
+2. admin危険操作の画面内確認UIで対象、操作、reasonを見直せることを確認する。
+3. P2を10人テスト前に直すか、既知制約として扱うか判断する。
 
-推奨は、古いPhase文言だけでも先に修正すること。admin危険操作UIは、10人テストで実際にadmin操作を行う頻度に応じて修正優先度を決める。
+推奨は、P1修正後の限定確認を通してからPhase 9 Preview環境検討へ進むこと。
 
 ## git status
 

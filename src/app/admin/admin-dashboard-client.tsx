@@ -153,6 +153,17 @@ type AdminData = {
   auditLogs: AuditLogItem[];
 };
 
+type PendingAdminAction = {
+  title: string;
+  description: string;
+  targetLabel: string;
+  actionLabel: string;
+  reasonPlaceholder: string;
+  danger?: boolean;
+  reasonRequired?: boolean;
+  onConfirm: (reason: string) => Promise<boolean>;
+};
+
 type ApiResult = {
   ok?: boolean;
   errors?: string[];
@@ -236,23 +247,6 @@ async function fetchJson(path: string): Promise<ApiResult> {
   return result;
 }
 
-function promptReason(message: string): string | null {
-  const reason = window.prompt(message);
-
-  if (reason === null) {
-    return null;
-  }
-
-  const trimmed = reason.trim();
-
-  if (!trimmed) {
-    window.alert("reasonは必須です。");
-    return null;
-  }
-
-  return trimmed;
-}
-
 export function AdminDashboardClient({ adminName }: { adminName: string }) {
   const [tab, setTab] = useState<AdminTab>("overview");
   const [data, setData] = useState<AdminData>(initialData);
@@ -267,6 +261,8 @@ export function AdminDashboardClient({ adminName }: { adminName: string }) {
   const [inviteCode, setInviteCode] = useState("");
   const [inviteMaxUses, setInviteMaxUses] = useState(1);
   const [inviteReason, setInviteReason] = useState("");
+  const [pendingAction, setPendingAction] = useState<PendingAdminAction | null>(null);
+  const [pendingReason, setPendingReason] = useState("");
 
   const reportCandidates = useMemo(
     () => data.reports.filter((report) => report.reviewRequiredCandidate).length,
@@ -326,7 +322,7 @@ export function AdminDashboardClient({ adminName }: { adminName: string }) {
     path: string,
     body: Record<string, unknown>,
     successMessage: string
-  ) {
+  ): Promise<boolean> {
     setSubmitting(true);
     setErrors([]);
     setMessage(null);
@@ -341,14 +337,54 @@ export function AdminDashboardClient({ adminName }: { adminName: string }) {
 
       if (!response.ok || !result.ok) {
         setErrors(result.errors ?? ["admin操作に失敗しました。"]);
-        return;
+        return false;
       }
 
       setMessage(successMessage);
       await loadAll();
+      return true;
+    } catch (error) {
+      setErrors([
+        error instanceof Error ? error.message : "admin操作に失敗しました。"
+      ]);
+      return false;
     } finally {
       setSubmitting(false);
     }
+  }
+
+  function openAdminAction(action: PendingAdminAction) {
+    setErrors([]);
+    setMessage(null);
+    setPendingReason("");
+    setPendingAction(action);
+  }
+
+  async function confirmPendingAction(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    if (!pendingAction) {
+      return;
+    }
+
+    const reason = pendingReason.trim();
+
+    if (pendingAction.reasonRequired !== false && !reason) {
+      setErrors(["reasonは必須です。"]);
+      return;
+    }
+
+    const succeeded = await pendingAction.onConfirm(reason);
+
+    if (succeeded) {
+      setPendingAction(null);
+      setPendingReason("");
+    }
+  }
+
+  function cancelPendingAction() {
+    setPendingAction(null);
+    setPendingReason("");
   }
 
   async function loadReportDetail(reportId: string) {
@@ -371,70 +407,74 @@ export function AdminDashboardClient({ adminName }: { adminName: string }) {
     }
   }
 
-  async function updateReportStatus(reportId: string, status: AdminReportStatus) {
-    const reason = promptReason(`reportを${status}に更新する理由`);
-
-    if (!reason) {
-      return;
-    }
-
-    await mutate(
-      `/api/admin/reports/${reportId}`,
-      { status, reason },
-      "report statusを更新しました。"
-    );
+  function updateReportStatus(report: ReportItem, status: AdminReportStatus) {
+    openAdminAction({
+      title: "report status更新",
+      description: "reportの状態を変更し、admin_audit_logsに記録します。",
+      targetLabel: `${report.reason} / ${report.reporterDisplayName}`,
+      actionLabel: `report -> ${status}`,
+      reasonPlaceholder: `reportを${status}に更新する理由`,
+      onConfirm: (reason) => mutate(
+        `/api/admin/reports/${report.id}`,
+        { status, reason },
+        "report statusを更新しました。"
+      )
+    });
   }
 
-  async function moderateQuestion(
+  function moderateQuestion(
     questionId: string,
     status: AdminQuestionModerationStatus,
-    reportId?: string
+    reportId?: string,
+    targetLabel = "question"
   ) {
-    const reason = promptReason(`questionを${status}に変更する理由`);
-
-    if (!reason) {
-      return;
-    }
-
-    await mutate(
-      `/api/admin/questions/${questionId}/moderation`,
-      { status, reason, reportId: reportId ?? null },
-      "question moderationを実行しました。"
-    );
+    openAdminAction({
+      title: "question moderation",
+      description: "questionのstatusを変更します。完全削除は行わず、既存ログは監査用に残します。",
+      targetLabel,
+      actionLabel: `question -> ${status}`,
+      reasonPlaceholder: `questionを${status}に変更する理由`,
+      danger: status === "suspended",
+      onConfirm: (reason) => mutate(
+        `/api/admin/questions/${questionId}/moderation`,
+        { status, reason, reportId: reportId ?? null },
+        "question moderationを実行しました。"
+      )
+    });
   }
 
-  async function suspendUser(userId: string) {
-    if (!window.confirm("このユーザーを停止します。復帰APIはPhase 7では作りません。")) {
-      return;
-    }
-
-    const reason = promptReason("ユーザー停止の理由");
-
-    if (!reason) {
-      return;
-    }
-
-    await mutate(
-      `/api/admin/users/${userId}/suspend`,
-      { reason },
-      "userを停止しました。"
-    );
+  function suspendUser(user: UserItem) {
+    openAdminAction({
+      title: "user停止",
+      description: "profiles.status と world_members.status を suspended に更新します。復帰APIはPhase 7では作りません。",
+      targetLabel: `${user.displayName} / ${user.role}`,
+      actionLabel: "user -> suspended",
+      reasonPlaceholder: "ユーザー停止の理由",
+      danger: true,
+      onConfirm: (reason) => mutate(
+        `/api/admin/users/${user.id}/suspend`,
+        { reason },
+        "userを停止しました。"
+      )
+    });
   }
 
-  async function updateWaitlistStatus(itemId: string, status: AdminWaitlistStatus) {
-    const reason = status === "rejected"
-      ? promptReason("waitlistをrejectedにする理由")
-      : window.prompt("waitlist status更新理由（任意）")?.trim() ?? "";
-
-    if (status === "rejected" && !reason) {
-      return;
-    }
-
-    await mutate(
-      `/api/admin/waitlist/${itemId}`,
-      { status, reason },
-      "waitlist statusを更新しました。"
-    );
+  function updateWaitlistStatus(item: WaitlistItem, status: AdminWaitlistStatus) {
+    openAdminAction({
+      title: "waitlist status更新",
+      description: "waitlistの状態を更新し、admin_audit_logsに記録します。rejectedのみreason必須です。",
+      targetLabel: `${item.displayName} / ${item.email}`,
+      actionLabel: `waitlist -> ${status}`,
+      reasonPlaceholder: status === "rejected"
+        ? "waitlistをrejectedにする理由"
+        : "waitlist status更新理由（任意）",
+      reasonRequired: status === "rejected",
+      onConfirm: (reason) => mutate(
+        `/api/admin/waitlist/${item.id}`,
+        { status, reason },
+        "waitlist statusを更新しました。"
+      )
+    });
   }
 
   async function createInvite(event: React.FormEvent<HTMLFormElement>) {
@@ -524,6 +564,80 @@ export function AdminDashboardClient({ adminName }: { adminName: string }) {
         </p>
       ) : null}
 
+      {pendingAction ? (
+        <Surface
+          className={
+            pendingAction.danger
+              ? "border-rose-200 bg-rose-50"
+              : "border-amber-200 bg-amber-50"
+          }
+        >
+          <form className="grid gap-4" onSubmit={confirmPendingAction}>
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <p className="text-xs font-medium uppercase tracking-[0.08em] text-[color:var(--muted)]">
+                  Admin confirmation
+                </p>
+                <h2 className="mt-1 font-semibold">{pendingAction.title}</h2>
+                <p className="mt-1 text-sm text-[color:var(--muted)]">
+                  {pendingAction.description}
+                </p>
+              </div>
+              <Badge tone={pendingAction.danger ? "red" : "amber"}>
+                {pendingAction.actionLabel}
+              </Badge>
+            </div>
+            <dl className="grid gap-3 text-sm sm:grid-cols-2">
+              <div className="rounded-md border border-white/70 bg-white/70 p-3">
+                <dt className="text-xs font-medium uppercase tracking-[0.08em] text-[color:var(--muted)]">
+                  対象
+                </dt>
+                <dd className="mt-1 break-words font-semibold">
+                  {pendingAction.targetLabel}
+                </dd>
+              </div>
+              <div className="rounded-md border border-white/70 bg-white/70 p-3">
+                <dt className="text-xs font-medium uppercase tracking-[0.08em] text-[color:var(--muted)]">
+                  操作
+                </dt>
+                <dd className="mt-1 font-semibold">{pendingAction.actionLabel}</dd>
+              </div>
+            </dl>
+            <Field
+              label={pendingAction.reasonRequired === false ? "reason（任意）" : "reason"}
+            >
+              <TextInput
+                onChange={(event) => setPendingReason(event.target.value)}
+                placeholder={pendingAction.reasonPlaceholder}
+                required={pendingAction.reasonRequired !== false}
+                value={pendingReason}
+              />
+            </Field>
+            <div className="flex flex-wrap gap-2">
+              <button
+                className={`focus-ring min-h-11 rounded-md px-4 text-sm font-semibold text-white disabled:bg-stone-400 ${
+                  pendingAction.danger
+                    ? "bg-rose-700 hover:bg-rose-800"
+                    : "bg-[color:var(--accent-strong)] hover:bg-[color:var(--accent)]"
+                }`}
+                disabled={submitting}
+                type="submit"
+              >
+                確認して実行
+              </button>
+              <button
+                className="focus-ring min-h-11 rounded-md border border-[color:var(--line)] bg-white px-4 text-sm font-semibold disabled:opacity-50"
+                disabled={submitting}
+                onClick={cancelPendingAction}
+                type="button"
+              >
+                キャンセル
+              </button>
+            </div>
+          </form>
+        </Surface>
+      ) : null}
+
       {loading ? (
         <Surface>
           <p className="text-sm text-[color:var(--muted)]">admin dataを読み込み中...</p>
@@ -577,7 +691,7 @@ export function AdminDashboardClient({ adminName }: { adminName: string }) {
                         className="focus-ring min-h-10 rounded-md border border-[color:var(--line)] bg-white px-3 text-sm font-semibold disabled:opacity-50"
                         disabled={submitting || report.status === status}
                         key={status}
-                        onClick={() => void updateReportStatus(report.id, status)}
+                        onClick={() => updateReportStatus(report, status)}
                         type="button"
                       >
                         {status}
@@ -591,7 +705,8 @@ export function AdminDashboardClient({ adminName }: { adminName: string }) {
                           onClick={() => void moderateQuestion(
                             report.question!.id,
                             "review_required",
-                            report.id
+                            report.id,
+                            report.question!.bodyPreview
                           )}
                           type="button"
                         >
@@ -603,7 +718,8 @@ export function AdminDashboardClient({ adminName }: { adminName: string }) {
                           onClick={() => void moderateQuestion(
                             report.question!.id,
                             "suspended",
-                            report.id
+                            report.id,
+                            report.question!.bodyPreview
                           )}
                           type="button"
                         >
@@ -669,7 +785,7 @@ export function AdminDashboardClient({ adminName }: { adminName: string }) {
                   <button
                     className="focus-ring min-h-10 rounded-md border border-amber-200 bg-amber-50 px-3 text-sm font-semibold text-amber-900 disabled:opacity-50"
                     disabled={submitting || question.status === "review_required"}
-                    onClick={() => void moderateQuestion(question.id, "review_required")}
+                    onClick={() => moderateQuestion(question.id, "review_required", undefined, question.bodyPreview)}
                     type="button"
                   >
                     review_required
@@ -677,7 +793,7 @@ export function AdminDashboardClient({ adminName }: { adminName: string }) {
                   <button
                     className="focus-ring min-h-10 rounded-md border border-rose-200 bg-rose-50 px-3 text-sm font-semibold text-rose-900 disabled:opacity-50"
                     disabled={submitting || question.status === "suspended"}
-                    onClick={() => void moderateQuestion(question.id, "suspended")}
+                    onClick={() => moderateQuestion(question.id, "suspended", undefined, question.bodyPreview)}
                     type="button"
                   >
                     suspended
@@ -717,7 +833,7 @@ export function AdminDashboardClient({ adminName }: { adminName: string }) {
                 <button
                   className="focus-ring mt-3 min-h-10 w-full rounded-md border border-rose-200 bg-rose-50 px-3 text-sm font-semibold text-rose-900 disabled:opacity-50"
                   disabled={submitting || user.status === "suspended"}
-                  onClick={() => void suspendUser(user.id)}
+                  onClick={() => suspendUser(user)}
                   type="button"
                 >
                   user停止
@@ -748,7 +864,7 @@ export function AdminDashboardClient({ adminName }: { adminName: string }) {
                         className="focus-ring min-h-10 rounded-md border border-[color:var(--line)] bg-white px-3 text-sm font-semibold disabled:opacity-50"
                         disabled={submitting || item.status === status}
                         key={status}
-                        onClick={() => void updateWaitlistStatus(item.id, status)}
+                        onClick={() => updateWaitlistStatus(item, status)}
                         type="button"
                       >
                         {status}

@@ -15,7 +15,7 @@ export default function LoginPage() {
             登録へ
           </ButtonLink>
         }
-        description="Phase 1ではSupabase localのemail/password認証でログインします。"
+        description="MVP初期はSupabase localのemail/password認証でログインします。"
         eyebrow="Login"
         title="ログイン"
       />

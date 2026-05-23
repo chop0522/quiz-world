@@ -28,7 +28,7 @@ export default function LandingPage() {
           value={`${worldSnapshot.members}/${worldSnapshot.memberLimit}`}
         />
         <Metric
-          helper="Phase 1は画面内通知"
+          helper="MVP初期は画面内通知"
           label="通知"
           value="15秒ポーリング"
         />
@@ -36,7 +36,7 @@ export default function LandingPage() {
       </section>
 
       <Section
-        description="Phase 0ではDB接続やAPI処理を作らず、ローカルで画面遷移とMVP方針を確認できる土台に留めています。"
+        description="Phase 1〜7のMVP主要ループはSupabase localで確認済みです。cloud環境、Web Push、Realtime、production deployはまだ扱いません。"
         title="MVPの固定方針"
       >
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">

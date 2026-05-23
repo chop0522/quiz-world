@@ -9,7 +9,7 @@ export default function CreatePage() {
   return (
     <>
       <PageHeader
-        description="Phase 2では四択クイズの作成、保存、編集までを扱います。配信、通知、回答、結果表示はまだ実装しません。"
+        description="四択クイズを作成し、activeな問題は出題できます。配信、回答、結果、評価、通報、rank events、admin moderationまでlocalで確認済みです。"
         eyebrow="Create"
         title="四択クイズを作成"
       />

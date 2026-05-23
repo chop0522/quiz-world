@@ -146,7 +146,7 @@ export function SignupForm() {
           value={email}
         />
       </Field>
-      <Field label="パスワード" hint="8文字以上。Phase 1ではemail/password方式で開始します。">
+      <Field label="パスワード" hint="8文字以上。MVP初期はemail/password方式で開始します。">
         <TextInput
           autoComplete="new-password"
           minLength={8}

@@ -2,7 +2,7 @@
 
 通知型早押しクイズワールドの専用リポジトリです。
 
-Phase 1の signup/auth ローカル実装は完了・push・tag済みです。Phase 2の四択クイズ作成local実装も完了・push・tag済みです。Phase 3 quiz launch / recipients local実装も完了・push・tag済みです。Phase 4 answer submission / ranking local実装も完了・push・tag済みです。Phase 5 result / rating / reports のlocal実装も完了・push・tag済みです。Phase 6 rank_events / ranking local実装も完了・push・tag済みです。Phase 7 admin / moderation のlocal実装も完了・push・tag済みです。Phase 8 10-user local smoke / ops rehearsalは89チェックpass、DB reset済みです。Phase 8 manual UI rehearsalもSupabase localのみで実行済みです。既存Smart Buzzerとは別プロジェクトとして扱います。
+Phase 1の signup/auth ローカル実装は完了・push・tag済みです。Phase 2の四択クイズ作成local実装も完了・push・tag済みです。Phase 3 quiz launch / recipients local実装も完了・push・tag済みです。Phase 4 answer submission / ranking local実装も完了・push・tag済みです。Phase 5 result / rating / reports のlocal実装も完了・push・tag済みです。Phase 6 rank_events / ranking local実装も完了・push・tag済みです。Phase 7 admin / moderation のlocal実装も完了・push・tag済みです。Phase 8 10-user local smoke / ops rehearsalは89チェックpass、DB reset済みです。Phase 8 manual UI rehearsalもSupabase localのみで実行済みで、P1の古いPhase文言とadmin危険操作UIは最小修正・限定再確認済みです。既存Smart Buzzerとは別プロジェクトとして扱います。
 
 Smart Buzzer の production / Stripe / Vercel / Supabase / env / legal page / cleanup / live key には触れません。
 
@@ -268,7 +268,7 @@ Phase 7では、10人テストを安全に運用するための簡易admin / mod
 - invite code発行
 - admin API: reports / questions / users / waitlist / invites / audit logs
 - world member / profile状態確認
-- 管理操作の確認ダイアログ
+- 管理操作の画面内確認UI
 - 管理操作ログ
 
 Phase 7の固定方針:
@@ -354,13 +354,13 @@ Smart Buzzer のSupabase/Vercel/Stripe/envとは混ぜません。
 - Phase 8で確認するものはsignup、invite/waitlist、question、launch、/home polling、answer、result、rating/report、rank_events、admin moderation、admin_audit_logsです。
 - Phase 8 local smoke / ops rehearsalは89チェックpass、実行後DB reset済みです。
 - Phase 8 manual UI rehearsal planを作成済みです。自動smokeではなく、人間がブラウザで操作したときの導線、表示、分かりやすさをSupabase localだけで確認します。
-- Phase 8 manual UI rehearsalはSupabase localのみで実行済みです。P0はなし、P1は古いPhase文言とadmin危険操作UI、P2はrating/report送信後状態、rank説明、world補助指標、legal文言です。
+- Phase 8 manual UI rehearsalはSupabase localのみで実行済みです。P0はなし、P1の古いPhase文言は更新済み、admin危険操作UIは対象・操作・reasonを見直せる画面内確認UIへ最小改善済みで、限定再確認もpassです。P2のうちrating/report送信後状態とlegal文言は最小修正済みです。rank説明とworld補助指標は既知制約として残します。
 - Phase 8ではSupabase cloud / Vercel / Stripe / production deploy / Web Push / Realtimeは作りません。
 - Supabase / Vercel / Stripe のcloud環境はまだ作成しません。
 
 ## Next Work
 
-- Phase 8 manual UI rehearsal resultsをレビューする
-- P1を修正するか、10人テスト前の既知制約として明文化する
-- Phase 9 Preview環境検討へ進むか、P1整理後に判断する
+- P1/P2最小修正後の差分をレビューする
+- profileのrank説明と/world補助指標を10人テスト前の既知制約として扱うか最終確認する
+- Phase 9 Preview環境検討へ進むか判断する
 - Web Push / Realtime / cloud環境 / production deploy はまだ作らない

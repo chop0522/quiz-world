@@ -64,7 +64,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               Quiz World local scaffold
             </p>
             <p className="mt-1">
-              Phase 4はSupabase localの回答送信実装。cloud環境、Stripe、production deployは未作成です。
+              MVP主要ループはSupabase localで確認中。cloud環境、Stripe、production deployは未作成です。
             </p>
           </div>
           <div className="flex flex-wrap gap-3">

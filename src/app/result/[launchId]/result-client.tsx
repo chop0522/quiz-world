@@ -144,6 +144,8 @@ export function ResultClient({ launchId }: { launchId: string }) {
   const [loading, setLoading] = useState(true);
   const [submittingRating, setSubmittingRating] = useState(false);
   const [submittingReport, setSubmittingReport] = useState(false);
+  const [ratingSubmitted, setRatingSubmitted] = useState(false);
+  const [reportSubmitted, setReportSubmitted] = useState(false);
   const [rating, setRating] = useState<RatingValue>("good");
   const [ratingReason, setRatingReason] = useState<RatingReasonTag>("面白い");
   const [reportReason, setReportReason] = useState<ReportReasonTag>("不適切");
@@ -209,6 +211,7 @@ export function ResultClient({ launchId }: { launchId: string }) {
       }
 
       setMessage("評価を保存しました。");
+      setRatingSubmitted(true);
     } finally {
       setSubmittingRating(false);
     }
@@ -241,6 +244,7 @@ export function ResultClient({ launchId }: { launchId: string }) {
       }
 
       setMessage("通報を送信しました。");
+      setReportSubmitted(true);
     } finally {
       setSubmittingReport(false);
     }
@@ -272,6 +276,9 @@ export function ResultClient({ launchId }: { launchId: string }) {
   if (!result) {
     return null;
   }
+
+  const ratingLocked = submittingRating || ratingSubmitted;
+  const reportLocked = submittingReport || reportSubmitted;
 
   return (
     <div className="grid gap-6">
@@ -399,14 +406,20 @@ export function ResultClient({ launchId }: { launchId: string }) {
               </p>
             ) : (
               <>
+                {ratingSubmitted ? (
+                  <p className="rounded-md border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-800">
+                    評価済みです。MVPでは評価の変更はできません。
+                  </p>
+                ) : null}
                 <div className="flex flex-wrap gap-2">
                   {ratingValues.map((value) => (
                     <button
-                      className={`focus-ring inline-flex min-h-10 items-center gap-2 rounded-md border px-3 text-sm font-medium ${
+                      className={`focus-ring inline-flex min-h-10 items-center gap-2 rounded-md border px-3 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-60 ${
                         rating === value
                           ? "border-[color:var(--accent-strong)] bg-emerald-50 text-emerald-900"
                           : "border-[color:var(--line)] bg-white"
                       }`}
+                      disabled={ratingLocked}
                       key={value}
                       onClick={() => setRating(value)}
                       type="button"
@@ -418,6 +431,7 @@ export function ResultClient({ launchId }: { launchId: string }) {
                 </div>
                 <Field label="理由タグ">
                   <SelectInput
+                    disabled={ratingLocked}
                     onChange={(event) => setRatingReason(event.target.value as RatingReasonTag)}
                     value={ratingReason}
                   >
@@ -428,12 +442,12 @@ export function ResultClient({ launchId }: { launchId: string }) {
                 </Field>
                 <button
                   className="focus-ring inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-[color:var(--accent-strong)] px-4 py-2 text-sm font-semibold text-white disabled:bg-stone-400"
-                  disabled={submittingRating}
+                  disabled={ratingLocked}
                   onClick={() => void submitRating()}
                   type="button"
                 >
                   <Trophy aria-hidden className="size-4" />
-                  {submittingRating ? "保存中..." : "評価を送信"}
+                  {ratingSubmitted ? "評価済み" : submittingRating ? "保存中..." : "評価を送信"}
                 </button>
               </>
             )}
@@ -442,8 +456,14 @@ export function ResultClient({ launchId }: { launchId: string }) {
 
         <Section title="通報">
           <Surface className="grid gap-4">
+            {reportSubmitted ? (
+              <p className="rounded-md border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-800">
+                通報済みです。同じ内容の重複通報はできません。
+              </p>
+            ) : null}
             <Field label="通報理由">
               <SelectInput
+                disabled={reportLocked}
                 onChange={(event) => setReportReason(event.target.value as ReportReasonTag)}
                 value={reportReason}
               >
@@ -454,12 +474,12 @@ export function ResultClient({ launchId }: { launchId: string }) {
             </Field>
             <button
               className="focus-ring inline-flex min-h-11 items-center justify-center gap-2 rounded-md border border-rose-200 bg-rose-50 px-4 py-2 text-sm font-semibold text-rose-800 disabled:bg-stone-100 disabled:text-stone-500"
-              disabled={submittingReport}
+              disabled={reportLocked}
               onClick={() => void submitReport()}
               type="button"
             >
               <Flag aria-hidden className="size-4" />
-              {submittingReport ? "送信中..." : "通報する"}
+              {reportSubmitted ? "通報済み" : submittingReport ? "送信中..." : "通報する"}
             </button>
           </Surface>
         </Section>
