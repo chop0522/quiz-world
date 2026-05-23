@@ -6,16 +6,39 @@
 
 現時点ではまだSupabase cloud project、Vercel project、Production環境、Stripe、Web Push、Realtimeは作らない。Smart Buzzerのproduction / Stripe / Vercel / Supabase / env / legal page / cleanup / live keyには触らない。
 
+## レビュー結果
+
+2026-05-23時点のレビュー結果は「条件付きGO候補（実作成前）」である。
+
+local実装、Phase 8 smoke、manual UI rehearsal follow-up、Phase 9計画、migration順、seed方針、env項目、rollback / cleanup方針は整理済みである。今回、project名、plan、Preview branch、Preview invite code、Preview共有範囲の初期方針を反映した。
+
+決定済み:
+
+- Supabase project名: `quiz-world-preview`
+- Supabase plan: Free または最小プラン
+- Vercel project名: `quiz-world-preview`
+- GitHub repo: `chop0522/quiz-world`
+- Preview branch: `preview`
+- Preview invite code: `SEASON0-PREVIEW-001`
+- Preview共有範囲: owner/adminのみから開始
+- 初期admin email: 実値はdocsに書かず、Vercel Preview envの `ADMIN_EMAILS` に設定する
+
+実作成前にまだ人間が記録する項目:
+
+- Supabase region
+- Preview DB cleanup担当
+- 最終GO/NO-GO判断
+
 ## 1. Phase 9で実作成するもの
 
 Phase 9の実行判断後に作成する対象は以下に限定する。
 
-| 対象 | 用途 | 注意 |
+| 対象 | 用途 | レビュー結果 |
 | --- | --- | --- |
-| Quiz World専用 Supabase development project | Preview DB / Auth / RLS確認 | Smart Buzzerとは別projectにする |
-| Quiz World専用 Vercel Preview project | Preview URLでの少人数確認 | Production domainは設定しない |
-| Preview env | Supabase URL / keys / admin emailsなど | secretはVercel envにのみ置く |
-| Preview seed data | 初期world、初期admin、invite code | 本番データではない |
+| Quiz World専用 Supabase development project | Preview DB / Auth / RLS確認 | 作成対象。project名は `quiz-world-preview` |
+| Quiz World専用 Vercel Preview project | Preview URLでの少人数確認 | 作成対象。project名は `quiz-world-preview` |
+| Preview env | Supabase URL / keys / admin emailsなど | Vercel Preview envにのみ設定。repoには入れない |
+| Preview seed data | 初期world、初期admin、invite code | local seed相当 + `SEASON0-PREVIEW-001` |
 
 ## 2. Phase 9でまだ作らないもの
 
@@ -23,6 +46,8 @@ Phase 9では以下を作らない。
 
 - Production project
 - Production deploy
+- Production domain
+- Production env
 - Stripe
 - Web Push
 - Realtime
@@ -34,16 +59,27 @@ Phase 9では以下を作らない。
 
 ## 3. Supabase作成前チェック
 
-| チェック | GO条件 | 状態 |
+| チェック | レビュー結果 | GO/NO-GO |
 | --- | --- | --- |
-| project名 | `quiz-world-preview` などSmart Buzzerと混同しない名前 | 未確認 |
-| region | 10人テスト候補者に近いregionを選ぶ | 未確認 |
-| plan | Preview用途に必要なplanを決める | 未確認 |
-| project分離 | Smart Buzzerと別projectであることを確認する | 未確認 |
-| reset / cleanup | Preview DBをreset / cleanupできる運用を決める | 未確認 |
-| service role key | server専用。repoやclientに出さない運用を決める | 未確認 |
-| RLS | migration適用後にRLS有効を確認する | 未確認 |
-| project id記録 | 作業前後にproject id / URLを記録する | 未確認 |
+| project名 | `quiz-world-preview` | GO候補 |
+| region | 人間が選んだregionを実作成前に記録する。日本/東アジアに近いregionを第一候補にする | 人間記録待ち |
+| plan | Free または最小プラン。quota不足時のみ有償planを検討する | GO候補 |
+| project分離 | Smart Buzzerとは別projectを新規作成する。既存Smart Buzzer projectは開かない | GO条件 |
+| reset / cleanup | Preview DBは破棄可能データのみ。reset / cleanup手順を本ドキュメントで定義済み | GO候補 |
+| service role key | Vercel Preview envのserver側にのみ保存。repo、docs、client bundleには出さない | GO条件 |
+| RLS | migration適用後、全対象tableでRLS有効を確認する | GO条件 |
+| project id記録 | 作成後にproject id / URLをこの表の下に記録する。実値はpublic URLのみ可、secretは書かない | 作成後記録 |
+
+作成後の記録欄:
+
+| 項目 | 値 |
+| --- | --- |
+| Supabase project name | `quiz-world-preview` |
+| Supabase project id | 作成後に記録 |
+| Supabase public URL | 作成後に記録 |
+| Supabase region | 実作成前に人間が選んだregionを記録 |
+| Supabase plan | Free または最小プラン |
+| service role key保存先 | Vercel Preview env only |
 
 作成前に必ず確認すること:
 
@@ -51,18 +87,30 @@ Phase 9では以下を作らない。
 - Localの `.env.local` をそのまま流用しない
 - service role keyの保存先がVercel Preview envだけに限定されている
 - Preview DBを削除しても困らないデータだけを入れる
+- 作成前後にproject id / URLを確認して、誤project操作を避ける
 
 ## 4. Vercel作成前チェック
 
-| チェック | GO条件 | 状態 |
+| チェック | レビュー結果 | GO/NO-GO |
 | --- | --- | --- |
-| project名 | Quiz World専用名にする | 未確認 |
-| GitHub repo接続先 | `chop0522/quiz-world` などQuiz World専用repoだけを接続する | 未確認 |
-| Preview branch運用 | `main` 直結かPreview専用branchかを決める | 未確認 |
-| Production domain | 未設定にする | 未確認 |
-| Production env | 未設定にする | 未確認 |
-| project分離 | Smart BuzzerのVercel projectとは別であることを確認する | 未確認 |
-| Preview URL共有範囲 | 共有先を限定する | 未確認 |
+| project名 | `quiz-world-preview` | GO候補 |
+| GitHub repo接続先 | `chop0522/quiz-world` のみ | GO条件 |
+| Preview branch運用 | `preview` branchを使う | GO候補 |
+| Production domain | 設定しない | GO条件 |
+| Production env | 設定しない | GO条件 |
+| project分離 | Smart BuzzerのVercel projectとは別projectにする | GO条件 |
+| Preview URL共有範囲 | owner/adminのみから開始。smoke pass後に限定共有を検討 | GO候補 |
+
+作成後の記録欄:
+
+| 項目 | 値 |
+| --- | --- |
+| Vercel project name | `quiz-world-preview` |
+| GitHub repo | `chop0522/quiz-world` |
+| Preview branch | `preview` |
+| Preview URL | 作成後に記録 |
+| Production domain | 未設定 |
+| Production env | 未設定 |
 
 作成前に必ず確認すること:
 
@@ -70,20 +118,21 @@ Phase 9では以下を作らない。
 - Production環境を有効化しない
 - Preview URLの共有先を決める
 - Preview envの入力担当者を決める
+- Vercel上でproject名とGitHub repo接続先を目視確認する
 
 ## 5. envチェック
 
 Preview envはVercel Project Settingsに設定する。repoには入れない。
 
-| env | 必須 | 配置 | 注意 |
-| --- | --- | --- | --- |
-| `NEXT_PUBLIC_SUPABASE_URL` | 必須 | Vercel Preview env | Supabase development projectのURL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | 必須 | Vercel Preview env | public値だがrepoには入れない |
-| `SUPABASE_SERVICE_ROLE_KEY` | 必須 | Vercel Preview env | server専用。clientに出さない |
-| `NEXT_PUBLIC_APP_URL` | 必須 | Vercel Preview env | Preview URL |
-| `ADMIN_EMAILS` | 必須 | Vercel Preview env | 初期admin emailをカンマ区切りで指定 |
-| `QUIZ_WORLD_ID` | 必須 | Vercel Preview env | 初期world id |
-| `MAX_INITIAL_MEMBERS` | 必須 | Vercel Preview env | MVP初期は10 |
+| env | 値の方針 | GO/NO-GO |
+| --- | --- | --- |
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase development project作成後のpublic URL。実値はrepoに書かない | 作成後設定 |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase development project作成後のanon / publishable key。実値はrepoに書かない | 作成後設定 |
+| `SUPABASE_SERVICE_ROLE_KEY` | server専用。Vercel Preview envにのみ保存。実値はrepo、docs、clientに出さない | GO条件 |
+| `NEXT_PUBLIC_APP_URL` | Vercel Preview URL。作成後に設定 | 作成後設定 |
+| `ADMIN_EMAILS` | 初期admin emailをVercel Preview envに設定。実値はdocsに書かない | env設定待ち |
+| `QUIZ_WORLD_ID` | `00000000-0000-4000-8000-000000000001` | GO候補 |
+| `MAX_INITIAL_MEMBERS` | `10` | GO候補 |
 
 確認事項:
 
@@ -95,37 +144,63 @@ Preview envはVercel Project Settingsに設定する。repoには入れない。
 
 ## 6. migration / seed チェック
 
-### migration適用手順
+### migration適用順
 
-Preview project作成後に、以下の順序でmigrationを適用する。
+Preview project作成後に、以下の順序で既存migrationを適用する。
 
-1. 接続先Supabase project id / URLがQuiz World Previewであることを確認する
-2. `supabase/migrations` の適用順を確認する
-3. Preview DBへmigrationを適用する
-4. RLSと主要indexを確認する
-5. `worlds`、`profiles`、`world_members`、`questions`、`quiz_launches`、`answers`、`question_ratings`、`reports`、`rank_events`、`admin_audit_logs` の作成を確認する
+1. `20260516000100_phase1_signup_auth.sql`
+2. `20260521000100_phase2_questions.sql`
+3. `20260521000200_phase3_quiz_launches.sql`
+4. `20260522000100_phase4_answers.sql`
+5. `20260522000200_phase5_result_rating_reports.sql`
+6. `20260522000300_phase6_rank_events.sql`
+7. `20260522000400_phase7_admin_moderation.sql`
+
+適用前チェック:
+
+- 接続先Supabase project id / URLがQuiz World Previewであることを確認する
+- Smart Buzzer projectではないことを確認する
+- migration適用前後のproject id / URLを記録する
+- 新規DB migration SQLはこのレビューでは作らない
+
+適用後チェック:
+
+- 主要tableが作成されている
+- RLSが有効である
+- `complete_signup`、`submit_quiz_answer`、`apply_answer_rank_events`、`apply_rating_rank_events`、admin RPCが存在する
+- non-admin / suspended user制御がsmokeで確認できる
 
 ### seed投入手順
 
-初期seedは最小構成にする。
+local seedと同じ初期worldを使う。
 
-| データ | 値 |
-| --- | --- |
-| 初期world | `クイズワールド` |
-| world id | `00000000-0000-4000-8000-000000000001` |
-| member_limit | `10` |
-| current_season | `0` |
-| 初期admin | `ADMIN_EMAILS` 対象メールでsignup後に確認 |
-| 初期invite code | `SEASON0-TEST-001` またはPreview専用code |
+| データ | 値 | レビュー結果 |
+| --- | --- | --- |
+| 初期world | `クイズワールド` | GO候補 |
+| world id | `00000000-0000-4000-8000-000000000001` | GO候補 |
+| member_limit | `10` | GO候補 |
+| current_season | `0` | GO候補 |
+| 初期admin | `ADMIN_EMAILS` 対象メールでsignup後に `profiles.role = admin` を確認。email実値はdocsに書かない | env設定待ち |
+| 初期invite code | `SEASON0-PREVIEW-001` | GO候補 |
+
+seed投入方針:
+
+- Previewでは本番ユーザーを入れない
+- まずadmin 1名とテストユーザー2〜3名でsmokeする
+- invite code発行はadmin画面でも確認する
+- Preview用invite codeは10人テスト本番codeと混ぜない
 
 ### Preview reset手順
 
 Preview resetは実行前に確認を挟む。
 
-- reset対象projectがQuiz World Previewであることを確認する
-- Smart Buzzerのproject id / URLではないことを確認する
-- test users、questions、launches、answers、ratings、reports、rank_events、admin_audit_logs、waitlist、invitesの扱いを決める
-- reset後に初期world / invite / adminを再作成できることを確認する
+1. reset対象projectがQuiz World Previewであることを確認する
+2. Smart Buzzerのproject id / URLではないことを確認する
+3. test users、questions、launches、answers、ratings、reports、rank_events、admin_audit_logs、waitlist、invitesを削除またはreset対象にする
+4. reset後に初期world / invite / adminを再作成できることを確認する
+5. reset作業を行った日時、担当者、対象project idを記録する
+
+Preview reset / cleanup担当は人間記録待ち。
 
 ## 7. Preview smoke checklist
 
@@ -155,19 +230,20 @@ API / DB確認:
 - `rank_events` がanswer/rating後に作られる
 - `correctChoiceId` は `/quiz/[launchId]` の回答受付中APIでは返らない
 - `category_note` とemailが不要なresponseに出ない
+- service role keyがclient bundleやresponseに出ない
 
 ## 8. rollback / cleanup
 
 Preview環境は本番ではないため、rollback / cleanupを事前に決める。
 
-| 操作 | 方針 | 実行前確認 |
+| 操作 | 方針 | GO/NO-GO |
 | --- | --- | --- |
-| Vercel Preview env削除 | Preview projectのenvだけ削除 | Smart Buzzer projectではないこと |
-| Supabase Preview DB reset | Preview DBだけreset | project id / URLがQuiz World Previewであること |
-| Supabase project削除判断 | Previewが不要になった場合のみ検討 | 削除前に必要ログを控える |
-| test users削除 | Preview用ユーザーだけ対象 | 本番ユーザーではないこと |
-| invite code削除 | Preview用codeを削除または無効化 | 10人テスト用codeと混ぜない |
-| audit log保持判断 | 監査目的で保持するかresetするか決める | 個人情報と運用記録の扱いを確認 |
+| Vercel Preview env削除 | Preview projectのenvだけ削除 | GO候補 |
+| Supabase Preview DB reset | Preview DBだけreset | GO候補 |
+| Supabase project削除判断 | Previewが不要になった場合のみ検討 | 後続判断 |
+| test users削除 | Preview用ユーザーだけ対象 | GO候補 |
+| invite code削除 | Preview用codeを削除または無効化 | GO候補 |
+| audit log保持判断 | 監査目的で保持するかresetするか決める | 後続判断 |
 
 cleanup対象候補:
 
@@ -181,22 +257,31 @@ cleanup対象候補:
 - rank_events
 - admin_audit_logs
 
+cleanup担当は人間記録待ち。audit log保持方針とSupabase project削除判断はPreview smoke後の後続判断にする。
+
 ## 9. GO条件
 
 以下をすべて満たす場合のみ、Phase 9 Preview環境の実作成へ進める。
 
+すでに確認済み:
+
 - local `main` がcleanである
-- latest tagが確認済みである
 - Phase 8 local smoke / manual rehearsalが通過済みである
 - P0がない
 - P1が対応済みである
 - P2の残項目が既知制約として整理されている
 - secretをrepoに入れない運用が確認済みである
-- Smart Buzzerと混ざらないことを確認済みである
-- Supabase development project名、region、planが決まっている
-- Vercel Preview project名、repo接続先、Preview branch運用が決まっている
-- `ADMIN_EMAILS` と初期invite codeが決まっている
-- Preview reset / cleanupの担当と手順が決まっている
+- Smart Buzzerと混ざらない方針が明文化されている
+- migration適用順が確認済みである
+- env項目が整理済みである
+
+実作成前に追加確認すること:
+
+- latest tag / origin/mainを確認する
+- Supabase regionを記録する
+- `ADMIN_EMAILS` の実値をVercel Preview envに設定する
+- Preview reset / cleanup担当を決める
+- 作成直前にSmart BuzzerのDashboardを開いていないことを確認する
 
 ## 10. NO-GO条件
 
@@ -212,6 +297,7 @@ cleanup対象候補:
 - legal草案が空、または18歳以上限定・UGC・通知・停止方針と大きく矛盾している
 - Production domainやProduction envを同時に作ろうとしている
 - Stripe、Web Push、Realtimeを同時に入れようとしている
+- Supabase region、admin emailのenv設定、cleanup担当のいずれかが未確認のまま実作成しようとしている
 
 ## 実作成前の最終判断メモ
 
@@ -219,13 +305,14 @@ Phase 9実作成へ進む直前に、以下を埋める。
 
 | 項目 | 値 |
 | --- | --- |
-| Supabase project名 | 未定 |
-| Supabase region | 未定 |
-| Supabase plan | 未定 |
-| Vercel project名 | 未定 |
-| Preview branch | 未定 |
-| 初期admin email | 未定 |
-| Preview invite code | 未定 |
-| Preview共有先 | 未定 |
-| cleanup担当 | 未定 |
-| GO / NO-GO判断 | 未定 |
+| Supabase project名 | `quiz-world-preview` |
+| Supabase region | 人間が選んだregionを実作成前に記録 |
+| Supabase plan | Free または最小プラン |
+| Vercel project名 | `quiz-world-preview` |
+| GitHub repo | `chop0522/quiz-world` |
+| Preview branch | `preview` |
+| 初期admin email | docsには実値を書かない。Vercel Preview envの `ADMIN_EMAILS` に設定 |
+| Preview invite code | `SEASON0-PREVIEW-001` |
+| Preview共有先 | owner/adminのみから開始 |
+| cleanup担当 | 担当者名または役割を実作成前に記録 |
+| GO / NO-GO判断 | まだ実作成前。Supabase region、admin env設定、cleanup担当が埋まればGO候補 |

@@ -2,7 +2,7 @@
 
 通知型早押しクイズワールドの専用リポジトリです。
 
-Phase 1の signup/auth ローカル実装は完了・push・tag済みです。Phase 2の四択クイズ作成local実装も完了・push・tag済みです。Phase 3 quiz launch / recipients local実装も完了・push・tag済みです。Phase 4 answer submission / ranking local実装も完了・push・tag済みです。Phase 5 result / rating / reports のlocal実装も完了・push・tag済みです。Phase 6 rank_events / ranking local実装も完了・push・tag済みです。Phase 7 admin / moderation のlocal実装も完了・push・tag済みです。Phase 8 10-user local smoke / ops rehearsalは89チェックpass、DB reset済みです。Phase 8 manual UI rehearsal follow-upも完了・push済みです。Phase 9 Preview環境は計画済みで、実行前チェックリストを作成中です。cloud環境はまだ実作成していません。既存Smart Buzzerとは別プロジェクトとして扱います。
+Phase 1の signup/auth ローカル実装は完了・push・tag済みです。Phase 2の四択クイズ作成local実装も完了・push・tag済みです。Phase 3 quiz launch / recipients local実装も完了・push・tag済みです。Phase 4 answer submission / ranking local実装も完了・push・tag済みです。Phase 5 result / rating / reports のlocal実装も完了・push・tag済みです。Phase 6 rank_events / ranking local実装も完了・push・tag済みです。Phase 7 admin / moderation のlocal実装も完了・push・tag済みです。Phase 8 10-user local smoke / ops rehearsalは89チェックpass、DB reset済みです。Phase 8 manual UI rehearsal follow-upも完了・push済みです。Phase 9 Preview環境は計画済みで、実行前GO/NO-GOレビューに人間決定項目を反映中です。cloud環境はまだ実作成していません。既存Smart Buzzerとは別プロジェクトとして扱います。
 
 Smart Buzzer の production / Stripe / Vercel / Supabase / env / legal page / cleanup / live key には触れません。
 
@@ -358,13 +358,13 @@ Smart Buzzer のSupabase/Vercel/Stripe/envとは混ぜません。
 - Phase 8 manual UI rehearsal planを作成済みです。自動smokeではなく、人間がブラウザで操作したときの導線、表示、分かりやすさをSupabase localだけで確認します。
 - Phase 8 manual UI rehearsal follow-upは完了・push済みです。P0はなし、P1は修正・再確認済みです。P2のうちrating/report送信後状態とlegal文言は最小修正済みで、rank説明とworld補助指標は既知制約として残します。
 - Phase 9 Preview環境計画docsはcommit・push済みです。Quiz World専用のSupabase development project / Vercel Preview projectへ移す準備は設計済みですが、cloud環境はまだ実作成しません。
-- Phase 9 Preview実行前チェックリストを作成中です。Supabase / Vercel / env / migration / seed / smoke / cleanupのGO/NO-GO条件を整理します。
+- Phase 9 Preview実行前チェックリストは作成済みで、GO/NO-GOレビューに人間決定項目を反映中です。project名、plan、Preview branch、Preview invite code、Preview共有範囲、env、migration、seed、smoke、cleanup方針は整理済みです。Supabase region、admin emailのVercel env設定、cleanup担当は実作成前確認として残します。
 - Phase 8ではSupabase cloud / Vercel / Stripe / production deploy / Web Push / Realtimeは作りません。
 - Supabase / Vercel / Stripe のcloud環境はまだ作成しません。
 
 ## Next Work
 
-- Phase 9 Preview実行前チェックリストをレビューする
-- Supabase development project名、Region、Vercel Preview project名、admin email、Preview用invite codeを決める
+- Phase 9 Preview実行前チェックリストの残項目を埋める
+- Supabase region、admin emailのVercel Preview env設定、cleanup担当を確認する
 - cloud環境の実作成へ進むか、もう一度local確認を挟むか判断する
 - Web Push / Realtime / cloud環境 / production deploy はまだ作らない
