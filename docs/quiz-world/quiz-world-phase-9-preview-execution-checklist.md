@@ -353,9 +353,9 @@ Step A実行時に確認済み / 今後も維持すること:
 - migration / seed適用、Vercel project作成、Production deploy、Stripe、Web Push、RealtimeをStep Aと同時に行おうとしている
 - Supabase作成条件が `quiz-world-preview`、個人アカウント、`Northeast Asia (Tokyo) ap-northeast-1`、Free planから外れている
 
-## Step A / Step B実作成結果メモ
+## Step A / Step B / Step C実作成結果メモ
 
-Step AでQuiz World専用Supabase development projectを作成し、Step BでPreview DBへmigration / seedを適用した結果を以下に記録する。
+Step AでQuiz World専用Supabase development projectを作成し、Step BでPreview DBへmigration / seedを適用した。Step CでPreview DB smokeを実行し、migration履歴、seed、主要table、RLS、table件数を確認した。
 
 | 項目 | 値 |
 | --- | --- |
@@ -368,6 +368,9 @@ Step AでQuiz World専用Supabase development projectを作成し、Step BでPre
 | Supabase organization / workspace | 個人アカウント |
 | Supabase project作成日時 | `2026-05-24 13:54 JST` |
 | migration / seed適用日時 | `2026-05-24 14:39 JST` |
+| Preview DB smoke実行日時 | `2026-05-24 15:13 JST` |
+| Preview DB smoke結果 | pass |
+| smoke確認内容 | migration履歴、初期world、Preview invite code、主要14table、RLS、table件数、Smart Buzzer混入なし |
 | Vercel project名 | `quiz-world-preview` |
 | GitHub repo | `chop0522/quiz-world` |
 | Preview branch | `preview` |
@@ -375,4 +378,4 @@ Step AでQuiz World専用Supabase development projectを作成し、Step BでPre
 | Preview invite code | `SEASON0-PREVIEW-001` |
 | Preview共有先 | owner/adminのみから開始 |
 | cleanup担当 | 自分 |
-| GO / NO-GO判断 | Step Bまで実行済み。Vercel project作成、Production deploy、Stripe、Web Push、Realtimeはまだ行わない |
+| GO / NO-GO判断 | Step Cまで実行済み。Vercel project作成、Production deploy、Stripe、Web Push、Realtimeはまだ行わない |
