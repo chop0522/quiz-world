@@ -4,15 +4,15 @@
 
 このドキュメントは、Phase 9でQuiz World専用Preview環境を実作成する直前のGO/NO-GO判断と、Stepごとの実行結果記録に使うチェックリストである。
 
-2026-05-24時点で、Step AとしてQuiz World専用Supabase development projectを作成済み、Step BとしてPreview DBへのmigration / seed適用済み、Step CとしてPreview DB smokeをpass済みである。Step DとしてVercel Preview project作成前のGO/NO-GOレビューを行い、Quiz World専用Vercel projectを作成済みである。Step D follow-upとしてVercel GitHub Appのrepository accessに `chop0522/quiz-world` を追加し、Vercel projectへGitHub repo接続を完了した。Production環境、Stripe、Web Push、Realtimeはまだ作らない。Smart Buzzerのproduction / Stripe / Vercel / Supabase / env / legal page / cleanup / live keyには触らない。
+2026-05-24時点で、Step AとしてQuiz World専用Supabase development projectを作成済み、Step BとしてPreview DBへのmigration / seed適用済み、Step CとしてPreview DB smokeをpass済みである。Step DとしてVercel Preview project作成前のGO/NO-GOレビューを行い、Quiz World専用Vercel projectを作成済みである。Step D follow-upとしてVercel GitHub Appのrepository accessに `chop0522/quiz-world` を追加し、Vercel projectへGitHub repo接続を完了した。Step EのVercel Preview env設定前チェックでは、想定外のProduction deploymentを検出したためNO-GOとし、Vercel env設定は行っていない。Stripe、Web Push、Realtimeはまだ作らない。Smart Buzzerのproduction / Stripe / Vercel / Supabase / env / legal page / cleanup / live keyには触らない。
 
 ## レビュー結果
 
-2026-05-24時点のレビュー結果は「Step D Vercel project作成済み / GitHub repo接続済み / Vercel env未設定 / Preview deploy未実行」である。
+2026-05-24時点のレビュー結果は「Step D Vercel project作成済み / GitHub repo接続済み / Step Eは想定外Production deployment検出によりNO-GO / Vercel env未設定」である。
 
 local実装、Phase 8 smoke、manual UI rehearsal follow-up、Phase 9計画、migration順、seed方針、env項目、rollback / cleanup方針は整理済みである。今回、Supabase organization / workspace、region、plan、cleanup担当、最終GO/NO-GO判断を人間決定済みとして反映した。
 
-cloud実作成はQuiz World専用Supabase development projectの作成、Preview DBへのmigration / seed適用、Quiz World専用Vercel project作成、GitHub repo接続まで完了した。Vercel env設定、Preview deploy、Production project / Production deploy、Stripe、Web Push、Realtimeはまだ行わない。
+cloud実作成はQuiz World専用Supabase development projectの作成、Preview DBへのmigration / seed適用、Quiz World専用Vercel project作成、GitHub repo接続まで完了した。Step Eでは事前確認のみ行い、Vercel env設定、Preview deploy、追加のProduction deploy、Stripe、Web Push、Realtimeは行わない。
 
 決定済み:
 
@@ -27,7 +27,7 @@ cloud実作成はQuiz World専用Supabase development projectの作成、Preview
 - Preview共有範囲: owner/adminのみから開始
 - 初期admin email: 決定済み。実値はdocsに書かず、Vercel Preview envの `ADMIN_EMAILS` にのみ設定する
 - Preview DB cleanup担当: 自分
-- 最終GO/NO-GO判断: Step DでVercel project作成済み。Step D follow-upでGitHub repo接続済み。Vercel env設定とPreview deployは未実行
+- 最終GO/NO-GO判断: Step DでVercel project作成済み。Step D follow-upでGitHub repo接続済み。Step Eは想定外Production deployment検出によりNO-GO。Vercel env設定は未実行
 
 Step A作成後の記録:
 
@@ -97,6 +97,21 @@ Step D follow-up GitHub App access確認:
 - Vercel repo接続再試行: `https://github.com/chop0522/quiz-world` を `quiz-world-preview` に接続
 - Vercel repo接続結果: `Connected`
 - Vercel env / Preview deploy / Production deploy: 未実行
+
+Step E Vercel Preview env設定前GO/NO-GO確認:
+
+- 実行日時: `2026-05-24 16:46 JST`
+- git状態: `main` と `origin/main` が同一commitでclean
+- 確認対象Vercel project: `quiz-world-preview` / `prj_fCviBUF2fYH077fLBUHV5uPFleMx`
+- GitHub repo接続: `chop0522/quiz-world` 接続済み
+- Vercel env確認: environment variablesなし
+- Production env: 未設定
+- Preview env: 未設定
+- deployments確認: 想定外のProduction deploymentが1件存在
+- Step E判断: NO-GO
+- NO-GO理由: Preview env設定前に想定外のProduction deploymentが存在するため、Vercel env設定へ進まない
+- 実施しなかったこと: Vercel env設定、Preview deploy、Production deploy、Production domain設定、Stripe、Web Push、Realtime
+- 次の必要作業: 想定外Production deploymentの扱いを決める。必要ならVercel側でdeploy/production設定の確認、cleanup、またはPreview branch運用を整理してからStep Eを再実行する
 
 ## 1. Phase 9で実作成するもの
 
@@ -459,6 +474,8 @@ Step AでQuiz World専用Supabase development projectを作成し、Step BでPre
 | Production domain / env | 未設定 |
 | Vercel env | 未設定 |
 | Preview deploy | 未実行 |
+| Step E事前確認 | 想定外のProduction deploymentを検出したためNO-GO |
+| Step E env設定 | 未実行 |
 | env確認 | environment variablesなし |
 | deployment確認 | deploymentsなし |
 | 初期admin email | 決定済み。docsには実値を書かない。Vercel Preview envの `ADMIN_EMAILS` にのみ設定 |
