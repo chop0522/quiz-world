@@ -638,11 +638,11 @@ Phase 9でcloud環境を実作成する前に、GO/NO-GOを判断するチェッ
 - Preview共有範囲はowner/adminのみから開始。
 - 初期admin emailは決定済み。実値はdocsに書かず、Vercel Preview envの `ADMIN_EMAILS` にのみ設定する。
 - Preview DB cleanup担当は自分。
-- 最終GO/NO-GO判断はStep AのみGO候補。
+- 最終GO/NO-GO判断はStep Aのみ実行済み。
 
-実作成前確認として残る項目:
+Step A作成後の記録:
 
-- Supabase project作成後のproject id / public URL記録
+- Supabase project id / public URLは `quiz-world-phase-9-preview-execution-checklist.md` にpublic情報として記録済み
 - migration / seed適用前の別GO判断
 - Vercel project作成前の別GO判断
 
@@ -659,18 +659,18 @@ Phase 9でcloud環境を実作成する前に、GO/NO-GOを判断するチェッ
 - GO条件
 - NO-GO条件
 
-チェックリストレビュー時点では、Supabase cloud project、Vercel project、Production deploy、Stripe、Web Push、Realtimeはまだ作らない。
+Step AとしてQuiz World専用Supabase development projectのみ作成済み。Vercel project、Production deploy、Stripe、Web Push、Realtimeはまだ作らない。
 
 チェックリストは `quiz-world-phase-9-preview-execution-checklist.md` に記録済み。
 
 ## 次の作業候補
 
-### A. Phase 9 Preview実行前GO/NO-GO判断
+### A. Phase 9 Preview残作業のGO/NO-GO判断
 
-- Step AとしてQuiz World専用Supabase development projectの作成だけを行うか最終確認する。
-- Supabase project作成時は `quiz-world-preview`、個人アカウント、`Northeast Asia (Tokyo) ap-northeast-1`、Free planに限定する。
+- Step Aで作成したQuiz World専用Supabase development projectのpublic情報を確認する。
+- migration / seed適用へ進む前に、別途GO/NO-GO判断を行う。
 - migration / seed適用、Vercel project作成、Production deployはまだ行わない。
-- cloud環境を実作成する前に、Smart Buzzerと完全分離されることを再確認する。
+- 今後のcloud操作前に、Smart Buzzerと完全分離されることを再確認する。
 
 ### B. P2残項目整理
 
@@ -683,4 +683,4 @@ Phase 9でcloud環境を実作成する前に、GO/NO-GOを判断するチェッ
 
 ## 現時点の推奨
 
-Phase 1〜7 local実装は完了・push・tag済み。Phase 8 10-user local smoke / ops rehearsalもSupabase localのみで実行済み、89チェックpass、DB reset済み。Phase 8 manual UI rehearsal follow-upも完了・push済み。Phase 9 Preview環境計画はcommit・push済み。Phase 9 Preview実行前チェックリストでは、Supabase project名、個人アカウント、Tokyo region、Free plan、Preview branch、Preview invite code、Preview共有範囲、初期admin email方針、cleanup担当、env、migration、seed、smoke、cleanup方針は整理済み。次はStep AとしてQuiz World専用Supabase development projectの作成だけを行うか最終確認する。
+Phase 1〜7 local実装は完了・push・tag済み。Phase 8 10-user local smoke / ops rehearsalもSupabase localのみで実行済み、89チェックpass、DB reset済み。Phase 8 manual UI rehearsal follow-upも完了・push済み。Phase 9 Preview環境計画はcommit・push済み。Phase 9 Step AとしてQuiz World専用Supabase development project `quiz-world-preview` の作成だけ完了し、project id / public URLは `quiz-world-phase-9-preview-execution-checklist.md` にpublic情報として記録済み。次はmigration / seed適用へ進む前の別GO/NO-GO判断を行う。

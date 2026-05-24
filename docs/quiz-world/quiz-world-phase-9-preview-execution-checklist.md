@@ -4,15 +4,15 @@
 
 このドキュメントは、Phase 9でQuiz World専用Preview環境を実作成する直前のGO/NO-GO判断に使うチェックリストである。
 
-現時点ではまだSupabase cloud project、Vercel project、Production環境、Stripe、Web Push、Realtimeは作らない。Smart Buzzerのproduction / Stripe / Vercel / Supabase / env / legal page / cleanup / live keyには触らない。
+2026-05-24時点で、Step AとしてQuiz World専用Supabase development projectのみ作成済みである。Vercel project、Production環境、Stripe、Web Push、Realtimeはまだ作らない。Smart Buzzerのproduction / Stripe / Vercel / Supabase / env / legal page / cleanup / live keyには触らない。
 
 ## レビュー結果
 
-2026-05-24時点のレビュー結果は「Step AのみGO候補（実作成前）」である。
+2026-05-24時点のレビュー結果は「Step Aのみ実行済み」である。
 
 local実装、Phase 8 smoke、manual UI rehearsal follow-up、Phase 9計画、migration順、seed方針、env項目、rollback / cleanup方針は整理済みである。今回、Supabase organization / workspace、region、plan、cleanup担当、最終GO/NO-GO判断を人間決定済みとして反映した。
 
-まだcloud実作成は行っていない。Step Aで許可するのは、Quiz World専用Supabase development projectの作成だけである。migration / seed適用、Vercel project作成、Production project / Production deploy、Stripe、Web Push、Realtimeはまだ行わない。
+cloud実作成はQuiz World専用Supabase development projectの作成だけ完了した。migration / seed適用、Vercel project作成、Production project / Production deploy、Stripe、Web Push、Realtimeはまだ行わない。
 
 決定済み:
 
@@ -27,14 +27,14 @@ local実装、Phase 8 smoke、manual UI rehearsal follow-up、Phase 9計画、mi
 - Preview共有範囲: owner/adminのみから開始
 - 初期admin email: 決定済み。実値はdocsに書かず、Vercel Preview envの `ADMIN_EMAILS` にのみ設定する
 - Preview DB cleanup担当: 自分
-- 最終GO/NO-GO判断: Step AのみGO候補
+- 最終GO/NO-GO判断: Step Aのみ実行済み
 
-Step A作成後に記録する項目:
+Step A作成後の記録:
 
-- Supabase project id
-- Supabase public URL
-- 作成日時
-- 作成確認者
+- Supabase project id / ref: `ogfuohrvzfjmgvdewvcl`
+- Supabase public URL: `https://ogfuohrvzfjmgvdewvcl.supabase.co`
+- 作成日時: `2026-05-24 13:54 JST`
+- 作成確認者: Codex via Supabase Dashboard
 
 ## 1. Phase 9で実作成するもの
 
@@ -42,7 +42,7 @@ Step Aの実行判断後に作成する対象は以下に限定する。
 
 | 対象 | 用途 | レビュー結果 |
 | --- | --- | --- |
-| Quiz World専用 Supabase development project | Preview DB / Auth / RLS確認 | 作成対象。project名は `quiz-world-preview` |
+| Quiz World専用 Supabase development project | Preview DB / Auth / RLS確認 | 作成済み。project名は `quiz-world-preview` |
 
 Step Aでは、以下はまだ作成・設定しない。
 
@@ -81,19 +81,21 @@ Phase 9では以下を作らない。
 | reset / cleanup | Preview DBは破棄可能データのみ。reset / cleanup手順を本ドキュメントで定義済み | GO候補 |
 | service role key | Vercel Preview envのserver側にのみ保存。repo、docs、client bundleには出さない | GO条件 |
 | RLS | migration適用後、全対象tableでRLS有効を確認する | GO条件 |
-| project id記録 | 作成後にproject id / URLをこの表の下に記録する。実値はpublic URLのみ可、secretは書かない | 作成後記録 |
+| project id記録 | project id / URLをこの表の下に記録済み。secretは書かない | 記録済み |
 
 作成後の記録欄:
 
 | 項目 | 値 |
 | --- | --- |
 | Supabase project name | `quiz-world-preview` |
-| Supabase project id | 作成後に記録 |
-| Supabase public URL | 作成後に記録 |
+| Supabase project id / ref | `ogfuohrvzfjmgvdewvcl` |
+| Supabase public URL | `https://ogfuohrvzfjmgvdewvcl.supabase.co` |
 | Supabase region | `Northeast Asia (Tokyo) ap-northeast-1` |
 | Supabase plan | Free |
+| Supabase compute | NANO |
 | Supabase organization / workspace | 個人アカウント |
 | service role key保存先 | Vercel Preview env only |
+| 作成日時 | `2026-05-24 13:54 JST` |
 
 作成前に必ず確認すること:
 
@@ -275,7 +277,7 @@ cleanup担当は自分。audit log保持方針とSupabase project削除判断は
 
 ## 9. GO条件
 
-以下をすべて満たす場合のみ、Phase 9 Preview環境の実作成へ進める。
+Step Aは以下を満たして実行済みである。migration / seed適用、Vercel project作成、Production deployへ進む場合は、別途GO/NO-GO判断を行う。
 
 すでに確認済み:
 
@@ -289,7 +291,7 @@ cleanup担当は自分。audit log保持方針とSupabase project削除判断は
 - migration適用順が確認済みである
 - env項目が整理済みである
 
-実作成前に追加確認すること:
+Step A実行時に確認済み / 今後も維持すること:
 
 - latest tag / origin/mainを確認する
 - Supabase作成先が個人アカウントであることを確認する
@@ -316,16 +318,20 @@ cleanup担当は自分。audit log保持方針とSupabase project削除判断は
 - migration / seed適用、Vercel project作成、Production deploy、Stripe、Web Push、RealtimeをStep Aと同時に行おうとしている
 - Supabase作成条件が `quiz-world-preview`、個人アカウント、`Northeast Asia (Tokyo) ap-northeast-1`、Free planから外れている
 
-## 実作成前の最終判断メモ
+## Step A実作成結果メモ
 
-Phase 9実作成へ進む直前に、以下を埋める。
+Step AでQuiz World専用Supabase development projectのみ作成した結果を以下に記録する。
 
 | 項目 | 値 |
 | --- | --- |
 | Supabase project名 | `quiz-world-preview` |
+| Supabase project id / ref | `ogfuohrvzfjmgvdewvcl` |
+| Supabase public URL | `https://ogfuohrvzfjmgvdewvcl.supabase.co` |
 | Supabase region | `Northeast Asia (Tokyo) ap-northeast-1` |
 | Supabase plan | Free |
+| Supabase compute | NANO |
 | Supabase organization / workspace | 個人アカウント |
+| Supabase project作成日時 | `2026-05-24 13:54 JST` |
 | Vercel project名 | `quiz-world-preview` |
 | GitHub repo | `chop0522/quiz-world` |
 | Preview branch | `preview` |
@@ -333,4 +339,4 @@ Phase 9実作成へ進む直前に、以下を埋める。
 | Preview invite code | `SEASON0-PREVIEW-001` |
 | Preview共有先 | owner/adminのみから開始 |
 | cleanup担当 | 自分 |
-| GO / NO-GO判断 | Step AのみGO候補。Quiz World専用Supabase development project作成だけ進める。migration / seed適用、Vercel project作成、Production deploy、Stripe、Web Push、Realtimeはまだ行わない |
+| GO / NO-GO判断 | Step Aのみ実行済み。migration / seed適用、Vercel project作成、Production deploy、Stripe、Web Push、Realtimeはまだ行わない |
