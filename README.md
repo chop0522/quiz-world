@@ -358,13 +358,13 @@ Smart Buzzer のSupabase/Vercel/Stripe/envとは混ぜません。
 - Phase 8 manual UI rehearsal planを作成済みです。自動smokeではなく、人間がブラウザで操作したときの導線、表示、分かりやすさをSupabase localだけで確認します。
 - Phase 8 manual UI rehearsal follow-upは完了・push済みです。P0はなし、P1は修正・再確認済みです。P2のうちrating/report送信後状態とlegal文言は最小修正済みで、rank説明とworld補助指標は既知制約として残します。
 - Phase 9 Preview環境計画docsはcommit・push済みです。Quiz World専用のSupabase development project / Vercel Preview projectへ移す準備は設計済みですが、cloud環境はまだ実作成しません。
-- Phase 9 Preview実行前チェックリストは作成済みで、GO/NO-GOレビューに人間決定項目を反映中です。project名、plan、Preview branch、Preview invite code、Preview共有範囲、env、migration、seed、smoke、cleanup方針は整理済みです。Supabase region、admin emailのVercel env設定、cleanup担当は実作成前確認として残します。
+- Phase 9 Preview実行前チェックリストは作成済みで、GO/NO-GOレビューに人間決定項目を反映中です。Supabase project名、個人アカウント、Tokyo region、Free plan、Preview branch、Preview invite code、Preview共有範囲、初期admin email方針、cleanup担当、env、migration、seed、smoke、cleanup方針は整理済みです。Step AのみGO候補で、cloud環境はまだ実作成していません。
 - Phase 8ではSupabase cloud / Vercel / Stripe / production deploy / Web Push / Realtimeは作りません。
 - Supabase / Vercel / Stripe のcloud環境はまだ作成しません。
 
 ## Next Work
 
-- Phase 9 Preview実行前チェックリストの残項目を埋める
-- Supabase region、admin emailのVercel Preview env設定、cleanup担当を確認する
-- cloud環境の実作成へ進むか、もう一度local確認を挟むか判断する
+- Step AとしてQuiz World専用Supabase development projectの作成だけを行うか最終確認する
+- Supabase project作成時は `quiz-world-preview`、個人アカウント、`Northeast Asia (Tokyo) ap-northeast-1`、Free planに限定する
+- migration / seed適用、Vercel project作成、Production deployはまだ行わない
 - Web Push / Realtime / cloud環境 / production deploy はまだ作らない

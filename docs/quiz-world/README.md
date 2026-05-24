@@ -626,7 +626,9 @@ Phase 9でcloud環境を実作成する前に、GO/NO-GOを判断するチェッ
 レビュー済み / 決定済みの主な方針:
 
 - Supabase project名は `quiz-world-preview`。
-- Supabase planはFreeまたは最小プラン。
+- Supabase organization / workspaceは個人アカウント。
+- Supabase regionは `Northeast Asia (Tokyo) ap-northeast-1`。
+- Supabase planはFree。
 - Vercel project名は `quiz-world-preview`。
 - GitHub repo接続先は `chop0522/quiz-world`。
 - Preview branchは `preview`。
@@ -634,14 +636,15 @@ Phase 9でcloud環境を実作成する前に、GO/NO-GOを判断するチェッ
 - `MAX_INITIAL_MEMBERS` は `10`。
 - 初期invite codeは `SEASON0-PREVIEW-001`。
 - Preview共有範囲はowner/adminのみから開始。
-- 初期admin emailの実値はdocsに書かず、Vercel Preview envの `ADMIN_EMAILS` に設定する。
+- 初期admin emailは決定済み。実値はdocsに書かず、Vercel Preview envの `ADMIN_EMAILS` にのみ設定する。
+- Preview DB cleanup担当は自分。
+- 最終GO/NO-GO判断はStep AのみGO候補。
 
 実作成前確認として残る項目:
 
-- Supabase regionの記録
-- admin email実値のVercel Preview env設定
-- Preview DB cleanup担当の記録
-- 最終GO/NO-GO判断
+- Supabase project作成後のproject id / public URL記録
+- migration / seed適用前の別GO判断
+- Vercel project作成前の別GO判断
 
 チェック対象:
 
@@ -664,8 +667,9 @@ Phase 9でcloud環境を実作成する前に、GO/NO-GOを判断するチェッ
 
 ### A. Phase 9 Preview実行前GO/NO-GO判断
 
-- Phase 9 Preview実行前チェックリストの残項目を埋める。
-- Supabase region、admin emailのVercel Preview env設定、cleanup担当を確認する。
+- Step AとしてQuiz World専用Supabase development projectの作成だけを行うか最終確認する。
+- Supabase project作成時は `quiz-world-preview`、個人アカウント、`Northeast Asia (Tokyo) ap-northeast-1`、Free planに限定する。
+- migration / seed適用、Vercel project作成、Production deployはまだ行わない。
 - cloud環境を実作成する前に、Smart Buzzerと完全分離されることを再確認する。
 
 ### B. P2残項目整理
@@ -679,4 +683,4 @@ Phase 9でcloud環境を実作成する前に、GO/NO-GOを判断するチェッ
 
 ## 現時点の推奨
 
-Phase 1〜7 local実装は完了・push・tag済み。Phase 8 10-user local smoke / ops rehearsalもSupabase localのみで実行済み、89チェックpass、DB reset済み。Phase 8 manual UI rehearsal follow-upも完了・push済み。Phase 9 Preview環境計画はcommit・push済み。Phase 9 Preview実行前チェックリストでは、project名、plan、Preview branch、Preview invite code、Preview共有範囲、env、migration、seed、smoke、cleanup方針は整理済み。次はSupabase region、admin emailのVercel Preview env設定、cleanup担当を確認し、cloud環境の実作成へ進むか最終判断する。
+Phase 1〜7 local実装は完了・push・tag済み。Phase 8 10-user local smoke / ops rehearsalもSupabase localのみで実行済み、89チェックpass、DB reset済み。Phase 8 manual UI rehearsal follow-upも完了・push済み。Phase 9 Preview環境計画はcommit・push済み。Phase 9 Preview実行前チェックリストでは、Supabase project名、個人アカウント、Tokyo region、Free plan、Preview branch、Preview invite code、Preview共有範囲、初期admin email方針、cleanup担当、env、migration、seed、smoke、cleanup方針は整理済み。次はStep AとしてQuiz World専用Supabase development projectの作成だけを行うか最終確認する。

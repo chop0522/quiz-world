@@ -8,37 +8,49 @@
 
 ## レビュー結果
 
-2026-05-23時点のレビュー結果は「条件付きGO候補（実作成前）」である。
+2026-05-24時点のレビュー結果は「Step AのみGO候補（実作成前）」である。
 
-local実装、Phase 8 smoke、manual UI rehearsal follow-up、Phase 9計画、migration順、seed方針、env項目、rollback / cleanup方針は整理済みである。今回、project名、plan、Preview branch、Preview invite code、Preview共有範囲の初期方針を反映した。
+local実装、Phase 8 smoke、manual UI rehearsal follow-up、Phase 9計画、migration順、seed方針、env項目、rollback / cleanup方針は整理済みである。今回、Supabase organization / workspace、region、plan、cleanup担当、最終GO/NO-GO判断を人間決定済みとして反映した。
+
+まだcloud実作成は行っていない。Step Aで許可するのは、Quiz World専用Supabase development projectの作成だけである。migration / seed適用、Vercel project作成、Production project / Production deploy、Stripe、Web Push、Realtimeはまだ行わない。
 
 決定済み:
 
 - Supabase project名: `quiz-world-preview`
-- Supabase plan: Free または最小プラン
+- Supabase organization / workspace: 個人アカウント
+- Supabase region: `Northeast Asia (Tokyo) ap-northeast-1`
+- Supabase plan: Free
 - Vercel project名: `quiz-world-preview`
 - GitHub repo: `chop0522/quiz-world`
 - Preview branch: `preview`
 - Preview invite code: `SEASON0-PREVIEW-001`
 - Preview共有範囲: owner/adminのみから開始
-- 初期admin email: 実値はdocsに書かず、Vercel Preview envの `ADMIN_EMAILS` に設定する
+- 初期admin email: 決定済み。実値はdocsに書かず、Vercel Preview envの `ADMIN_EMAILS` にのみ設定する
+- Preview DB cleanup担当: 自分
+- 最終GO/NO-GO判断: Step AのみGO候補
 
-実作成前にまだ人間が記録する項目:
+Step A作成後に記録する項目:
 
-- Supabase region
-- Preview DB cleanup担当
-- 最終GO/NO-GO判断
+- Supabase project id
+- Supabase public URL
+- 作成日時
+- 作成確認者
 
 ## 1. Phase 9で実作成するもの
 
-Phase 9の実行判断後に作成する対象は以下に限定する。
+Step Aの実行判断後に作成する対象は以下に限定する。
 
 | 対象 | 用途 | レビュー結果 |
 | --- | --- | --- |
 | Quiz World専用 Supabase development project | Preview DB / Auth / RLS確認 | 作成対象。project名は `quiz-world-preview` |
-| Quiz World専用 Vercel Preview project | Preview URLでの少人数確認 | 作成対象。project名は `quiz-world-preview` |
-| Preview env | Supabase URL / keys / admin emailsなど | Vercel Preview envにのみ設定。repoには入れない |
-| Preview seed data | 初期world、初期admin、invite code | local seed相当 + `SEASON0-PREVIEW-001` |
+
+Step Aでは、以下はまだ作成・設定しない。
+
+- Vercel Preview project
+- Vercel Preview env
+- Preview seed data
+- migration適用
+- seed適用
 
 ## 2. Phase 9でまだ作らないもの
 
@@ -62,8 +74,9 @@ Phase 9では以下を作らない。
 | チェック | レビュー結果 | GO/NO-GO |
 | --- | --- | --- |
 | project名 | `quiz-world-preview` | GO候補 |
-| region | 人間が選んだregionを実作成前に記録する。日本/東アジアに近いregionを第一候補にする | 人間記録待ち |
-| plan | Free または最小プラン。quota不足時のみ有償planを検討する | GO候補 |
+| organization / workspace | 個人アカウント | GO候補 |
+| region | `Northeast Asia (Tokyo) ap-northeast-1` | GO候補 |
+| plan | Free | GO候補 |
 | project分離 | Smart Buzzerとは別projectを新規作成する。既存Smart Buzzer projectは開かない | GO条件 |
 | reset / cleanup | Preview DBは破棄可能データのみ。reset / cleanup手順を本ドキュメントで定義済み | GO候補 |
 | service role key | Vercel Preview envのserver側にのみ保存。repo、docs、client bundleには出さない | GO条件 |
@@ -77,8 +90,9 @@ Phase 9では以下を作らない。
 | Supabase project name | `quiz-world-preview` |
 | Supabase project id | 作成後に記録 |
 | Supabase public URL | 作成後に記録 |
-| Supabase region | 実作成前に人間が選んだregionを記録 |
-| Supabase plan | Free または最小プラン |
+| Supabase region | `Northeast Asia (Tokyo) ap-northeast-1` |
+| Supabase plan | Free |
+| Supabase organization / workspace | 個人アカウント |
 | service role key保存先 | Vercel Preview env only |
 
 作成前に必ず確認すること:
@@ -130,7 +144,7 @@ Preview envはVercel Project Settingsに設定する。repoには入れない。
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase development project作成後のanon / publishable key。実値はrepoに書かない | 作成後設定 |
 | `SUPABASE_SERVICE_ROLE_KEY` | server専用。Vercel Preview envにのみ保存。実値はrepo、docs、clientに出さない | GO条件 |
 | `NEXT_PUBLIC_APP_URL` | Vercel Preview URL。作成後に設定 | 作成後設定 |
-| `ADMIN_EMAILS` | 初期admin emailをVercel Preview envに設定。実値はdocsに書かない | env設定待ち |
+| `ADMIN_EMAILS` | 初期admin emailは決定済み。実値はdocsに書かず、Vercel Preview envにのみ設定する | 決定済み / env作成時設定 |
 | `QUIZ_WORLD_ID` | `00000000-0000-4000-8000-000000000001` | GO候補 |
 | `MAX_INITIAL_MEMBERS` | `10` | GO候補 |
 
@@ -180,7 +194,7 @@ local seedと同じ初期worldを使う。
 | world id | `00000000-0000-4000-8000-000000000001` | GO候補 |
 | member_limit | `10` | GO候補 |
 | current_season | `0` | GO候補 |
-| 初期admin | `ADMIN_EMAILS` 対象メールでsignup後に `profiles.role = admin` を確認。email実値はdocsに書かない | env設定待ち |
+| 初期admin | 初期admin emailは決定済み。`ADMIN_EMAILS` 対象メールでsignup後に `profiles.role = admin` を確認。email実値はdocsに書かない | 決定済み / env作成時設定 |
 | 初期invite code | `SEASON0-PREVIEW-001` | GO候補 |
 
 seed投入方針:
@@ -257,7 +271,7 @@ cleanup対象候補:
 - rank_events
 - admin_audit_logs
 
-cleanup担当は人間記録待ち。audit log保持方針とSupabase project削除判断はPreview smoke後の後続判断にする。
+cleanup担当は自分。audit log保持方針とSupabase project削除判断はPreview smoke後の後続判断にする。
 
 ## 9. GO条件
 
@@ -278,9 +292,11 @@ cleanup担当は人間記録待ち。audit log保持方針とSupabase project削
 実作成前に追加確認すること:
 
 - latest tag / origin/mainを確認する
-- Supabase regionを記録する
-- `ADMIN_EMAILS` の実値をVercel Preview envに設定する
-- Preview reset / cleanup担当を決める
+- Supabase作成先が個人アカウントであることを確認する
+- Supabase regionが `Northeast Asia (Tokyo) ap-northeast-1` であることを確認する
+- Supabase planがFreeであることを確認する
+- `ADMIN_EMAILS` の実値をVercel Preview envにのみ設定する
+- Preview reset / cleanup担当が自分であることを確認する
 - 作成直前にSmart BuzzerのDashboardを開いていないことを確認する
 
 ## 10. NO-GO条件
@@ -297,7 +313,8 @@ cleanup担当は人間記録待ち。audit log保持方針とSupabase project削
 - legal草案が空、または18歳以上限定・UGC・通知・停止方針と大きく矛盾している
 - Production domainやProduction envを同時に作ろうとしている
 - Stripe、Web Push、Realtimeを同時に入れようとしている
-- Supabase region、admin emailのenv設定、cleanup担当のいずれかが未確認のまま実作成しようとしている
+- migration / seed適用、Vercel project作成、Production deploy、Stripe、Web Push、RealtimeをStep Aと同時に行おうとしている
+- Supabase作成条件が `quiz-world-preview`、個人アカウント、`Northeast Asia (Tokyo) ap-northeast-1`、Free planから外れている
 
 ## 実作成前の最終判断メモ
 
@@ -306,13 +323,14 @@ Phase 9実作成へ進む直前に、以下を埋める。
 | 項目 | 値 |
 | --- | --- |
 | Supabase project名 | `quiz-world-preview` |
-| Supabase region | 人間が選んだregionを実作成前に記録 |
-| Supabase plan | Free または最小プラン |
+| Supabase region | `Northeast Asia (Tokyo) ap-northeast-1` |
+| Supabase plan | Free |
+| Supabase organization / workspace | 個人アカウント |
 | Vercel project名 | `quiz-world-preview` |
 | GitHub repo | `chop0522/quiz-world` |
 | Preview branch | `preview` |
-| 初期admin email | docsには実値を書かない。Vercel Preview envの `ADMIN_EMAILS` に設定 |
+| 初期admin email | 決定済み。docsには実値を書かない。Vercel Preview envの `ADMIN_EMAILS` にのみ設定 |
 | Preview invite code | `SEASON0-PREVIEW-001` |
 | Preview共有先 | owner/adminのみから開始 |
-| cleanup担当 | 担当者名または役割を実作成前に記録 |
-| GO / NO-GO判断 | まだ実作成前。Supabase region、admin env設定、cleanup担当が埋まればGO候補 |
+| cleanup担当 | 自分 |
+| GO / NO-GO判断 | Step AのみGO候補。Quiz World専用Supabase development project作成だけ進める。migration / seed適用、Vercel project作成、Production deploy、Stripe、Web Push、Realtimeはまだ行わない |
