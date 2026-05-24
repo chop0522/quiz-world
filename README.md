@@ -2,7 +2,7 @@
 
 通知型早押しクイズワールドの専用リポジトリです。
 
-Phase 1の signup/auth ローカル実装は完了・push・tag済みです。Phase 2の四択クイズ作成local実装も完了・push・tag済みです。Phase 3 quiz launch / recipients local実装も完了・push・tag済みです。Phase 4 answer submission / ranking local実装も完了・push・tag済みです。Phase 5 result / rating / reports のlocal実装も完了・push・tag済みです。Phase 6 rank_events / ranking local実装も完了・push・tag済みです。Phase 7 admin / moderation のlocal実装も完了・push・tag済みです。Phase 8 10-user local smoke / ops rehearsalは89チェックpass、DB reset済みです。Phase 8 manual UI rehearsal follow-upも完了・push済みです。Phase 9 Step AとしてQuiz World専用Supabase development projectを作成済み、Step BとしてPreview DBへのmigration / seed適用済み、Step CとしてPreview DB smokeをpass済みです。Step DとしてQuiz World専用Vercel project `quiz-world-preview` を作成済みです。GitHub repo接続はVercel側の権限エラーで未完了です。Production deploy、Stripe、Web Push、Realtimeはまだ行っていません。既存Smart Buzzerとは別プロジェクトとして扱います。
+Phase 1の signup/auth ローカル実装は完了・push・tag済みです。Phase 2の四択クイズ作成local実装も完了・push・tag済みです。Phase 3 quiz launch / recipients local実装も完了・push・tag済みです。Phase 4 answer submission / ranking local実装も完了・push・tag済みです。Phase 5 result / rating / reports のlocal実装も完了・push・tag済みです。Phase 6 rank_events / ranking local実装も完了・push・tag済みです。Phase 7 admin / moderation のlocal実装も完了・push・tag済みです。Phase 8 10-user local smoke / ops rehearsalは89チェックpass、DB reset済みです。Phase 8 manual UI rehearsal follow-upも完了・push済みです。Phase 9 Step AとしてQuiz World専用Supabase development projectを作成済み、Step BとしてPreview DBへのmigration / seed適用済み、Step CとしてPreview DB smokeをpass済みです。Step DとしてQuiz World専用Vercel project `quiz-world-preview` を作成済みで、Step D follow-upとしてGitHub repo `chop0522/quiz-world` への接続も完了しました。Production deploy、Stripe、Web Push、Realtimeはまだ行っていません。既存Smart Buzzerとは別プロジェクトとして扱います。
 
 Smart Buzzer の production / Stripe / Vercel / Supabase / env / legal page / cleanup / live key には触れません。
 
@@ -363,13 +363,13 @@ Smart Buzzer のSupabase/Vercel/Stripe/envとは混ぜません。
 - Phase 9 Step Bとして、Preview DBへのmigration / seed適用を完了しました。初期world `クイズワールド` とPreview invite code `SEASON0-PREVIEW-001` を作成済みです。service role key / anon key / DB passwordはrepo/docsに記録していません。
 - Phase 9 Step Cとして、Supabase Preview DB smokeを実行し、migration履歴、初期world、Preview invite code、主要table、RLS、table件数、Smart Buzzer混入なしを確認済みです。
 - Phase 9 Step Dとして、Quiz World専用Vercel project `quiz-world-preview` を作成しました。Production URLはなく、Production domain / Production env / Vercel envは未設定です。
-- GitHub repo `chop0522/quiz-world` 接続は試行しましたが、Vercel側の権限エラーで未完了です。
+- Step D follow-upとして、Vercel GitHub Appのrepository accessに `chop0522/quiz-world` を追加し、Vercel project `quiz-world-preview` へGitHub repo接続を完了しました。
 - Supabase PreviewとVercel project作成は完了済みです。Stripe / Production環境はまだ作成しません。
 - Vercel env設定、Preview deploy、Production deploy、Stripe、Web Push、Realtimeはまだ行いません。
 
 ## Next Work
 
-- Vercel GitHub Appが `chop0522/quiz-world` にアクセスできるようにして、repo接続を再実行する
+- Phase 9 Step EとしてVercel Preview env設定前のGO/NO-GOレビューを行う
 - Preview branch `preview` の作成タイミングを確認する
-- Vercel project作成、Production deployはまだ行わない
+- Production deployはまだ行わない
 - Web Push / Realtime / production deploy はまだ作らない

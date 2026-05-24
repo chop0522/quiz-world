@@ -4,15 +4,15 @@
 
 このドキュメントは、Phase 9でQuiz World専用Preview環境を実作成する直前のGO/NO-GO判断と、Stepごとの実行結果記録に使うチェックリストである。
 
-2026-05-24時点で、Step AとしてQuiz World専用Supabase development projectを作成済み、Step BとしてPreview DBへのmigration / seed適用済み、Step CとしてPreview DB smokeをpass済みである。Step DとしてVercel Preview project作成前のGO/NO-GOレビューを行い、Quiz World専用Vercel projectを作成済みである。GitHub repo接続はVercel側の権限エラーで未完了である。Production環境、Stripe、Web Push、Realtimeはまだ作らない。Smart Buzzerのproduction / Stripe / Vercel / Supabase / env / legal page / cleanup / live keyには触らない。
+2026-05-24時点で、Step AとしてQuiz World専用Supabase development projectを作成済み、Step BとしてPreview DBへのmigration / seed適用済み、Step CとしてPreview DB smokeをpass済みである。Step DとしてVercel Preview project作成前のGO/NO-GOレビューを行い、Quiz World専用Vercel projectを作成済みである。Step D follow-upとしてVercel GitHub Appのrepository accessに `chop0522/quiz-world` を追加し、Vercel projectへGitHub repo接続を完了した。Production環境、Stripe、Web Push、Realtimeはまだ作らない。Smart Buzzerのproduction / Stripe / Vercel / Supabase / env / legal page / cleanup / live keyには触らない。
 
 ## レビュー結果
 
-2026-05-24時点のレビュー結果は「Step D Vercel project作成済み / GitHub repo接続は未完了」である。
+2026-05-24時点のレビュー結果は「Step D Vercel project作成済み / GitHub repo接続済み / Vercel env未設定 / Preview deploy未実行」である。
 
 local実装、Phase 8 smoke、manual UI rehearsal follow-up、Phase 9計画、migration順、seed方針、env項目、rollback / cleanup方針は整理済みである。今回、Supabase organization / workspace、region、plan、cleanup担当、最終GO/NO-GO判断を人間決定済みとして反映した。
 
-cloud実作成はQuiz World専用Supabase development projectの作成、Preview DBへのmigration / seed適用、Quiz World専用Vercel project作成まで完了した。GitHub repo接続、Vercel env設定、Preview deploy、Production project / Production deploy、Stripe、Web Push、Realtimeはまだ行わない。
+cloud実作成はQuiz World専用Supabase development projectの作成、Preview DBへのmigration / seed適用、Quiz World専用Vercel project作成、GitHub repo接続まで完了した。Vercel env設定、Preview deploy、Production project / Production deploy、Stripe、Web Push、Realtimeはまだ行わない。
 
 決定済み:
 
@@ -27,7 +27,7 @@ cloud実作成はQuiz World専用Supabase development projectの作成、Preview
 - Preview共有範囲: owner/adminのみから開始
 - 初期admin email: 決定済み。実値はdocsに書かず、Vercel Preview envの `ADMIN_EMAILS` にのみ設定する
 - Preview DB cleanup担当: 自分
-- 最終GO/NO-GO判断: Step DでVercel project作成済み。GitHub repo接続は未完了
+- 最終GO/NO-GO判断: Step DでVercel project作成済み。Step D follow-upでGitHub repo接続済み。Vercel env設定とPreview deployは未実行
 
 Step A作成後の記録:
 
@@ -79,8 +79,24 @@ Step D Vercel project作成後の記録:
 - env確認: `vercel env ls` でenvironment variablesなし
 - deployment確認: `vercel list quiz-world-preview` でdeploymentsなし
 - local link: `.vercel/project.json` 作成済み。ただし `.vercel/` はgitignore対象でcommitしない
-- GitHub repo接続: `chop0522/quiz-world` へ接続を試行したが、Vercel側の権限エラーで未完了
+- GitHub repo接続: 初回は `chop0522/quiz-world` への接続を試行したが、Vercel側の権限エラーで未完了
 - repo接続エラー: `Failed to connect chop0522/quiz-world to project. Make sure there aren't any typos and that you have access to the repository if it's private.`
+
+Step D follow-up GitHub App access確認:
+
+- 実行日時: `2026-05-24 16:34 JST`
+- 確認対象Vercel project: `quiz-world-preview` / `prj_fCviBUF2fYH077fLBUHV5uPFleMx`
+- Smart Buzzer project: 開いていない。操作対象外
+- Vercel env: 未設定のまま
+- Production domain / Production env: 未設定のまま
+- Preview deploy: 未実行のまま
+- GitHub側のVercel App設定確認: GitHub Installed Apps上でVercel GitHub Appがインストール済みであることを確認
+- GitHub sudo認証: GitHub Mobile認証を完了
+- repository access: `Only select repositories` のまま、既存の `chop0522/smart-buzzer` は外さず、`chop0522/quiz-world` を追加
+- GitHub App access確認結果: `chop0522/quiz-world` と `chop0522/smart-buzzer` の2repositoryが選択済み
+- Vercel repo接続再試行: `https://github.com/chop0522/quiz-world` を `quiz-world-preview` に接続
+- Vercel repo接続結果: `Connected`
+- Vercel env / Preview deploy / Production deploy: 未実行
 
 ## 1. Phase 9で実作成するもの
 
@@ -178,7 +194,7 @@ Step Dレビュー結果:
 | Vercel project name | `quiz-world-preview` |
 | Vercel project id | `prj_fCviBUF2fYH077fLBUHV5uPFleMx` |
 | owner / account | `chop0522's projects` |
-| GitHub repo | `chop0522/quiz-world` への接続を試行。Vercel側の権限エラーで未完了 |
+| GitHub repo | Step D follow-upで `chop0522/quiz-world` への接続完了 |
 | Preview branch | `preview` |
 | Preview URL | 未作成 |
 | Production domain | 未設定 |
@@ -191,7 +207,7 @@ Step Dレビュー結果:
 - Preview URLの共有先を決める
 - Preview envの入力担当者を決める
 - Vercel上でproject名とGitHub repo接続先を目視確認する
-- GitHub repo接続が失敗した場合は、Vercel GitHub Appのrepoアクセス権を確認してから再実行する
+- GitHub repo接続はStep D follow-upで完了済み。次はVercel env設定前に別途GO/NO-GO判断を行う
 
 ## 5. envチェック
 
@@ -364,7 +380,7 @@ cleanup担当は自分。audit log保持方針とSupabase project削除判断は
 
 ## 9. GO条件
 
-Step AからStep Cまでは以下を満たして実行済みである。Step DではVercel Preview project作成のみを行った。GitHub repo接続、Vercel env設定、Preview deploy、Production deployへ進む場合は、別途GO/NO-GO判断を行う。
+Step AからStep Cまでは以下を満たして実行済みである。Step DではVercel Preview project作成を行い、Step D follow-upでGitHub repo接続まで完了した。Vercel env設定、Preview deploy、Production deployへ進む場合は、別途GO/NO-GO判断を行う。
 
 すでに確認済み:
 
@@ -393,7 +409,7 @@ Step A実行時に確認済み / 今後も維持すること:
 - 作成直前にSmart BuzzerのDashboardを開いていないことを確認する
 - Vercel作成直前に、Smart BuzzerのVercel projectを開いていないことを確認する
 - Preview branch `preview` の作成タイミングを確認する
-- Vercel GitHub Appが `chop0522/quiz-world` にアクセスできることを確認する
+- Vercel GitHub Appが `chop0522/quiz-world` にアクセスできることを確認済み
 
 ## 10. NO-GO条件
 
@@ -416,7 +432,7 @@ Step A実行時に確認済み / 今後も維持すること:
 
 ## Step A / Step B / Step C / Step D実作成結果メモ
 
-Step AでQuiz World専用Supabase development projectを作成し、Step BでPreview DBへmigration / seedを適用した。Step CでPreview DB smokeを実行し、migration履歴、seed、主要table、RLS、table件数を確認した。Step DではVercel Preview project作成だけを実行した。GitHub repo接続はVercel側の権限エラーで未完了である。
+Step AでQuiz World専用Supabase development projectを作成し、Step BでPreview DBへmigration / seedを適用した。Step CでPreview DB smokeを実行し、migration履歴、seed、主要table、RLS、table件数を確認した。Step DではVercel Preview projectを作成し、Step D follow-upでGitHub repo接続まで完了した。Vercel env設定とPreview deployは未実行である。
 
 | 項目 | 値 |
 | --- | --- |
@@ -436,7 +452,8 @@ Step AでQuiz World専用Supabase development projectを作成し、Step BでPre
 | Vercel project名 | `quiz-world-preview` |
 | Vercel project id | `prj_fCviBUF2fYH077fLBUHV5uPFleMx` |
 | owner / account | `chop0522's projects` |
-| GitHub repo | `chop0522/quiz-world` への接続を試行。Vercel側の権限エラーで未完了 |
+| GitHub repo | `chop0522/quiz-world` への接続完了 |
+| GitHub App access follow-up | `chop0522/quiz-world` をVercel GitHub Appのrepository accessに追加済み。repo接続再試行結果は `Connected` |
 | Preview branch | `preview` |
 | Vercel project作成状態 | 作成済み |
 | Production domain / env | 未設定 |
@@ -448,4 +465,4 @@ Step AでQuiz World専用Supabase development projectを作成し、Step BでPre
 | Preview invite code | `SEASON0-PREVIEW-001` |
 | Preview共有先 | owner/adminのみから開始 |
 | cleanup担当 | 自分 |
-| GO / NO-GO判断 | Vercel project作成は完了。GitHub repo接続、Vercel env設定、Preview deployは次Step以降。Production deploy、Stripe、Web Push、Realtimeはまだ行わない |
+| GO / NO-GO判断 | Vercel project作成とGitHub repo接続は完了。Vercel env設定、Preview deployは次Step以降。Production deploy、Stripe、Web Push、Realtimeはまだ行わない |
