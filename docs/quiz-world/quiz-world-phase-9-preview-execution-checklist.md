@@ -219,6 +219,32 @@ Step E Vercel Preview env設定後の記録:
 - deployment確認: 既存Production deployment 2件とCanceled Preview 1件のみ。env設定による新規deployは発生していない
 - secret確認: service role key / anon key / DB password / 初期admin email実値はdocs、README、repo、commit messageに記録しない
 
+Step F Preview deploy前GO/NO-GO確認:
+
+- 実行日時: `2026-05-24 23:37 JST`
+- 作業対象Vercel project: `quiz-world-preview` / `prj_fCviBUF2fYH077fLBUHV5uPFleMx`
+- GitHub repo接続: `chop0522/quiz-world` 接続済み
+- git状態: `main` と `origin/main` が同一commitでclean
+- Production Branch: `production-hold`
+- Production env: 未設定
+- Production domain: custom domainは未設定。ただし既存Production deploymentにはVercel automatic aliasが残っている
+- Preview env: 必要env名は設定済み。値はdocs、README、repo、commit messageに記録しない
+- Preview env設定済みenv名: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `ADMIN_EMAILS`, `QUIZ_WORLD_ID`, `MAX_INITIAL_MEMBERS`
+- `.env.local` / `.vercel`: gitignore対象でcommit対象外
+- secret確認: service role key / anon key / DB password / 初期admin email実値はgit diffに含まれていない
+- Ignored Build Step現在値: `exit 0`
+- Ignored Build Step判断: 現在値のままだとPreview deployもskipされる可能性があるため、Step Fでdeploy前に変更が必要
+- Ignored Build Step推奨方針: `preview` branchだけbuildを許可する条件式へ変更する
+- 推奨条件式: `if [ "$VERCEL_GIT_COMMIT_REF" = "preview" ]; then exit 1; else exit 0; fi`
+- 根拠: Vercel公式Knowledge Baseで、Ignored Build Stepは終了コード0でskip、1以上でbuild実行であり、`VERCEL_GIT_COMMIT_REF` をbranch条件に使う例が示されている
+- `NEXT_PUBLIC_APP_URL`: 未設定のまま。app codeからは参照されておらず、`NEXT_PUBLIC_APP_URL` を空にしたlocal `vercel build` は成功
+- `NEXT_PUBLIC_APP_URL`判断: 初回Preview deployのblockerではない。Preview URL発行後、必要ならVercel Preview envへ追加設定する
+- remote `preview` branch: 未作成
+- preview branch方針: Step Fで `origin/main` から `preview` branchを作成してpushする。今回の確認段階ではまだpushしない
+- Preview deploy: 未実行
+- Production deploy: 実行しない
+- Step F判断: GO候補。ただしStep F開始時にIgnored Build Stepを上記条件式へ変更し、Preview branch作成・push後にPreview deploy確認へ進む
+
 ## 1. Phase 9で実作成するもの
 
 Step Aの実行判断後に作成する対象は以下に限定する。

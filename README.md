@@ -2,7 +2,7 @@
 
 通知型早押しクイズワールドの専用リポジトリです。
 
-Phase 1の signup/auth ローカル実装は完了・push・tag済みです。Phase 2の四択クイズ作成local実装も完了・push・tag済みです。Phase 3 quiz launch / recipients local実装も完了・push・tag済みです。Phase 4 answer submission / ranking local実装も完了・push・tag済みです。Phase 5 result / rating / reports のlocal実装も完了・push・tag済みです。Phase 6 rank_events / ranking local実装も完了・push・tag済みです。Phase 7 admin / moderation のlocal実装も完了・push・tag済みです。Phase 8 10-user local smoke / ops rehearsalは89チェックpass、DB reset済みです。Phase 8 manual UI rehearsal follow-upも完了・push済みです。Phase 9 Step AとしてQuiz World専用Supabase development projectを作成済み、Step BとしてPreview DBへのmigration / seed適用済み、Step CとしてPreview DB smokeをpass済みです。Step DとしてQuiz World専用Vercel project `quiz-world-preview` を作成済みで、Step D follow-upとしてGitHub repo `chop0522/quiz-world` への接続も完了しました。Step EとしてVercel Preview envをPreview environmentのみに設定済みです。Production envは未設定、Preview deployは未実行です。`NEXT_PUBLIC_APP_URL` はPreview URL未確定のため未設定です。その前段で、Vercel Ignored Build Stepを一時的に `exit 0` に設定し、`production-hold` branchを作成してpushし、Vercel Production Branchを `production-hold` に変更しました。Stripe、Web Push、Realtimeはまだ行っていません。既存Smart Buzzerとは別プロジェクトとして扱います。
+Phase 1の signup/auth ローカル実装は完了・push・tag済みです。Phase 2の四択クイズ作成local実装も完了・push・tag済みです。Phase 3 quiz launch / recipients local実装も完了・push・tag済みです。Phase 4 answer submission / ranking local実装も完了・push・tag済みです。Phase 5 result / rating / reports のlocal実装も完了・push・tag済みです。Phase 6 rank_events / ranking local実装も完了・push・tag済みです。Phase 7 admin / moderation のlocal実装も完了・push・tag済みです。Phase 8 10-user local smoke / ops rehearsalは89チェックpass、DB reset済みです。Phase 8 manual UI rehearsal follow-upも完了・push済みです。Phase 9 Step AとしてQuiz World専用Supabase development projectを作成済み、Step BとしてPreview DBへのmigration / seed適用済み、Step CとしてPreview DB smokeをpass済みです。Step DとしてQuiz World専用Vercel project `quiz-world-preview` を作成済みで、Step D follow-upとしてGitHub repo `chop0522/quiz-world` への接続も完了しました。Step EとしてVercel Preview envをPreview environmentのみに設定済みです。Step F Preview deploy前GO/NO-GOではGO候補です。ただしStep F開始時にIgnored Build Stepを `preview` branchだけbuild許可する条件式へ変更する必要があります。Production envは未設定、Preview deployは未実行です。`NEXT_PUBLIC_APP_URL` はPreview URL未確定のため未設定ですが、現状のbuild blockerではありません。Stripe、Web Push、Realtimeはまだ行っていません。既存Smart Buzzerとは別プロジェクトとして扱います。
 
 Smart Buzzer の production / Stripe / Vercel / Supabase / env / legal page / cleanup / live key には触れません。
 
@@ -369,15 +369,17 @@ Smart Buzzer のSupabase/Vercel/Stripe/envとは混ぜません。
 - Vercel Ignored Build Stepを一時的に `exit 0` に設定しました。Step F Preview deploy前に解除または見直しが必要です。
 - `production-hold` branchを `origin/main` から作成してpushし、Vercel Production Branchを `production-hold` に変更しました。
 - Phase 9 Step Eとして、Vercel Preview envに `NEXT_PUBLIC_SUPABASE_URL`、`NEXT_PUBLIC_SUPABASE_ANON_KEY`、`SUPABASE_SERVICE_ROLE_KEY`、`ADMIN_EMAILS`、`QUIZ_WORLD_ID`、`MAX_INITIAL_MEMBERS` を設定済みです。env実値はrepo/docsに記録していません。
-- `NEXT_PUBLIC_APP_URL` はPreview URL未確定のため未設定です。Step F Preview deploy前後で実値を確定してから設定します。
+- Step F Preview deploy前GO/NO-GOではGO候補です。Ignored Build Stepは現在 `exit 0` のため、Step F開始時に `preview` branchだけbuildを許可する条件式へ変更します。
+- `NEXT_PUBLIC_APP_URL` はPreview URL未確定のため未設定です。現状のapp codeでは参照されておらず、未設定でもlocal `vercel build` は成功しています。Preview URL発行後に必要なら設定します。
 - Preview確認は `preview` branchで行う方針です。ただし `preview` branchのpush、Preview deployはまだ行っていません。
 - Supabase PreviewとVercel project作成は完了済みです。Stripe / Production環境はまだ作成しません。
 - Preview deploy、Production deploy、Stripe、Web Push、Realtimeはまだ行いません。
 
 ## Next Work
 
-- Step F Preview deploy前に、Ignored Build Stepの一時設定 `exit 0` を解除するか、Preview deployを許可する条件付きcommandへ見直す
-- Preview deploy前に `NEXT_PUBLIC_APP_URL` の設定タイミングを確定する
+- Step F開始時に、Ignored Build Stepを `if [ "$VERCEL_GIT_COMMIT_REF" = "preview" ]; then exit 1; else exit 0; fi` へ変更する
+- `origin/main` から `preview` branchを作成してpushする
+- Preview deploy後に、必要なら `NEXT_PUBLIC_APP_URL` をPreview URLで追加設定する
 - Preview branch `preview` の作成タイミングを確認する
 - Production deployはまだ行わない
 - Web Push / Realtime / production deploy はまだ作らない
