@@ -4,15 +4,15 @@
 
 このドキュメントは、Phase 9でQuiz World専用Preview環境を実作成する直前のGO/NO-GO判断と、Stepごとの実行結果記録に使うチェックリストである。
 
-2026-05-24時点で、Step AとしてQuiz World専用Supabase development projectを作成済み、Step BとしてPreview DBへのmigration / seed適用済み、Step CとしてPreview DB smokeをpass済みである。Step DとしてVercel Preview project作成前のGO/NO-GOレビューを行い、Quiz World専用Vercel projectを作成済みである。Step D follow-upとしてVercel GitHub Appのrepository accessに `chop0522/quiz-world` を追加し、Vercel projectへGitHub repo接続を完了した。Step EのVercel Preview env設定前チェックでは、想定外のProduction deploymentを検出したためNO-GOとし、Vercel env設定は行っていない。Stripe、Web Push、Realtimeはまだ作らない。Smart Buzzerのproduction / Stripe / Vercel / Supabase / env / legal page / cleanup / live keyには触らない。
+2026-05-24時点で、Step AとしてQuiz World専用Supabase development projectを作成済み、Step BとしてPreview DBへのmigration / seed適用済み、Step CとしてPreview DB smokeをpass済みである。Step DとしてVercel Preview project作成前のGO/NO-GOレビューを行い、Quiz World専用Vercel projectを作成済みである。Step D follow-upとしてVercel GitHub Appのrepository accessに `chop0522/quiz-world` を追加し、Vercel projectへGitHub repo接続を完了した。Step EのVercel Preview env設定前チェックでは、想定外のProduction deploymentを検出したためNO-GOとし、Vercel env設定は行っていない。Step E再開前調査では、Production deploymentが2件あり、どちらもGitHub連携後の `main` push由来であることを確認した。その後、不要build抑止のためVercel Ignored Build Stepを一時的に `exit 0` に設定し、`origin/main` から `production-hold` branchを作成してpushしたうえで、Vercel Production Branchを `production-hold` に変更した。Stripe、Web Push、Realtimeはまだ作らない。Smart Buzzerのproduction / Stripe / Vercel / Supabase / env / legal page / cleanup / live keyには触らない。
 
 ## レビュー結果
 
-2026-05-24時点のレビュー結果は「Step D Vercel project作成済み / GitHub repo接続済み / Step Eは想定外Production deployment検出によりNO-GO / Vercel env未設定」である。
+2026-05-24時点のレビュー結果は「Step D Vercel project作成済み / GitHub repo接続済み / Step Eは想定外Production deployment検出によりNO-GO / Step E再開前調査でGitHub main push由来のProduction deployment 2件を確認 / Ignored Build Stepを一時設定 / `production-hold` branch作成済み / Production Branchを `production-hold` に変更済み / Vercel env未設定」である。
 
 local実装、Phase 8 smoke、manual UI rehearsal follow-up、Phase 9計画、migration順、seed方針、env項目、rollback / cleanup方針は整理済みである。今回、Supabase organization / workspace、region、plan、cleanup担当、最終GO/NO-GO判断を人間決定済みとして反映した。
 
-cloud実作成はQuiz World専用Supabase development projectの作成、Preview DBへのmigration / seed適用、Quiz World専用Vercel project作成、GitHub repo接続まで完了した。Step Eでは事前確認のみ行い、Vercel env設定、Preview deploy、追加のProduction deploy、Stripe、Web Push、Realtimeは行わない。
+cloud実作成はQuiz World専用Supabase development projectの作成、Preview DBへのmigration / seed適用、Quiz World専用Vercel project作成、GitHub repo接続まで完了した。Step Eでは事前確認のみ行い、Vercel env設定、Preview deploy、追加のProduction deploy、Stripe、Web Push、Realtimeは行わない。Production deploymentはGitHub連携後の `main` pushで自動作成されたため、Step E再開前にproduction branch / deploy運用を整理した。現時点ではVercelのProduction Branch設定を `production-hold` に変更済みで、`main` は開発の安定branchとして残す。
 
 決定済み:
 
@@ -27,7 +27,7 @@ cloud実作成はQuiz World専用Supabase development projectの作成、Preview
 - Preview共有範囲: owner/adminのみから開始
 - 初期admin email: 決定済み。実値はdocsに書かず、Vercel Preview envの `ADMIN_EMAILS` にのみ設定する
 - Preview DB cleanup担当: 自分
-- 最終GO/NO-GO判断: Step DでVercel project作成済み。Step D follow-upでGitHub repo接続済み。Step Eは想定外Production deployment検出によりNO-GO。Vercel env設定は未実行
+- 最終GO/NO-GO判断: Step DでVercel project作成済み。Step D follow-upでGitHub repo接続済み。Step Eは想定外Production deployment検出によりNO-GO。Step E再開前安全作業で `production-hold` branch作成とProduction Branch変更は完了。Vercel env設定は未実行
 
 Step A作成後の記録:
 
@@ -113,6 +113,96 @@ Step E Vercel Preview env設定前GO/NO-GO確認:
 - 実施しなかったこと: Vercel env設定、Preview deploy、Production deploy、Production domain設定、Stripe、Web Push、Realtime
 - 次の必要作業: 想定外Production deploymentの扱いを決める。必要ならVercel側でdeploy/production設定の確認、cleanup、またはPreview branch運用を整理してからStep Eを再実行する
 
+Step E再開前 Production deployment調査:
+
+- 実行日時: `2026-05-24 17:03 JST`
+- 調査対象Vercel project: `quiz-world-preview` / `prj_fCviBUF2fYH077fLBUHV5uPFleMx`
+- GitHub repo接続: `chop0522/quiz-world` 接続済み
+- Production branch設定: `main`
+- Vercel env確認: environment variablesなし
+- Production env: 未設定
+- Preview env: 未設定
+- custom Production domain: 未設定
+- Vercel automatic aliases: Production deploymentに自動aliasが割当済み
+- Production deployment件数: 2件
+- Production deploymentの原因: どちらもsourceは `git`。Vercel CLI手動deployではなく、GitHub連携後の `main` branch pushにより自動作成されたと判断する
+- 外部共有確認: docs / READMEには調査前時点でdeployment URLを共有していなかった。Vercel CLIだけでは第三者共有履歴までは確認できない
+- secret確認: service role key / anon key / DB password / 初期admin email実値は確認結果に記録しない
+
+| created | source | branch | commit | message | status | target | deployment URL |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `2026-05-24 17:00:21 JST` | GitHub | `main` | `fe7e974` | `docs: record phase 9 vercel env setup no-go` | Ready | Production | `https://quiz-world-preview-ee43atdtz-chop0522s-projects.vercel.app` |
+| `2026-05-24 16:39:05 JST` | GitHub | `main` | `39bf037` | `docs: record phase 9 vercel git connection` | Ready | Production | `https://quiz-world-preview-razogyaot-chop0522s-projects.vercel.app` |
+
+扱いの提案:
+
+- rollback: 非推奨。2件とも想定外のProduction deploymentであり、rollbackしても別の想定外Production deploymentへ戻るだけで根本原因を解決しない
+- 削除: すぐには行わない。先にproduction branch設定と自動deploy運用を整理する。削除する場合も別途GO/NO-GO判断を行う
+- 放置: 短期的な一時放置は可能。ただしautomatic production aliasesが存在するため、10人テスト前までに扱いを決める
+- 記録のみ: 現時点の推奨。まず記録し、Step E再開前にproduction branchを `main` 以外にする、またはPreview branch運用を確定してからVercel Preview env設定へ進む
+
+Step E再開前 branch / deployment運用整理:
+
+- 実行日時: `2026-05-24 19:58 JST`
+- 調査対象Vercel project: `quiz-world-preview` / `prj_fCviBUF2fYH077fLBUHV5uPFleMx`
+- GitHub repo接続: `chop0522/quiz-world` 接続済み
+- 操作対象確認: Quiz World専用Vercel project。Smart Buzzer projectは操作対象外
+- Production Branch変更方針: `main` から `production-hold` へ変更したい
+- 変更結果: 未成立
+- 未成立理由: Vercelが `Branch "production-hold" not found in the connected Git repository.` を返したため
+- 対応: 指示どおり、その場で `production-hold` branch作成やpushは行わず停止
+- 現在のProduction Branch: `main`
+- Preview branch運用方針: `preview` branchでPreview確認を行う
+- `main` の扱い: 開発の安定branchとして残す
+- 既存Production deployment 2件: 削除・rollbackせず、記録のみ
+- 既存Production deployment URL: 外部共有しない
+- Production env: 未設定
+- Preview env: 未設定
+- Vercel env: environment variablesなし
+- Production domain: custom domainは未設定。ただしVercel自動aliasはProduction deploymentに割当済み
+- Preview deploy: 未実行
+- Production deploy: 追加実行なし
+- secret確認: service role key / anon key / DB password / 初期admin email実値は記録しない
+
+Step E再開前の判断:
+
+- この時点ではNO-GO。Production Branchが `main` のままなので、この状態で `main` にcommit / pushするとProduction deploymentが増える可能性があった
+- Step Eへ進むには、先に `production-hold` branchを作成してpushするか、Vercel Dashboard上で存在しないbranchを許可できる別手段があるかを人間が確認する必要があった
+- `preview` branchへのPreview deploy運用は方針として固定するが、branch作成・push・Preview deployはまだ行わない
+
+Step E再開前 Production Branch切り替え安全作業:
+
+- 実行日時: `2026-05-24 22:37 JST`
+- 作業対象Vercel project: `quiz-world-preview` / `prj_fCviBUF2fYH077fLBUHV5uPFleMx`
+- GitHub repo接続: `chop0522/quiz-world` 接続済み
+- 操作対象確認: Quiz World専用Vercel project。Smart Buzzer projectは操作対象外
+- 作業前Production Branch: `main`
+- 安全策: Vercel Ignored Build Stepを一時的に `exit 0` に設定
+- 一時設定の目的: `production-hold` branch作成pushやdocs pushで不要なbuild/deploymentを発生させないため
+- `production-hold` branch作成: `origin/main` の現在commitからremote branchとして作成済み
+- `production-hold` branch commit: `fe7e974`
+- Vercel側の確認: `production-hold` branch push後もdeployment一覧は既存Production deployment 2件のみ
+- Production Branch変更: `production-hold` へ変更済み
+- 作業後Production Branch: `production-hold`
+- `main` の扱い: 開発の安定branchとして残す。今後の `main` pushはProduction Branch Trackingの対象ではない運用にする
+- Preview branch運用方針: `preview` branchでPreview確認を行う。ただし `preview` branch作成・push・Preview deployはまだ行わない
+- 既存Production deployment 2件: 削除・rollbackせず、記録のみ
+- 既存Production deployment URL: 外部共有しない
+- Production env: 未設定
+- Preview env: 未設定
+- Vercel env: environment variablesなし
+- Production domain: custom domainは未設定。ただしVercel自動aliasは既存Production deploymentに割当済み
+- Preview deploy: 未実行
+- Production deploy: 追加実行なし
+- Stripe / Web Push / Realtime: 未実施
+- secret確認: service role key / anon key / DB password / 初期admin email実値は記録しない
+
+Step F前の注意:
+
+- Ignored Build Step `exit 0` は一時設定である
+- Preview deployを実行するStep F前に、Ignored Build Stepを解除するか、Preview deployを許可する条件付きcommandへ見直す
+- この一時設定を残したままではPreview deployもskipされる可能性がある
+
 ## 1. Phase 9で実作成するもの
 
 Step Aの実行判断後に作成する対象は以下に限定する。
@@ -122,10 +212,11 @@ Step Aの実行判断後に作成する対象は以下に限定する。
 | Quiz World専用 Supabase development project | Preview DB / Auth / RLS確認 | 作成済み。project名は `quiz-world-preview` |
 | Preview DB migration / seed | Preview DB schema / 初期world / Preview invite code | Step Bで適用済み |
 
-Step B後も、以下はまだ作成・設定しない。
+Step DまでにVercel Preview projectは作成済みである。Step E調査後も、以下はまだ設定・実行しない。
 
-- Vercel Preview project
 - Vercel Preview env
+- Preview deploy
+- 追加のProduction deploy
 
 ## 2. Phase 9でまだ作らないもの
 
@@ -476,10 +567,16 @@ Step AでQuiz World専用Supabase development projectを作成し、Step BでPre
 | Preview deploy | 未実行 |
 | Step E事前確認 | 想定外のProduction deploymentを検出したためNO-GO |
 | Step E env設定 | 未実行 |
+| Step E再開前調査 | Production deployment 2件を確認。どちらもGitHub連携後の `main` push由来 |
+| Ignored Build Step | 一時的に `exit 0` を設定済み。Step F Preview deploy前に解除または見直す |
+| `production-hold` branch | `origin/main` から作成し、originへpush済み |
+| Production branch | `production-hold` へ変更済み |
+| Preview branch運用 | `preview` branchでPreview確認する方針。ただしbranch作成・push・Preview deployは未実行 |
+| deployment扱い提案 | 既存Production deployment 2件は削除・rollbackせず記録のみ |
 | env確認 | environment variablesなし |
-| deployment確認 | deploymentsなし |
+| deployment確認 | Step D project作成直後はdeploymentsなし。Step E調査時点ではProduction deployment 2件 |
 | 初期admin email | 決定済み。docsには実値を書かない。Vercel Preview envの `ADMIN_EMAILS` にのみ設定 |
 | Preview invite code | `SEASON0-PREVIEW-001` |
 | Preview共有先 | owner/adminのみから開始 |
 | cleanup担当 | 自分 |
-| GO / NO-GO判断 | Vercel project作成とGitHub repo接続は完了。Vercel env設定、Preview deployは次Step以降。Production deploy、Stripe、Web Push、Realtimeはまだ行わない |
+| GO / NO-GO判断 | Production Branch切り替えは完了。次はIgnored Build Stepの扱いを確認したうえでStep E Vercel Preview env設定へ進む候補 |
