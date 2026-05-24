@@ -2,7 +2,7 @@
 
 通知型早押しクイズワールドの専用リポジトリです。
 
-Phase 1の signup/auth ローカル実装は完了・push・tag済みです。Phase 2の四択クイズ作成local実装も完了・push・tag済みです。Phase 3 quiz launch / recipients local実装も完了・push・tag済みです。Phase 4 answer submission / ranking local実装も完了・push・tag済みです。Phase 5 result / rating / reports のlocal実装も完了・push・tag済みです。Phase 6 rank_events / ranking local実装も完了・push・tag済みです。Phase 7 admin / moderation のlocal実装も完了・push・tag済みです。Phase 8 10-user local smoke / ops rehearsalは89チェックpass、DB reset済みです。Phase 8 manual UI rehearsal follow-upも完了・push済みです。Phase 9 Step AとしてQuiz World専用Supabase development projectを作成済み、Step BとしてPreview DBへのmigration / seed適用済み、Step CとしてPreview DB smokeをpass済みです。Step DとしてQuiz World専用Vercel project `quiz-world-preview` を作成済みで、Step D follow-upとしてGitHub repo `chop0522/quiz-world` への接続も完了しました。Step EのVercel Preview env設定前チェックでは想定外のProduction deploymentを検出したためNO-GOとし、env設定は行っていません。Step E再開前調査ではProduction deploymentが2件あり、どちらもGitHub連携後の `main` push由来であることを確認しました。その後、Vercel Ignored Build Stepを一時的に `exit 0` に設定し、`production-hold` branchを作成してpushし、Vercel Production Branchを `production-hold` に変更しました。Stripe、Web Push、Realtimeはまだ行っていません。既存Smart Buzzerとは別プロジェクトとして扱います。
+Phase 1の signup/auth ローカル実装は完了・push・tag済みです。Phase 2の四択クイズ作成local実装も完了・push・tag済みです。Phase 3 quiz launch / recipients local実装も完了・push・tag済みです。Phase 4 answer submission / ranking local実装も完了・push・tag済みです。Phase 5 result / rating / reports のlocal実装も完了・push・tag済みです。Phase 6 rank_events / ranking local実装も完了・push・tag済みです。Phase 7 admin / moderation のlocal実装も完了・push・tag済みです。Phase 8 10-user local smoke / ops rehearsalは89チェックpass、DB reset済みです。Phase 8 manual UI rehearsal follow-upも完了・push済みです。Phase 9 Step AとしてQuiz World専用Supabase development projectを作成済み、Step BとしてPreview DBへのmigration / seed適用済み、Step CとしてPreview DB smokeをpass済みです。Step DとしてQuiz World専用Vercel project `quiz-world-preview` を作成済みで、Step D follow-upとしてGitHub repo `chop0522/quiz-world` への接続も完了しました。Step EとしてVercel Preview envをPreview environmentのみに設定済みです。Production envは未設定、Preview deployは未実行です。`NEXT_PUBLIC_APP_URL` はPreview URL未確定のため未設定です。その前段で、Vercel Ignored Build Stepを一時的に `exit 0` に設定し、`production-hold` branchを作成してpushし、Vercel Production Branchを `production-hold` に変更しました。Stripe、Web Push、Realtimeはまだ行っていません。既存Smart Buzzerとは別プロジェクトとして扱います。
 
 Smart Buzzer の production / Stripe / Vercel / Supabase / env / legal page / cleanup / live key には触れません。
 
@@ -362,19 +362,22 @@ Smart Buzzer のSupabase/Vercel/Stripe/envとは混ぜません。
 - Phase 9 Step Aとして、Quiz World専用Supabase development project `quiz-world-preview` の作成だけ完了しました。project id / public URLは `quiz-world-phase-9-preview-execution-checklist.md` にpublic情報として記録済みです。
 - Phase 9 Step Bとして、Preview DBへのmigration / seed適用を完了しました。初期world `クイズワールド` とPreview invite code `SEASON0-PREVIEW-001` を作成済みです。service role key / anon key / DB passwordはrepo/docsに記録していません。
 - Phase 9 Step Cとして、Supabase Preview DB smokeを実行し、migration履歴、初期world、Preview invite code、主要table、RLS、table件数、Smart Buzzer混入なしを確認済みです。
-- Phase 9 Step Dとして、Quiz World専用Vercel project `quiz-world-preview` を作成しました。Step D作成直後はdeploymentsなしでしたが、GitHub repo接続後の `main` pushにより想定外Production deploymentが作成されています。Production domain / Production env / Vercel envは未設定です。
+- Phase 9 Step Dとして、Quiz World専用Vercel project `quiz-world-preview` を作成しました。Step D作成直後はdeploymentsなしでしたが、GitHub repo接続後の `main` pushにより想定外Production deploymentが作成されています。Production domain / Production envは未設定です。
 - Step D follow-upとして、Vercel GitHub Appのrepository accessに `chop0522/quiz-world` を追加し、Vercel project `quiz-world-preview` へGitHub repo接続を完了しました。
-- Phase 9 Step Eの事前確認で、想定外のProduction deploymentを1件検出したためNO-GOとしました。Vercel envは未設定のままです。
+- Phase 9 Step Eの事前確認で、想定外のProduction deploymentを1件検出したため一度NO-GOとしました。Step E再開前にProduction Branchを `production-hold` へ変更してからPreview env設定へ進みました。
 - Step E再開前調査で、Production deploymentは2件存在し、どちらもGitHub連携後の `main` push由来であることを確認しました。
 - Vercel Ignored Build Stepを一時的に `exit 0` に設定しました。Step F Preview deploy前に解除または見直しが必要です。
 - `production-hold` branchを `origin/main` から作成してpushし、Vercel Production Branchを `production-hold` に変更しました。
-- Preview確認は `preview` branchで行う方針です。ただし `preview` branchのpush、Preview deploy、Vercel env設定はまだ行っていません。
+- Phase 9 Step Eとして、Vercel Preview envに `NEXT_PUBLIC_SUPABASE_URL`、`NEXT_PUBLIC_SUPABASE_ANON_KEY`、`SUPABASE_SERVICE_ROLE_KEY`、`ADMIN_EMAILS`、`QUIZ_WORLD_ID`、`MAX_INITIAL_MEMBERS` を設定済みです。env実値はrepo/docsに記録していません。
+- `NEXT_PUBLIC_APP_URL` はPreview URL未確定のため未設定です。Step F Preview deploy前後で実値を確定してから設定します。
+- Preview確認は `preview` branchで行う方針です。ただし `preview` branchのpush、Preview deployはまだ行っていません。
 - Supabase PreviewとVercel project作成は完了済みです。Stripe / Production環境はまだ作成しません。
-- Vercel env設定、Preview deploy、Production deploy、Stripe、Web Push、Realtimeはまだ行いません。
+- Preview deploy、Production deploy、Stripe、Web Push、Realtimeはまだ行いません。
 
 ## Next Work
 
-- Ignored Build Stepの一時設定を把握したうえで、Phase 9 Step EのVercel Preview env設定へ進む
+- Step F Preview deploy前に、Ignored Build Stepの一時設定 `exit 0` を解除するか、Preview deployを許可する条件付きcommandへ見直す
+- Preview deploy前に `NEXT_PUBLIC_APP_URL` の設定タイミングを確定する
 - Preview branch `preview` の作成タイミングを確認する
 - Production deployはまだ行わない
 - Web Push / Realtime / production deploy はまだ作らない
