@@ -245,6 +245,33 @@ Step F Preview deploy前GO/NO-GO確認:
 - Production deploy: 実行しない
 - Step F判断: GO候補。ただしStep F開始時にIgnored Build Stepを上記条件式へ変更し、Preview branch作成・push後にPreview deploy確認へ進む
 
+Step F Preview deploy実行結果:
+
+- 実行日時: `2026-05-25 00:01 JST`
+- 作業対象Vercel project: `quiz-world-preview` / `prj_fCviBUF2fYH077fLBUHV5uPFleMx`
+- GitHub repo接続: `chop0522/quiz-world` 接続済み
+- Production Branch: `production-hold`
+- Production env: 未設定
+- Production custom domain: 未設定
+- Preview env: 必要env名は設定済み。値はdocs、README、repo、commit messageに記録しない
+- Ignored Build Step変更: `if [ "$VERCEL_GIT_COMMIT_REF" = "preview" ]; then exit 1; else exit 0; fi`
+- `preview` branch: `origin/main` の `45ded1e` から作成してoriginへpush済み
+- Preview deploy実行方法: local `preview` branchからVercel CLIでPreview deploy
+- Preview deployment URL: `https://quiz-world-preview-pm23q56vf-chop0522s-projects.vercel.app`
+- Preview deployment inspector URL: `https://vercel.com/chop0522s-projects/quiz-world-preview/A7W6voaK5BjXHqabVQ4DCA4XnEe7`
+- deployment id: `dpl_A7W6voaK5BjXHqabVQ4DCA4XnEe7`
+- deployment status: Ready
+- deployment environment: Preview
+- deployment source: CLI
+- deployment branch / commit: `preview` / `45ded1e`
+- deployment commit message: `docs: record phase 9 preview deploy preflight`
+- Production deployment: 追加作成なし
+- Build result: Next.js build成功
+- Build log secret scan: pass
+- `NEXT_PUBLIC_APP_URL`: 未設定のまま。現状のbuild blockerではない。Step G Preview smoke後、必要ならPreview URLで追加設定する
+- Stripe / Web Push / Realtime: 未実施
+- Smart Buzzer: 操作対象外。触っていない
+
 ## 1. Phase 9で実作成するもの
 
 Step Aの実行判断後に作成する対象は以下に限定する。
@@ -577,9 +604,9 @@ Step A実行時に確認済み / 今後も維持すること:
 - Vercel project作成と同時にProduction domain / Production env / Production deployを設定しようとしている
 - Vercel Preview envにSmart Buzzer由来の値を入れようとしている
 
-## Step A / Step B / Step C / Step D実作成結果メモ
+## Step A / Step B / Step C / Step D / Step E / Step F実作成結果メモ
 
-Step AでQuiz World専用Supabase development projectを作成し、Step BでPreview DBへmigration / seedを適用した。Step CでPreview DB smokeを実行し、migration履歴、seed、主要table、RLS、table件数を確認した。Step DではVercel Preview projectを作成し、Step D follow-upでGitHub repo接続まで完了した。Step EでVercel Preview envを設定済みである。Preview deployは未実行である。
+Step AでQuiz World専用Supabase development projectを作成し、Step BでPreview DBへmigration / seedを適用した。Step CでPreview DB smokeを実行し、migration履歴、seed、主要table、RLS、table件数を確認した。Step DではVercel Preview projectを作成し、Step D follow-upでGitHub repo接続まで完了した。Step EでVercel Preview envを設定済みである。Step FでPreview deployを実行済みである。
 
 | 項目 | 値 |
 | --- | --- |
@@ -605,19 +632,22 @@ Step AでQuiz World専用Supabase development projectを作成し、Step BでPre
 | Vercel project作成状態 | 作成済み |
 | Production domain / env | 未設定 |
 | Vercel env | Preview env設定済み。Production envは未設定 |
-| Preview deploy | 未実行 |
+| Preview deploy | 実行済み。Ready |
+| Preview deployment URL | `https://quiz-world-preview-pm23q56vf-chop0522s-projects.vercel.app` |
+| Preview deployment id | `dpl_A7W6voaK5BjXHqabVQ4DCA4XnEe7` |
+| Preview deployment branch / commit | `preview` / `45ded1e` |
 | Step E事前確認 | 想定外のProduction deploymentを検出したためNO-GO |
 | Step E env設定 | Preview envのみ設定済み。`NEXT_PUBLIC_APP_URL` はPreview URL未確定のため未設定 |
 | Step E再開前調査 | Production deployment 2件を確認。どちらもGitHub連携後の `main` push由来 |
-| Ignored Build Step | 一時的に `exit 0` を設定済み。Step F Preview deploy前に解除または見直す |
+| Ignored Build Step | `if [ "$VERCEL_GIT_COMMIT_REF" = "preview" ]; then exit 1; else exit 0; fi` に変更済み |
 | `production-hold` branch | `origin/main` から作成し、originへpush済み |
 | Production branch | `production-hold` へ変更済み |
-| Preview branch運用 | `preview` branchでPreview確認する方針。ただしbranch作成・push・Preview deployは未実行 |
+| Preview branch運用 | `preview` branchを作成し、originへpush済み |
 | deployment扱い提案 | 既存Production deployment 2件は削除・rollbackせず記録のみ |
 | env確認 | Preview envに必要envを設定済み。Production envは未設定 |
-| deployment確認 | Step D project作成直後はdeploymentsなし。Step E調査時点ではProduction deployment 2件 |
+| deployment確認 | Preview deployment Ready。追加Production deploymentなし |
 | 初期admin email | 決定済み。docsには実値を書かない。Vercel Preview envの `ADMIN_EMAILS` にのみ設定 |
 | Preview invite code | `SEASON0-PREVIEW-001` |
 | Preview共有先 | owner/adminのみから開始 |
 | cleanup担当 | 自分 |
-| GO / NO-GO判断 | Step E Preview env設定は完了。次はIgnored Build Stepの扱いと `NEXT_PUBLIC_APP_URL` を確認したうえでStep F Preview deployへ進む候補 |
+| GO / NO-GO判断 | Step F Preview deployは完了。次はStep G Preview smokeへ進む候補 |
