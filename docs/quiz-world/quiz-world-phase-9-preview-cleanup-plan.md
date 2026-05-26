@@ -126,6 +126,7 @@ Preview DBは **full reset + seed再投入** を第一候補にする。
 - Auth usersが残る場合、Supabase DashboardまたはSQL/APIで検証ユーザーを整理する必要があるか
 - 初期admin email対象ユーザーは、cleanup後に再signupする運用でよいか
 - Preview invite code `SEASON0-PREVIEW-001` をseedで再投入できるか
+- 現在のrepo内 `supabase/seed.sql` はlocal用 `SEASON0-TEST-001` を投入するため、Preview reset時にそのまま使うとPreview invite codeを再作成できない。Preview用seed投入手順を実行前に決める
 
 ## 実行前チェック
 
@@ -161,6 +162,123 @@ cleanup前に確認する件数:
 - `reports`
 - `rank_events`
 - `admin_audit_logs`
+
+## 2026-05-26 read-only確認結果
+
+2026-05-26 23:03 JST に、Supabase CLIの `db query --linked` を使い、Quiz World Preview projectに対してread-only SQLだけを実行した。
+
+この確認ではcleanup / resetは実行していない。
+
+### 対象project確認
+
+| 項目 | 確認結果 |
+| --- | --- |
+| local git status | clean |
+| linked project ref | `ogfuohrvzfjmgvdewvcl` |
+| linked project name | `quiz-world-preview` |
+| Supabase project status | `ACTIVE_HEALTHY` |
+| region | `ap-northeast-1` |
+| remote PostgreSQL | `17.6` |
+| Smart Buzzer project | 対象外。project ref / table一覧ともQuiz World Previewで確認 |
+
+### cleanup前件数
+
+| 対象 | 件数 |
+| --- | ---: |
+| `auth.users` | 5 |
+| `profiles` | 5 |
+| `world_members` | 5 |
+| `waitlist` | 0 |
+| `invites` | 2 |
+| `questions` | 1 |
+| `blocks` | 0 |
+| `quiz_launches` | 1 |
+| `quiz_recipients` | 3 |
+| `answers` | 2 |
+| `question_ratings` | 1 |
+| `reports` | 1 |
+| `rank_events` | 4 |
+| `admin_audit_logs` | 4 |
+
+確認結果:
+
+- Step G smoke検証データはPreview DBに残っている
+- `profiles` は `admin/active=1`、`user/active=3`、`user/suspended=1`
+- `world_members` は `member/active=4`、`member/suspended=1`
+- `questions` は `review_required=1`
+- `reports` は `reviewing=1`
+- `rank_events` はanswer由来3件、rating由来1件
+- `admin_audit_logs` は4件
+
+### 初期データ確認
+
+| データ | 確認結果 |
+| --- | --- |
+| 初期world | `クイズワールド` が存在 |
+| world id | `00000000-0000-4000-8000-000000000001` |
+| member_limit | `10` |
+| world status | `active` |
+| Preview invite code | `SEASON0-PREVIEW-001` が存在 |
+| invite status | `active` |
+| invite max_uses / use_count | `100` / `5` |
+| invite expires_at | `null` |
+
+### migration / table / RLS確認
+
+適用済みmigration:
+
+- `20260516000100_phase1_signup_auth`
+- `20260521000100_phase2_questions`
+- `20260521000200_phase3_quiz_launches`
+- `20260522000100_phase4_answers`
+- `20260522000200_phase5_result_rating_reports`
+- `20260522000300_phase6_rank_events`
+- `20260522000400_phase7_admin_moderation`
+
+public schemaのtableは以下14件のみで、想定外tableは0件だった。
+
+- `admin_audit_logs`
+- `answers`
+- `blocks`
+- `invites`
+- `profiles`
+- `question_ratings`
+- `questions`
+- `quiz_launches`
+- `quiz_recipients`
+- `rank_events`
+- `reports`
+- `waitlist`
+- `world_members`
+- `worlds`
+
+RLSは上記14 tableすべてで有効だった。
+
+Smart Buzzer由来らしいtable名やデータは確認されなかった。
+
+### auth.usersの扱い
+
+read-only確認では、`auth.users` が5件存在することは確認できた。
+
+一方で、実際に `supabase db reset --linked` を実行しない限り、remote resetで `auth.users` の行が消えるかは確定できない。
+
+Supabase CLIのhelpでは `supabase db reset --linked` はlinked projectをlocal migrationsでresetし、seed scriptを実行する挙動である。ただし、Auth usersはSupabase Auth管理領域のため、Step H実行時は以下のどちらかを前提にする。
+
+- reset後に `auth.users` 件数を必ず再確認する
+- `auth.users` が残った場合に備え、Dashboardまたは管理APIで検証ユーザーを整理する手順を用意する
+
+### Preview seed再投入の注意
+
+現在のrepo内 `supabase/seed.sql` はlocal用 `SEASON0-TEST-001` を投入する。
+
+そのため、Preview DBをfull resetする場合、現状のseedだけでは `SEASON0-PREVIEW-001` を再投入できない。
+
+実行前に、以下のどちらかを決める。
+
+1. Preview用seed SQLを別途用意し、reset後に `SEASON0-PREVIEW-001` をidempotentに投入する
+2. `supabase/seed.sql` をPreview/local両対応にするか、Preview用seed運用をdocs化してから実行する
+
+この点が未決定のため、2026-05-26時点では **Step H cleanup / resetはNO-GO** とする。
 
 ## 実行手順案
 
