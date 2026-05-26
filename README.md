@@ -2,7 +2,7 @@
 
 通知型早押しクイズワールドの専用リポジトリです。
 
-Phase 1の signup/auth ローカル実装は完了・push・tag済みです。Phase 2の四択クイズ作成local実装も完了・push・tag済みです。Phase 3 quiz launch / recipients local実装も完了・push・tag済みです。Phase 4 answer submission / ranking local実装も完了・push・tag済みです。Phase 5 result / rating / reports のlocal実装も完了・push・tag済みです。Phase 6 rank_events / ranking local実装も完了・push・tag済みです。Phase 7 admin / moderation のlocal実装も完了・push・tag済みです。Phase 8 10-user local smoke / ops rehearsalは89チェックpass、DB reset済みです。Phase 8 manual UI rehearsal follow-upも完了・push済みです。Phase 9 Step AとしてQuiz World専用Supabase development projectを作成済み、Step BとしてPreview DBへのmigration / seed適用済み、Step CとしてPreview DB smokeをpass済みです。Step DとしてQuiz World専用Vercel project `quiz-world-preview` を作成済みで、Step D follow-upとしてGitHub repo `chop0522/quiz-world` への接続も完了しました。Step EとしてVercel Preview envをPreview environmentのみに設定済みです。Step FとしてIgnored Build Stepを `preview` branchだけbuild許可する条件式へ変更し、`preview` branchを作成・pushしてPreview deployを実行しました。Preview deploymentはReadyです。Step G Preview smokeは実行を試みましたが、Vercel Deployment Protectionで通常アクセスが401になり、CLI bypass経由も404になったためNO-GOです。Production envは未設定、追加Production deployは行っていません。`NEXT_PUBLIC_APP_URL` は未設定ですが、現状のbuild blockerではありません。Stripe、Web Push、Realtimeはまだ行っていません。既存Smart Buzzerとは別プロジェクトとして扱います。
+Phase 1の signup/auth ローカル実装は完了・push・tag済みです。Phase 2の四択クイズ作成local実装も完了・push・tag済みです。Phase 3 quiz launch / recipients local実装も完了・push・tag済みです。Phase 4 answer submission / ranking local実装も完了・push・tag済みです。Phase 5 result / rating / reports のlocal実装も完了・push・tag済みです。Phase 6 rank_events / ranking local実装も完了・push・tag済みです。Phase 7 admin / moderation のlocal実装も完了・push・tag済みです。Phase 8 10-user local smoke / ops rehearsalは89チェックpass、DB reset済みです。Phase 8 manual UI rehearsal follow-upも完了・push済みです。Phase 9 Step AとしてQuiz World専用Supabase development projectを作成済み、Step BとしてPreview DBへのmigration / seed適用済み、Step CとしてPreview DB smokeをpass済みです。Step DとしてQuiz World専用Vercel project `quiz-world-preview` を作成済みで、Step D follow-upとしてGitHub repo `chop0522/quiz-world` への接続も完了しました。Step EとしてVercel Preview envをPreview environmentのみに設定済みです。Step FとしてIgnored Build Stepを `preview` branchだけbuild許可する条件式へ変更し、`preview` branchを作成・pushしてPreview deployを実行しました。Preview deploymentはReadyです。Step G Preview smokeは実行を試みましたが、Vercel Deployment Protectionで通常アクセスが401になり、CLI bypass経由も404になったためNO-GOです。Step G再実行前のaccess investigationも記録済みで、owner/adminブラウザ、Shareable Link、または明示的automation bypassで `/` と `/api/world` へ到達できることを確認してから再実行します。Production envは未設定、追加Production deployは行っていません。`NEXT_PUBLIC_APP_URL` は未設定ですが、現状のbuild blockerではありません。Stripe、Web Push、Realtimeはまだ行っていません。既存Smart Buzzerとは別プロジェクトとして扱います。
 
 Smart Buzzer の production / Stripe / Vercel / Supabase / env / legal page / cleanup / live key には触れません。
 
@@ -376,6 +376,7 @@ Smart Buzzer のSupabase/Vercel/Stripe/envとは混ぜません。
 - Preview deployment branch / commit: `preview` / `45ded1e`
 - Build log secret scan: pass
 - Phase 9 Step G Preview smokeは実行を試みましたが、Preview URLの通常アクセスはVercel Deployment Protectionの `401 Authentication Required` で止まり、`vercel curl` のprotection bypass経由でも `/` と `/api/world` が `404_NOT_FOUND` になったため、MVP主要ループ確認には進めませんでした。
+- Step G再実行前調査として、Deployment ProtectionがVercel Authentication相当であること、Protection Bypass for Automationが設定済みであること、`vercel curl` がdeployment id指定とURL指定の両方で404になること、deployment metadata上のartifact見え方に追加確認余地があることを記録しました。bypass secret実値はrepo/docsに記録していません。
 - Step G中に追加Production deploymentは発生していません。Production envとProduction custom domainは未設定のままです。
 - `NEXT_PUBLIC_APP_URL` は未設定です。現状のapp codeでは参照されておらず、未設定でもbuildは成功していますが、Step GではPreview URLに到達できなかったためruntime影響は未確認です。
 - Supabase PreviewとVercel project作成は完了済みです。Stripe / Production環境はまだ作成しません。
@@ -384,7 +385,8 @@ Smart Buzzer のSupabase/Vercel/Stripe/envとは混ぜません。
 ## Next Work
 
 - Step G Preview smokeを再実行できるように、Vercel Deployment Protectionのowner/adminアクセスまたはbypass手順を確定する
-- `vercel curl` bypassが `404_NOT_FOUND` になる原因をVercel project / deployment設定で確認する
+- owner/adminブラウザ、Shareable Link、または明示的automation bypassで `/` と `/api/world` に到達できるか確認する。Shareable Linkやbypass secretの実値はrepo/docsに書かない
+- Shareable Linkまたは明示的bypassでも404なら、deployment artifact / root / output / deploy methodの修正計画を作る
 - Preview URLへ到達できた後、必要なら `NEXT_PUBLIC_APP_URL` をPreview URLで追加設定する
 - Production deployはまだ行わない
 - Web Push / Realtime / production deploy はまだ作らない

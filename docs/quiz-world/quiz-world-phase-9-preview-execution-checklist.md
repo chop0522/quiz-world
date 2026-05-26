@@ -301,6 +301,32 @@ Vercel CLI token安全確認:
 - revoke後、該当旧CLI tokenがtoken一覧に残っていないことを確認済み
 - token実値、Supabase key、DB password、初期admin email実値は記録しない
 
+Step G再実行前 Deployment Protection / bypass 調査:
+
+- 実行日時: `2026-05-26 18:25 JST`
+- Preview smoke再実行、Production deploy、Production env設定、Production domain設定、Stripe、Web Push、Realtimeは実行していない
+- 対象Vercel projectは `quiz-world-preview` / `prj_fCviBUF2fYH077fLBUHV5uPFleMx`
+- 接続repoは `chop0522/quiz-world`
+- 対象Preview deploymentは `dpl_A7W6voaK5BjXHqabVQ4DCA4XnEe7`
+- deployment branch / commitは `preview` / `45ded1e`
+- Production Branchは `production-hold`
+- Production envは未設定
+- Production custom domainは未設定
+- 追加Production deploymentはなし
+- `main` push由来でCanceled Preview deploymentが1件作成されたが、Ignored Build Stepでbuild/deployはskipされておりProductionではない
+- Deployment ProtectionはVercel Authentication相当の設定。Password ProtectionとTrusted IPsは未設定
+- Protection Bypass for Automationはprojectに設定済み。bypass secret実値は記録しない
+- Vercel公式docs上、Protection Bypass for Automationは `x-vercel-protection-bypass` headerまたはquery parameterで利用でき、`vercel curl` はbypass headerを自動付与する
+- `vercel curl` はdeployment id指定とURL指定の両方で再確認したが、`/` と `/api/world` は引き続き `404_NOT_FOUND`
+- Vercel logsではbypass経由の `/` が `source=static` / `responseStatusCode=404` として記録された
+- 通常の `curl` は `/` で `401 Authentication Required` を返すため、通常アクセスはDeployment Protectionで止まっている
+- `vercel inspect --logs` ではNext.js build成功と主要routes出力を確認済み
+- 一方でdeployment metadataでは `source=cli`、`builds=[]`、`routes=null`、`functions=[]` と見え、files APIでは`.next`や`.vercel/output`を確認できなかった
+- 現時点では、自動bypass経路だけの問題か、deployment artifact / root / output / CLI deploy methodの問題かをまだ断定しない
+- Step G再実行は条件付きGO候補。owner/adminブラウザ、Shareable Link、または明示的automation bypass secretで `/` と `/api/world` へ到達できることを確認してからMVP主要ループへ進む
+- Shareable Linkやbypass secretの実値はdocs、README、repo、commit messageに書かない
+- Shareable Linkまたは明示的bypassでも404になる場合は、Preview smoke再実行へ進まず、deployment artifact / root / output / deploy methodの修正計画を作る
+
 ## 1. Phase 9で実作成するもの
 
 Step Aの実行判断後に作成する対象は以下に限定する。

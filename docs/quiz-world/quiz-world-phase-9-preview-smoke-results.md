@@ -177,12 +177,83 @@ The page could not be found
 
 記録しているのは確認結果のみであり、Vercel token、Supabase key、DB password、初期admin emailの実値はdocs、README、repo、commit messageに書かない。
 
+## Step G再実行前 Deployment Protection / bypass 調査
+
+2026-05-26 18:25 JSTに、Step G Preview smokeを再実行する前のアクセス方法と `vercel curl` bypass経由404の原因を追加調査した。
+
+この調査ではPreview smoke本体、Production deploy、Production env設定、Production domain設定、Stripe、Web Push、Realtimeは実行していない。Smart Buzzerにも触っていない。
+
+### 確認した状態
+
+| 確認 | 結果 |
+| --- | --- |
+| git状態 | `main...origin/main`、調査開始時点でclean |
+| 対象Vercel project | `quiz-world-preview` / `prj_fCviBUF2fYH077fLBUHV5uPFleMx` |
+| 接続repo | `chop0522/quiz-world` |
+| 対象Preview deployment | `dpl_A7W6voaK5BjXHqabVQ4DCA4XnEe7` |
+| Preview URL | `https://quiz-world-preview-pm23q56vf-chop0522s-projects.vercel.app` |
+| deployment branch / commit | `preview` / `45ded1e` |
+| deployment status | Ready |
+| Production Branch | `production-hold` |
+| Production env | 未設定 |
+| Production custom domain | 未設定 |
+| project domain | `quiz-world-preview.vercel.app` のみ。custom production domainは未設定 |
+| Preview env | 必要env名はPreview environmentに設定済み。値は記録しない |
+| 追加Production deployment | なし。既存Production deployment 2件のみ |
+| main push由来deployment | `5acef12` のpushでPreview deploymentが1件作成されたが、Ignored Build StepによりCanceled。Productionではない |
+| secret実値 | docs / README / git diffには記録なし |
+
+### Deployment Protection確認
+
+Vercel project API上、Deployment ProtectionはVercel Authentication相当の設定で、`ssoProtection.deploymentType = all_except_custom_domains` だった。Password ProtectionとTrusted IPsは未設定だった。
+
+Protection Bypass for Automationはprojectに設定済みで、automation bypass用のsecretがdeployment envとして扱われていることを確認した。ただし、bypass secret実値は表示・記録していない。
+
+Vercel公式docsでは、Protection Bypass for Automationは `x-vercel-protection-bypass` をHTTP headerまたはquery parameterとして渡す方式であり、`vercel curl` は保護されたdeploymentに対してbypass headerを自動付与するCLIとして説明されている。Shareable LinkはDeployment画面のShareから作成・管理できる。
+
+### bypass / 404調査
+
+`vercel curl` をdeployment id指定とURL指定の両方で再確認した。
+
+```bash
+npx vercel curl / --deployment dpl_A7W6voaK5BjXHqabVQ4DCA4XnEe7 -- --include --silent --show-error
+npx vercel curl / --deployment https://quiz-world-preview-pm23q56vf-chop0522s-projects.vercel.app -- --include --silent --show-error
+npx vercel curl /api/world --deployment https://quiz-world-preview-pm23q56vf-chop0522s-projects.vercel.app -- --include --silent --show-error
+```
+
+結果はいずれもVercelの `404 NOT_FOUND` だった。Vercel logs上では、bypass経由の `/` requestが `source=static` / `responseStatusCode=404` として記録された。
+
+一方、通常の `curl` では `/` が `401 Authentication Required` になり、Vercel Authenticationの保護ページが返った。つまり、通常アクセスはDeployment Protectionで止まっており、`vercel curl` は少なくともVercel Authentication画面とは別の経路に進んでいる。
+
+### build / artifact / project設定確認
+
+`vercel inspect --logs` では、Preview deploymentのbuild log上でNext.js buildが成功しており、`/`、`/signup`、`/login`、`/home`、`/create`、`/quiz/[launchId]`、`/result/[launchId]`、`/admin`、`/api/world` などのroutesが出力されている。
+
+ただし、Vercel deployment metadataでは `source=cli`、`builds=[]`、`routes=null`、`functions=[]` と見え、files APIではrootに `src` directoryだけが見え、`.next` や `.vercel/output` は確認できなかった。build logとmetadata / files APIの見え方が一致していないため、現時点では以下のどちらかを追加確認する必要がある。
+
+- owner/adminのブラウザ認証、Shareable Link、または明示的なautomation bypass secretでは `/` が開けるが、`vercel curl` の自動bypass経路だけが不安定である
+- CLI deploy artifact / root / outputの扱いに問題があり、bypass後にVercel runtimeがNext.js routeへ到達できていない
+
+Project settings上、Root Directory、Framework Preset、Build Command、Output Directoryは明示設定なしで、Ignored Build Stepは `preview` branchだけbuildを許可する条件式のままだった。Step Fのbuild logではNext.js auto buildが成功しているため、Root Directoryの明確な誤設定とは断定しない。
+
+### 再実行判断
+
+現時点では、Step G Preview smoke再実行は **条件付きGO候補** に留める。
+
+Step Gを再実行する前に、次のいずれかを確認する。
+
+1. owner/adminとしてVercelにログイン済みのブラウザでDeployment画面からPreview URLを開き、`/` が表示できる
+2. Shareable Linkを発行し、実値をdocsに書かずに `/` が表示できる
+3. automation bypass secretを明示的に使い、実値をdocsに書かずに `/` と `/api/world` が200またはアプリ側の想定レスポンスになる
+
+上記のどれでも `/` が404になる場合は、Deployment Protectionではなくdeployment artifact / root / output / deploy methodの問題として扱い、Preview smoke再実行へ進まず修正計画を作る。
+
 ## 10人テスト前に残る課題
 
 | 優先度 | 課題 | 方針 |
 | --- | --- | --- |
-| P0 | Preview URLのDeployment Protectionにより通常smoke不可 | owner/adminが通せる認証手順、Vercel protection bypass、または一時的な保護設定の見直しを決める |
-| P0 | `vercel curl` bypassが `404_NOT_FOUND` になる | Vercel Dashboard / CLIでbypass対象deployment、project protection設定、deployment URLの扱いを再確認する |
+| P0 | Preview URLのDeployment Protectionにより通常smoke不可 | owner/adminブラウザ、Shareable Link、または明示的なautomation bypass secretのいずれかで `/` 到達を確認する。実値はdocsに書かない |
+| P0 | `vercel curl` bypassが `404_NOT_FOUND` になる | 自動bypass経路の問題か、deployment artifact / root / output問題かを切り分ける。Shareable Linkや明示的bypassでも404なら修正計画を作る |
 | P1 | `NEXT_PUBLIC_APP_URL` runtime影響未確認 | Preview到達後に再確認。必要ならPreview URLをPreview envに設定する |
 | P1 | Preview DB cleanup要否 | フルsmoke実行後にtest users / quiz / launch / answer / report / audit logの扱いを決める |
 
@@ -194,7 +265,8 @@ Step Hへ進む前に、Step G Preview smokeを完了できるアクセス方法
 
 推奨する次アクション:
 
-1. Vercel Deployment Protectionのowner/adminアクセス方法を確認する。
-2. `vercel curl` bypassが404になる原因をVercel project/deployment設定で確認する。
-3. 必要ならPreview deployment protection bypass secretを設定し、値はdocs/repoに書かずに再smokeする。
-4. Preview URLで `/`, `/signup`, `/api/world` へ到達できることを確認してから、MVP主要ループを再実行する。
+1. Vercel Deployment画面からowner/adminブラウザでPreview URLを開けるか確認する。
+2. 開けない場合はShareable Linkを発行し、実値をdocsに書かずに `/` 到達を確認する。
+3. Shareable Linkでも404なら、automation bypass secretを明示指定する確認を行う。secret実値はdocs/repoに書かない。
+4. 明示的bypassでも404なら、deployment artifact / root / output / CLI deploy methodの問題として扱い、Preview smoke再実行へ進まず修正計画を作る。
+5. Preview URLで `/`, `/signup`, `/api/world` へ到達できることを確認してから、MVP主要ループを再実行する。
