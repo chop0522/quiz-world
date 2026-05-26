@@ -126,7 +126,62 @@ Preview DBは **full reset + seed再投入** を第一候補にする。
 - Auth usersが残る場合、Supabase DashboardまたはSQL/APIで検証ユーザーを整理する必要があるか
 - 初期admin email対象ユーザーは、cleanup後に再signupする運用でよいか
 - Preview invite code `SEASON0-PREVIEW-001` をseedで再投入できるか
-- 現在のrepo内 `supabase/seed.sql` はlocal用 `SEASON0-TEST-001` を投入するため、Preview reset時にそのまま使うとPreview invite codeを再作成できない。Preview用seed投入手順を実行前に決める
+- 現在のrepo内 `supabase/seed.sql` はlocal用 `SEASON0-TEST-001` を投入するため、Preview reset時には使わない
+- Preview reset後は `supabase/seed.preview.sql` を使って `SEASON0-PREVIEW-001` を再投入する
+
+## Preview seed方針
+
+Preview seedはlocal seedと分離する。
+
+| ファイル | 用途 | invite code |
+| --- | --- | --- |
+| `supabase/seed.sql` | Supabase local用 | `SEASON0-TEST-001` |
+| `supabase/seed.preview.sql` | Supabase Preview用 | `SEASON0-PREVIEW-001` |
+
+固定方針:
+
+- `supabase/seed.sql` は維持し、local用として扱う
+- `supabase/seed.preview.sql` はPreview cleanup / reset後のseed再投入専用にする
+- `supabase/seed.preview.sql` は初期world `クイズワールド`、world id `00000000-0000-4000-8000-000000000001`、`member_limit=10` をidempotentに投入する
+- `supabase/seed.preview.sql` はPreview invite code `SEASON0-PREVIEW-001` をidempotentに投入する
+- `supabase/seed.preview.sql` には初期admin email実値、service role key、anon key、DB password、その他secret実値を書かない
+
+Preview reset時は、local用seedが実行されないように `--no-seed` を使い、migration適用後にPreview seedを明示適用する。
+
+実行案:
+
+```bash
+npx supabase db reset --linked --no-seed
+npx supabase db query --linked --file supabase/seed.preview.sql
+```
+
+このドキュメント作成時点では、上記コマンドはまだ実行しない。
+
+## Auth users cleanup方針
+
+Auth usersはPreview cleanup / reset実行後に必ず件数を確認する。
+
+固定方針:
+
+- `supabase db reset --linked --no-seed` 後に `auth.users` 件数をread-onlyで確認する
+- `auth.users` が0件なら、追加cleanupは不要とする
+- `auth.users` が残った場合は、Supabase DashboardのAuthentication > Users、またはAdmin APIで検証ユーザーを削除する
+- 削除対象はStep G smoke用の検証ユーザーのみとする
+- 10人テスト用の実ユーザーが入る前に実行する
+- 初期admin email実値はdocsに書かない
+- Admin APIを使う場合でも、service role keyやtoken実値はdocs/repo/commit messageに書かない
+
+Auth users cleanupの実行手順案:
+
+1. Supabase Dashboardでprojectが `quiz-world-preview` / `ogfuohrvzfjmgvdewvcl` であることを確認する
+2. Smart BuzzerのSupabase projectを開いていないことを確認する
+3. Authentication > Usersで、Step G smoke用の検証ユーザーだけを対象にする
+4. 10人テスト候補や本番候補ユーザーが含まれていないことを確認する
+5. 対象ユーザーを削除する
+6. `auth.users` 件数をread-onlyで再確認する
+7. `profiles` / `world_members` に対応する残骸がないことを確認する
+
+このドキュメント作成時点では、Auth users cleanupはまだ実行しない。
 
 ## 実行前チェック
 
@@ -271,14 +326,17 @@ Supabase CLIのhelpでは `supabase db reset --linked` はlinked projectをlocal
 
 現在のrepo内 `supabase/seed.sql` はlocal用 `SEASON0-TEST-001` を投入する。
 
-そのため、Preview DBをfull resetする場合、現状のseedだけでは `SEASON0-PREVIEW-001` を再投入できない。
+そのため、Preview DBをfull resetする場合、local用seedは使わず、Preview用 `supabase/seed.preview.sql` を使う。
 
-実行前に、以下のどちらかを決める。
+Preview用seed手順は以下に固定する。
 
-1. Preview用seed SQLを別途用意し、reset後に `SEASON0-PREVIEW-001` をidempotentに投入する
-2. `supabase/seed.sql` をPreview/local両対応にするか、Preview用seed運用をdocs化してから実行する
+1. `supabase db reset --linked --no-seed` でlocal用seedをskipする
+2. `supabase db query --linked --file supabase/seed.preview.sql` でPreview用seedを明示適用する
+3. 初期worldと `SEASON0-PREVIEW-001` をread-onlyで確認する
 
-この点が未決定のため、2026-05-26時点では **Step H cleanup / resetはNO-GO** とする。
+Auth users cleanup手順とPreview seed再投入手順を固定したため、Step H cleanup / resetは **GO候補** とする。
+
+ただし、実行前に人間GOを取る。cleanup / resetはこのドキュメント作成時点ではまだ実行しない。
 
 ## 実行手順案
 
@@ -289,10 +347,10 @@ full reset + seed再投入の手順案:
 1. `git status --short --branch` がcleanであることを確認する
 2. Supabase CLIのlink先が `ogfuohrvzfjmgvdewvcl` であることを確認する
 3. cleanup前の主要table件数をread-onlyで記録する
-4. Auth usersの扱いを確認する
-5. Preview DBをresetする
-6. migrationを適用する
-7. Preview seedを投入する
+4. `npx supabase db reset --linked --no-seed` でPreview DBをresetし、migrationを再適用する
+5. `npx supabase db query --linked --file supabase/seed.preview.sql` でPreview seedを投入する
+6. `auth.users` 件数をread-onlyで確認する
+7. `auth.users` が残っている場合は、Supabase DashboardまたはAdmin APIでStep G smoke用検証ユーザーを削除する
 8. 初期worldとPreview invite codeを確認する
 9. RLSが維持されていることを確認する
 10. smoke検証データが消えていることを確認する
