@@ -327,6 +327,26 @@ Step G再実行前 Deployment Protection / bypass 調査:
 - Shareable Linkやbypass secretの実値はdocs、README、repo、commit messageに書かない
 - Shareable Linkまたは明示的bypassでも404になる場合は、Preview smoke再実行へ進まず、deployment artifact / root / output / deploy methodの修正計画を作る
 
+Step G再実行前 artifact / root / output / deploy method 調査:
+
+- 実行日時: `2026-05-26 18:26 JST`
+- Preview smoke再実行、新規Preview deploy、Production deploy、Production env設定、Production domain設定、Stripe、Web Push、Realtimeは実行していない
+- `main` / `origin/main` は `edba2de docs: record phase 9 preview access investigation`
+- `preview` / `origin/preview` は `45ded1e docs: record phase 9 preview deploy preflight`
+- `preview` commitには `package.json`、`next.config.ts`、`src/app/page.tsx`、`src/app/layout.tsx`、`src/app/api/world/route.ts` などのNext.js app sourceが含まれている
+- `45ded1e..origin/main` の差分はREADME / docsのみで、`src/`、`package.json`、`next.config.ts`、`supabase/` の実装差分はなし
+- Vercel projectのRoot Directory、Build Command、Install Command、Output Directoryは未指定。repo root / Vercel default扱いで、明確な誤設定は見つからない
+- Framework Presetは未指定。build logではNext.jsが自動検出され `npm run build` が実行済みだが、次回deploy前にNext.jsへ明示設定するかどうかを判断する
+- `.vercel/project.json` は `quiz-world-preview` / `prj_fCviBUF2fYH077fLBUHV5uPFleMx` を指している
+- `.vercel/` と `.env.local` はgit管理対象外のまま
+- 対象deployment `dpl_A7W6voaK5BjXHqabVQ4DCA4XnEe7` は `source=cli`。Step Fでlocal `preview` branchからVercel CLI deployしたため、sourceがCLIなのは想定どおり
+- ただしdeployment metadataでは `builds=[]`、`routes=null`、`functions=null` で、files APIではrootに `src` directoryのみが見え、`.next` や `.vercel/output` は確認できない
+- Vercel logsではbypass経由 `/` が `source=static` / `responseStatusCode=404`
+- build logは成功しているが、runtime側がNext.js routeへ到達しているように見えないため、CLI deploymentのartifact / routing / output反映が最有力の原因候補
+- 次回は古いCLI deploymentを使い続けず、Git連携Preview deployで作り直す方針を推奨する
+- Git連携Preview deploy前にProduction Branchが `production-hold`、Ignored Build Stepが `preview` branchだけbuild許可、Production env/domain未設定であることを再確認する
+- Git連携Preview deploymentでも404が続く場合は、Framework Preset、Root Directory、Build Command、Output Directoryの明示設定を含む修正計画へ進む
+
 ## 1. Phase 9で実作成するもの
 
 Step Aの実行判断後に作成する対象は以下に限定する。

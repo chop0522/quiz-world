@@ -248,12 +248,95 @@ Step Gを再実行する前に、次のいずれかを確認する。
 
 上記のどれでも `/` が404になる場合は、Deployment Protectionではなくdeployment artifact / root / output / deploy methodの問題として扱い、Preview smoke再実行へ進まず修正計画を作る。
 
+## Step G再実行前 artifact / root / output / deploy method 調査
+
+2026-05-26 18:26 JSTに、Preview deploymentのartifact、root directory、output、deploy methodを追加調査した。
+
+この調査ではPreview smoke再実行、新規Preview deploy、Production deploy、Production env設定、Production domain設定、Stripe、Web Push、Realtimeは実行していない。Smart Buzzerにも触っていない。
+
+### repo / branch確認
+
+| 確認 | 結果 |
+| --- | --- |
+| `main` / `origin/main` | `edba2de docs: record phase 9 preview access investigation` |
+| `preview` / `origin/preview` | `45ded1e docs: record phase 9 preview deploy preflight` |
+| `preview` commitのsource | `package.json`、`next.config.ts`、`src/app/page.tsx`、`src/app/layout.tsx`、`src/app/api/world/route.ts`、`src/app/signup/page.tsx`、`src/app/admin/page.tsx` などを含む |
+| `preview` commitのtracked file数 | 133 |
+| `45ded1e..origin/main` 差分 | README / docsのみ。`src/`、`package.json`、`next.config.ts`、`supabase/` などの実装差分はなし |
+
+結論として、`preview` branchの `45ded1e` にはNext.js app sourceが含まれており、現在の`main`との差分もdocs中心である。404の直接原因を「preview commitにapp sourceがない」とは見ない。
+
+### Vercel project設定確認
+
+| 設定 | 結果 | 判断 |
+| --- | --- | --- |
+| project | `quiz-world-preview` / `prj_fCviBUF2fYH077fLBUHV5uPFleMx` | 正しい |
+| linked repo | `chop0522/quiz-world` | 正しい |
+| Production Branch | `production-hold` | 正しい |
+| Root Directory | 未指定 / `null` | repo root扱い。明確な誤設定は見つからない |
+| Framework Preset | 未指定 / `null` | Next.js固定ではない。ただしbuild logではNext.jsが自動検出され、`npm run build` が実行済み |
+| Build Command | 未指定 / `null` | package.jsonの `build: next build` が使われている |
+| Install Command | 未指定 / `null` | Vercel default |
+| Output Directory | 未指定 / `null` | Next.js default |
+| Node.js | `24.x` | 現時点ではbuild成功済み |
+| Ignored Build Step | `preview` branchだけbuild許可 | 意図どおり |
+| Production env | 未設定 | 維持 |
+| Production custom domain | 未設定 | 維持 |
+
+`package.json` のscriptsは `build: next build`、`dev: next dev`、`start: next start` であり、Vercel側のdefault buildと矛盾しない。
+
+### local `.vercel` 確認
+
+`.vercel/project.json` は `quiz-world-preview` / `prj_fCviBUF2fYH077fLBUHV5uPFleMx` を指している。`.vercel/` と `.env.local` は `.gitignore` 対象であり、git管理対象外である。
+
+### deployment method / artifact確認
+
+対象deployment `dpl_A7W6voaK5BjXHqabVQ4DCA4XnEe7` はmetadata上 `source=cli` である。これはStep Fでlocal `preview` branchからVercel CLIでPreview deployしたため、想定どおりである。
+
+ただし、同じdeploymentについて以下の不整合がある。
+
+| 確認 | 結果 |
+| --- | --- |
+| `vercel inspect --logs` | Next.js build成功。`/`、`/signup`、`/api/world` などの主要routesがbuild logに出力されている |
+| deployment metadata | `builds=[]`、`routes=null`、`functions=null` |
+| files API | rootに `src` directoryのみが見える。`.next` や `.vercel/output` は確認できない |
+| bypass経由request log | `/` が `source=static` / `responseStatusCode=404` |
+
+build logは成功している一方で、runtime側のmetadata / files API / request logはNext.js routeへ到達しているように見えない。現時点で最も疑わしいのは、Deployment Protectionそのものではなく、CLI deploy由来のartifact / routing / output反映の問題である。
+
+Framework Presetが未指定である点も改善候補だが、build logではNext.jsが自動検出されているため、単独の原因とは断定しない。Root DirectoryとOutput Directoryに明確な誤設定は見つかっていない。
+
+### Git連携Preview deployとCLI deployの比較
+
+| 方法 | 利点 | リスク / 注意 |
+| --- | --- | --- |
+| Git連携Preview deploy | VercelがGitHub repoから直接sourceを取得し、branch / commit / project設定が明確になる。`source=git` になり、Preview branch運用と一致する | `preview` branch pushにより新しいPreview deploymentが作成される。Production Branchは `production-hold` なのでProduction deployにはならない想定 |
+| CLI deploy | 手元から即時deployできる。今回すでにbuild log上は成功している | 今回の対象deploymentは `source=cli` で、metadata / files API / request log上の不整合がある。再現すると同じ404を踏む可能性がある |
+
+### 推奨修正方針
+
+次のPreview deploymentは、古いCLI deploymentを使い続けず、Git連携Preview deployで作り直す方針を推奨する。
+
+実行前の安全条件:
+
+1. Vercel Production Branchが `production-hold` のままであることを再確認する
+2. Ignored Build Stepが `preview` branchだけbuild許可のままであることを再確認する
+3. Vercel projectのFramework PresetをNext.jsに明示設定するか、少なくとも設定変更しない理由を記録する
+4. Root Directoryはrepo root、Build Command / Output DirectoryはNext.js defaultのままとする
+5. `preview` branchを `origin/main` に追従させてpushし、Git連携Preview deploymentを作る
+6. deployment sourceが `git`、branchが `preview`、commitが最新の `origin/main` 相当であることを確認する
+7. Production deployが発生していないことを確認する
+8. secret実値はdocs / README / repo / commit messageに書かない
+
+Git連携Preview deploymentでも `/` や `/api/world` が404になる場合は、Vercel project設定またはNext.js/Vercel adapter側の問題として扱い、Framework Preset、Root Directory、Build Command、Output Directoryを明示設定する修正計画へ進む。
+
 ## 10人テスト前に残る課題
 
 | 優先度 | 課題 | 方針 |
 | --- | --- | --- |
 | P0 | Preview URLのDeployment Protectionにより通常smoke不可 | owner/adminブラウザ、Shareable Link、または明示的なautomation bypass secretのいずれかで `/` 到達を確認する。実値はdocsに書かない |
 | P0 | `vercel curl` bypassが `404_NOT_FOUND` になる | 自動bypass経路の問題か、deployment artifact / root / output問題かを切り分ける。Shareable Linkや明示的bypassでも404なら修正計画を作る |
+| P0 | CLI deploymentのartifact / routingが不審 | 次回はGit連携Preview deployで作り直す。Production Branchが `production-hold` であることを再確認してから行う |
 | P1 | `NEXT_PUBLIC_APP_URL` runtime影響未確認 | Preview到達後に再確認。必要ならPreview URLをPreview envに設定する |
 | P1 | Preview DB cleanup要否 | フルsmoke実行後にtest users / quiz / launch / answer / report / audit logの扱いを決める |
 
@@ -269,4 +352,5 @@ Step Hへ進む前に、Step G Preview smokeを完了できるアクセス方法
 2. 開けない場合はShareable Linkを発行し、実値をdocsに書かずに `/` 到達を確認する。
 3. Shareable Linkでも404なら、automation bypass secretを明示指定する確認を行う。secret実値はdocs/repoに書かない。
 4. 明示的bypassでも404なら、deployment artifact / root / output / CLI deploy methodの問題として扱い、Preview smoke再実行へ進まず修正計画を作る。
-5. Preview URLで `/`, `/signup`, `/api/world` へ到達できることを確認してから、MVP主要ループを再実行する。
+5. 次回deployはGit連携Preview deployで作り直す方針を優先する。
+6. Preview URLで `/`, `/signup`, `/api/world` へ到達できることを確認してから、MVP主要ループを再実行する。
