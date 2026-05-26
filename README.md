@@ -2,7 +2,7 @@
 
 通知型早押しクイズワールドの専用リポジトリです。
 
-Phase 1の signup/auth ローカル実装は完了・push・tag済みです。Phase 2の四択クイズ作成local実装も完了・push・tag済みです。Phase 3 quiz launch / recipients local実装も完了・push・tag済みです。Phase 4 answer submission / ranking local実装も完了・push・tag済みです。Phase 5 result / rating / reports のlocal実装も完了・push・tag済みです。Phase 6 rank_events / ranking local実装も完了・push・tag済みです。Phase 7 admin / moderation のlocal実装も完了・push・tag済みです。Phase 8 10-user local smoke / ops rehearsalは89チェックpass、DB reset済みです。Phase 8 manual UI rehearsal follow-upも完了・push済みです。Phase 9 Step AとしてQuiz World専用Supabase development projectを作成済み、Step BとしてPreview DBへのmigration / seed適用済み、Step CとしてPreview DB smokeをpass済みです。Step DとしてQuiz World専用Vercel project `quiz-world-preview` を作成済みで、Step D follow-upとしてGitHub repo `chop0522/quiz-world` への接続も完了しました。Step EとしてVercel Preview envをPreview environmentのみに設定済みです。Step FとしてIgnored Build Stepを `preview` branchだけbuild許可する条件式へ変更し、`preview` branchを作成・pushしてPreview deployを実行しました。Preview deploymentはReadyです。Step G Preview smokeは一度NO-GOでしたが、Vercel Project SettingsでFramework PresetをNext.jsへ明示した後の新しいGit連携Preview deploymentで入口確認とMVP主要ループ本体をpassしました。対象deploymentは `https://quiz-world-preview-ri8igtw45-chop0522s-projects.vercel.app` / `dpl_6YhA6LJudsrnBEbJ4UPdgGPwmUkx` / `preview` / `7d63505` です。Production envは未設定、追加Production deployは行っていません。`NEXT_PUBLIC_APP_URL` は未設定ですが、今回確認した範囲ではruntime blockerではありません。Preview DBにはsmoke検証データが残っているため、10人テスト候補へ共有する前にcleanup / reset方針を決めます。Stripe、Web Push、Realtimeはまだ行っていません。既存Smart Buzzerとは別プロジェクトとして扱います。
+Phase 1〜7のlocal実装は完了・push・tag済みです。Phase 8 local smokeは89チェックpass、manual UI rehearsal follow-upも完了・push済みです。Phase 9ではQuiz World専用Supabase Preview projectとVercel Preview projectを作成し、Preview DB migration / seed、DB smoke、Vercel Preview env設定、Git連携Preview deployまで完了しています。Step G Preview smokeは、Framework PresetをNext.jsへ明示した後の新しいGit連携Preview deploymentで入口確認とMVP主要ループ本体をpassしました。対象deploymentは `https://quiz-world-preview-ri8igtw45-chop0522s-projects.vercel.app` / `dpl_6YhA6LJudsrnBEbJ4UPdgGPwmUkx` / `preview` / `7d63505` です。Step HとしてPreview DB cleanup / reset計画docsを作成済みです。cleanup / resetはまだ実行していません。Preview URL共有範囲はowner/adminのみを維持し、`v0.10.0-phase9-preview-ready` tagはまだ作成しません。Production envは未設定、Production deployは行っていません。Stripe、Web Push、Realtimeはまだ行っていません。既存Smart Buzzerとは別プロジェクトとして扱います。
 
 Smart Buzzer の production / Stripe / Vercel / Supabase / env / legal page / cleanup / live key には触れません。
 
@@ -328,6 +328,7 @@ Smart Buzzer のSupabase/Vercel/Stripe/envとは混ぜません。
 - [Phase 9 Preview execution checklist](docs/quiz-world/quiz-world-phase-9-preview-execution-checklist.md)
 - [Phase 9 Preview DB smoke results](docs/quiz-world/quiz-world-phase-9-preview-db-smoke-results.md)
 - [Phase 9 Preview smoke results](docs/quiz-world/quiz-world-phase-9-preview-smoke-results.md)
+- [Phase 9 Preview cleanup plan](docs/quiz-world/quiz-world-phase-9-preview-cleanup-plan.md)
 
 ## Current Status
 
@@ -398,15 +399,20 @@ Smart Buzzer のSupabase/Vercel/Stripe/envとは混ぜません。
 - Production env / Production custom domainは未設定で、追加Production deployは発生していません。
 - Step G中に追加Production deploymentは発生していません。Production envとProduction custom domainは未設定のままです。
 - `NEXT_PUBLIC_APP_URL` は未設定です。現状のapp codeでは参照されておらず、未設定でもbuildは成功しています。Step G Preview smoke本体でもruntime blockerは見つかっていません。
-- Preview DBにはStep G smokeの検証データが残っています。10人テスト候補へ共有する前にcleanup / reset方針を決めます。
+- Preview DBにはStep G smokeの検証データが残っています。10人テスト候補へ共有する前のcleanup / reset方針はStep H計画docsに整理済みです。
+- Phase 9 Step Hとして、Preview DB cleanup / reset計画docsを作成済みです。cleanup / resetはまだ実行していません。
+- Step Hの推奨方針は、Preview DBをfull resetし、migration / seedを再投入することです。ただし、Auth usersの扱いを確認してから人間GOを取ります。
+- Preview URL共有範囲はowner/adminのみを維持します。10人テスト候補への共有と `v0.10.0-phase9-preview-ready` tag作成はまだ行いません。
 - Supabase PreviewとVercel project作成は完了済みです。Stripe / Production環境はまだ作成しません。
 - Production deploy、Stripe、Web Push、Realtimeはまだ行いません。
 
 ## Next Work
 
-- Step G Preview smoke本体結果をcommit / pushする
-- Preview DB cleanup / reset方針を決める
-- 必要なら `v0.10.0-phase9-preview-ready` tag作成前の最終GO/NO-GO確認を行う
+- Step H Preview DB cleanup / reset計画docsをcommit / pushする
+- cleanup / reset実行前に、人間GOを取る
+- Auth usersがfull resetで消えるか、Dashboard/APIで別整理が必要か確認する
+- cleanup / reset後に軽いPreview確認を行う
+- `v0.10.0-phase9-preview-ready` tagはまだ作成しない
 - `NEXT_PUBLIC_APP_URL` は今回runtime blockerなし。共有URLやabsolute URLが必要な機能を入れる前にPreview URLで設定するか再検討する
 - Production deployはまだ行わない
 - Web Push / Realtime / production deploy はまだ作らない
