@@ -412,14 +412,70 @@ Git連携Preview deployで作り直す準備は **GO候補**。
 5. Production deploymentが発生していないことを確認する
 6. 新しいPreview URLでStep G smokeを再実行する
 
+## Step G再実行用 Git連携Preview deployment作成結果
+
+2026-05-26 19:18 JSTに、Git連携Preview deploymentを新しく作成した。
+
+この作業ではStep G smoke本体、Production deploy、Production env設定、Production domain設定、Stripe、Web Push、Realtimeは実行していない。Smart Buzzerにも触っていない。
+
+### branch / commit
+
+| 確認 | 結果 |
+| --- | --- |
+| 実行前 `origin/main` | `4fd64ef docs: record phase 9 git preview deploy preflight` |
+| 実行前 `origin/preview` | `45ded1e docs: record phase 9 preview deploy preflight` |
+| preflightとの差分 | preflight時点で想定していた `be62e73` は、その後のdocs commit前のmain。今回は最新の `origin/main` である `4fd64ef` を採用 |
+| 実行内容 | `preview` branchを `origin/main` の `4fd64ef` に合わせてoriginへpush |
+| 実行後 `origin/preview` | `4fd64ef` |
+
+### deployment
+
+| 確認 | 結果 |
+| --- | --- |
+| Preview deployment URL | `https://quiz-world-preview-j5hl87g7x-chop0522s-projects.vercel.app` |
+| deployment id | `dpl_GwrDB65DmZxCJs4gA6H9468dmt4k` |
+| status | Ready |
+| source | Git連携 |
+| branch / commit | `preview` / `4fd64ef` |
+| environment | Preview |
+| Vercel project | `quiz-world-preview` / `prj_fCviBUF2fYH077fLBUHV5uPFleMx` |
+| Production Branch | `production-hold` |
+| Production env | 未設定 |
+| Production custom domain | 未設定。default project domainのみ存在 |
+| 追加Production deployment | なし。既存Production deployment 2件のみ |
+
+Build logで `Cloning github.com/chop0522/quiz-world (Branch: preview, Commit: 4fd64ef)` を確認した。
+
+Build logのNext.js route一覧には、少なくとも以下が含まれている。
+
+- `/`
+- `/signup`
+- `/login`
+- `/home`
+- `/create`
+- `/quiz/[launchId]`
+- `/result/[launchId]`
+- `/admin`
+- `/api/world`
+- `/api/signup`
+- `/api/quiz-launches/[id]/result`
+
+secret実値、初期admin email実値、Supabase key、bypass secret、Vercel tokenは表示・記録していない。
+
+### 次の判断
+
+新しいGit連携Preview deploymentはReady。Step G smoke本体はまだ未実行である。
+
+次はこの新Preview deployment URLで、Deployment Protectionのowner/adminアクセス、Shareable Link、または明示的automation bypassのいずれかを使い、MVP主要ループのPreview smokeを実行する。
+
 ## 10人テスト前に残る課題
 
 | 優先度 | 課題 | 方針 |
 | --- | --- | --- |
 | P0 | Preview URLのDeployment Protectionにより通常smoke不可 | owner/adminブラウザ、Shareable Link、または明示的なautomation bypass secretのいずれかで `/` 到達を確認する。実値はdocsに書かない |
 | P0 | `vercel curl` bypassが `404_NOT_FOUND` になる | 自動bypass経路の問題か、deployment artifact / root / output問題かを切り分ける。Shareable Linkや明示的bypassでも404なら修正計画を作る |
-| P0 | CLI deploymentのartifact / routingが不審 | 次回はGit連携Preview deployで作り直す。Production Branchが `production-hold` であることを再確認してから行う |
-| P0 | `preview` branchがmainより古い | `preview` branchを `origin/main` の `be62e73` に合わせてpushし、Git連携Preview deploymentを作る |
+| 解消済み | CLI deploymentのartifact / routingが不審 | Git連携Preview deploymentを `preview` / `4fd64ef` で新規作成済み。次はこのdeploymentでStep G smokeを行う |
+| 解消済み | `preview` branchがmainより古い | `preview` branchを最新の `origin/main` である `4fd64ef` に合わせてpush済み |
 | P1 | `NEXT_PUBLIC_APP_URL` runtime影響未確認 | Preview到達後に再確認。必要ならPreview URLをPreview envに設定する |
 | P1 | Preview DB cleanup要否 | フルsmoke実行後にtest users / quiz / launch / answer / report / audit logの扱いを決める |
 
