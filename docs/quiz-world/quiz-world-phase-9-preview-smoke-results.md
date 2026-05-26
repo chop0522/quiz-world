@@ -627,13 +627,46 @@ Preview smoke再実行前に、以下の順で修正計画を作る。
 
 `vercel.json` によるframework明示は、現時点では第一候補にしない。まずVercel Project Settings側のFramework PresetをNext.jsへ明示する方針を優先する。
 
+## Step G NO-GO原因修正（Vercel Project Settings最小変更）
+
+2026-05-26 21:10 JSTに、Step G NO-GOの有力原因であるVercel serving artifact / routing metadata不整合の切り分けとして、Vercel Project Settingsを最小修正した。
+
+この作業では、Preview smoke本体、Preview deploy、Production deploy、Production env設定、Production custom domain設定、Stripe、Web Push、Realtimeは実行していない。Smart Buzzerにも触っていない。
+
+### 設定変更結果
+
+| 項目 | 変更後 | 判断 |
+| --- | --- | --- |
+| Vercel project | `quiz-world-preview` | Quiz World専用project |
+| Framework Preset | `Next.js` | 未指定 / auto-detectから明示設定へ変更 |
+| Root Directory | 未指定 / `null` | repo root/default扱い。誤ったsubdirectoryは指定していない |
+| Build Command | 未指定 / `null` | Vercel framework default、または `package.json` の `build: next build` を使う |
+| Output Directory | 未指定 / `null` | Next.js default。`.next` や `out` は手動指定していない |
+| Install Command | 未指定 / `null` | Vercel default |
+| Ignored Build Step | `if [ "$VERCEL_GIT_COMMIT_REF" = "preview" ]; then exit 1; else exit 0; fi` | `preview` branchだけbuildを許可する方針を維持 |
+| Production Branch | `production-hold` | main pushがProduction扱いにならない運用を維持 |
+| Production env | 未設定 | 変更なし |
+| Production custom domain | 未設定。default project domainのみ存在 | 変更なし |
+
+### 影響範囲
+
+- 設定変更のみ。新しいPreview deploymentは作成していない。
+- Production deploymentは作成していない。
+- Preview smoke本体は再実行していない。
+- env実値、Supabase key、Vercel token、bypass secret、初期admin email実値はdocs/repoに記録していない。
+
+### 次の判断
+
+Framework Preset明示後、次回はGit連携Preview deploymentを作り直し、明示的Automation BypassまたはShareable Linkで `/` と `/api/world` の到達確認を行う。到達確認が通るまで、Step GはNO-GOのままとする。
+
 ## 10人テスト前に残る課題
 
 | 優先度 | 課題 | 方針 |
 | --- | --- | --- |
 | P0 | Preview URLのDeployment Protectionにより通常smoke不可 | Shareable Link、または明示的なautomation bypass secretで `/` と `/api/world` 到達を確認する。実値はdocsに書かない |
 | P0 | 新しいGit連携Preview deploymentでもVercel CLI bypassが `404_NOT_FOUND` になる | 自動bypass経路またはVercel projectのProtection / routing設定を切り分ける。Shareable Linkや明示的bypassでも404なら修正計画を作る |
-| P0 | Framework Presetが未指定で、deployment metadata上のroutes/functions/file treeが確認できない | Vercel Project SettingsでFramework PresetをNext.jsに明示し、Git連携Preview deploymentを作り直す計画を立てる |
+| 解消済み | Framework Presetが未指定 | Vercel Project SettingsでFramework PresetをNext.jsに明示済み。次はGit連携Preview deploymentを作り直す |
+| P0 | Framework Preset明示後のPreview deployment未確認 | 新しいGit連携Preview deploymentを作成し、`/` と `/api/world` 到達を確認する |
 | 解消済み | CLI deploymentのartifact / routingが不審 | Git連携Preview deploymentを `preview` / `4fd64ef` で新規作成済み。ただし新deploymentでもStep GはNO-GO |
 | 解消済み | `preview` branchがmainより古い | `preview` branchを最新の `origin/main` である `4fd64ef` に合わせてpush済み |
 | P1 | `NEXT_PUBLIC_APP_URL` runtime影響未確認 | Preview到達後に再確認。必要ならPreview URLをPreview envに設定する |
@@ -647,7 +680,6 @@ Step Hへ進む前に、Step G Preview smokeを完了できるアクセス方法
 
 推奨する次アクション:
 
-1. Shareable Linkを発行し、実値をdocsに書かずに `/` と `/api/world` 到達を確認する。
-2. Vercel Project SettingsでFramework PresetをNext.jsに明示する計画を作る。
-3. Framework Preset明示後にGit連携Preview deploymentを作り直す。
-4. 明示的Automation BypassまたはShareable Linkで `/`, `/signup`, `/api/world` へ到達できることを確認してから、MVP主要ループを再実行する。
+1. Framework PresetをNext.jsに明示した設定で、Git連携Preview deploymentを作り直す。
+2. 新しいPreview deploymentで、Shareable Linkまたは明示的Automation Bypassを使い、実値をdocsに書かずに `/`, `/signup`, `/api/world` へ到達できることを確認する。
+3. 到達確認後に、MVP主要ループを再実行する。

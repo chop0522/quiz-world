@@ -450,6 +450,21 @@ Step G NO-GO原因調査:
 - 原因候補は、Framework Preset未指定のauto-detect状態またはVercel serving artifact / routing metadataの不整合
 - 推奨修正方針は、まずVercel Project SettingsでFramework PresetをNext.jsに明示し、Git連携Preview deploymentを作り直すこと
 
+Step G NO-GO原因修正:
+
+- 実行日時: `2026-05-26 21:10 JST`
+- Vercel Project SettingsでFramework Presetを `Next.js` に明示した
+- Root Directoryは未指定 / `null` のまま。repo root/default扱いとし、誤ったsubdirectoryは指定していない
+- Build Commandは未指定 / `null` のまま。Vercel framework defaultまたは `package.json` の `build: next build` を使う方針
+- Output Directoryは未指定 / `null` のまま。`.next` や `out` は手動指定していない
+- Install Commandは未指定 / `null` のまま。Vercel defaultを使う
+- Ignored Build Stepは `if [ "$VERCEL_GIT_COMMIT_REF" = "preview" ]; then exit 1; else exit 0; fi` を維持
+- Production envは未設定のまま
+- Production custom domainは未設定のまま。default project domainのみ存在
+- この設定変更ではPreview deploy / Production deployを実行していない
+- Framework Preset明示後のStep G smoke本体はまだ再実行していない
+- secret実値、Supabase key、Vercel token、bypass secret、初期admin email実値はdocs/repoに記録していない
+
 ## 1. Phase 9で実作成するもの
 
 Step Aの実行判断後に作成する対象は以下に限定する。
@@ -827,6 +842,7 @@ Step AでQuiz World専用Supabase development projectを作成し、Step BでPre
 | Step G再実行用Git連携Preview deployment | `https://quiz-world-preview-j5hl87g7x-chop0522s-projects.vercel.app` / `dpl_GwrDB65DmZxCJs4gA6H9468dmt4k` / Git連携 / `preview` / `4fd64ef` / Ready |
 | Step G再実行結果 | NO-GO。通常アクセスは `/` と `/api/world` が401、Vercel CLI bypassは `/` と `/api/world` が404、Chrome直接表示も `/` が404 |
 | Step G再実行後のMVP主要ループ | 未実行。入口条件である `/` と `/api/world` 到達を満たしていない |
+| Step G NO-GO原因修正 | Vercel Project SettingsでFramework PresetをNext.jsに明示。Root Directory / Build Command / Output Directory / Install Commandはdefaultのまま。Preview deploy / smoke本体は未実行 |
 | 初期admin email | 決定済み。docsには実値を書かない。Vercel Preview envの `ADMIN_EMAILS` にのみ設定 |
 | Preview invite code | `SEASON0-PREVIEW-001` |
 | Preview共有先 | owner/adminのみから開始 |
