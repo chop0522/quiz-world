@@ -347,6 +347,33 @@ Step G再実行前 artifact / root / output / deploy method 調査:
 - Git連携Preview deploy前にProduction Branchが `production-hold`、Ignored Build Stepが `preview` branchだけbuild許可、Production env/domain未設定であることを再確認する
 - Git連携Preview deploymentでも404が続く場合は、Framework Preset、Root Directory、Build Command、Output Directoryの明示設定を含む修正計画へ進む
 
+Step G再実行前 Git連携Preview deploy preflight:
+
+- 実行日時: `2026-05-26 18:42 JST`
+- 新しいPreview deploy、Production deploy、Production env設定、Production domain設定、Stripe、Web Push、Realtimeは実行していない
+- git状態は `main...origin/main` でclean
+- `main` / `origin/main` は `be62e73 docs: record phase 9 preview access artifact investigation`
+- `preview` / `origin/preview` は `45ded1e docs: record phase 9 preview deploy preflight`
+- `origin/preview..origin/main` は4 commits。`preview` branchはmainより古い
+- 次回は `preview` branchを `origin/main` の `be62e73` に合わせてpushする
+- 現時点では空commit不要。`preview` branchが4 commits遅れているため、branch更新pushでGit連携Preview deploymentが発火する見込み
+- Vercel projectは `quiz-world-preview` / `prj_fCviBUF2fYH077fLBUHV5uPFleMx`
+- Git連携は `github` / `chop0522/quiz-world`
+- Production Branchは `production-hold`
+- Production envは未設定
+- Production custom domainは未設定。default project domainのみ存在
+- Preview envには `NEXT_PUBLIC_SUPABASE_URL`、`NEXT_PUBLIC_SUPABASE_ANON_KEY`、`SUPABASE_SERVICE_ROLE_KEY`、`ADMIN_EMAILS`、`QUIZ_WORLD_ID`、`MAX_INITIAL_MEMBERS` が存在する。値は記録しない
+- `NEXT_PUBLIC_APP_URL` は未設定
+- Ignored Build Stepは `if [ "$VERCEL_GIT_COMMIT_REF" = "preview" ]; then exit 1; else exit 0; fi`
+- Git連携Preview deployは有効。`preview` branch pushでPreview deploymentが作られる見込み
+- Root Directory、Build Command、Install Command、Output Directoryは未指定。repo root / Vercel default / Next.js default扱い
+- Framework Presetは未指定。`NEXT_PUBLIC_APP_URL=` の状態で `npx vercel build` を実行し、Next.js auto-detectとbuild成功を確認済みのため、現時点ではblockerではない
+- Framework PresetをNext.jsに明示設定するのは、Git連携Preview deploymentでも404が続く場合の修正計画とする
+- `NEXT_PUBLIC_APP_URL=` の状態でもbuild成功。現時点でbuild blockerではない
+- preflight中に新しいPreview deploymentは作成していない
+- 追加Production deploymentは発生していない
+- Step G再実行前の次アクションは、git clean / Production Branch / env / domainを再確認し、`preview` branchを `be62e73` に合わせてpushしてGit連携Preview deploymentを作ること
+
 ## 1. Phase 9で実作成するもの
 
 Step Aの実行判断後に作成する対象は以下に限定する。
