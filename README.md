@@ -2,7 +2,7 @@
 
 通知型早押しクイズワールドの専用リポジトリです。
 
-Phase 1〜7のlocal実装は完了・push・tag済みです。Phase 8 local smokeは89チェックpass、manual UI rehearsal follow-upも完了・push済みです。Phase 9ではQuiz World専用Supabase Preview projectとVercel Preview projectを作成し、Preview DB migration / seed、DB smoke、Vercel Preview env設定、Git連携Preview deployまで完了しています。Step G Preview smokeは、Framework PresetをNext.jsへ明示した後の新しいGit連携Preview deploymentで入口確認とMVP主要ループ本体をpassしました。対象deploymentは `https://quiz-world-preview-ri8igtw45-chop0522s-projects.vercel.app` / `dpl_6YhA6LJudsrnBEbJ4UPdgGPwmUkx` / `preview` / `7d63505` です。Step HとしてPreview DB cleanup / reset計画docsを作成済みで、cleanup前read-only確認も実施済みです。Preview専用seed `supabase/seed.preview.sql` とAuth users cleanup手順を固定したため、cleanup / resetはGO候補です。ただし、cleanup / resetはまだ実行しておらず、実行前に人間GOを取ります。Preview URL共有範囲はowner/adminのみを維持し、`v0.10.0-phase9-preview-ready` tagはまだ作成しません。Production envは未設定、Production deployは行っていません。Stripe、Web Push、Realtimeはまだ行っていません。既存Smart Buzzerとは別プロジェクトとして扱います。
+Phase 1〜7のlocal実装は完了・push・tag済みです。Phase 8 local smokeは89チェックpass、manual UI rehearsal follow-upも完了・push済みです。Phase 9ではQuiz World専用Supabase Preview projectとVercel Preview projectを作成し、Preview DB migration / seed、DB smoke、Vercel Preview env設定、Git連携Preview deployまで完了しています。Step G Preview smokeは、Framework PresetをNext.jsへ明示した後の新しいGit連携Preview deploymentで入口確認とMVP主要ループ本体をpassしました。対象deploymentは `https://quiz-world-preview-ri8igtw45-chop0522s-projects.vercel.app` / `dpl_6YhA6LJudsrnBEbJ4UPdgGPwmUkx` / `preview` / `7d63505` です。Step HとしてPreview DB cleanup / resetを実行済みです。full reset + migration再適用 + Preview seed再投入により、初期worldとPreview invite code `SEASON0-PREVIEW-001` が復元され、Step G smoke由来データは削除されました。Preview URLの軽量確認もpassしています。Preview URL共有範囲はowner/adminのみを維持し、`v0.10.0-phase9-preview-ready` tagはまだ作成しません。Production envは未設定、Production deployは行っていません。Stripe、Web Push、Realtimeはまだ行っていません。既存Smart Buzzerとは別プロジェクトとして扱います。
 
 Smart Buzzer の production / Stripe / Vercel / Supabase / env / legal page / cleanup / live key には触れません。
 
@@ -400,24 +400,25 @@ Smart Buzzer のSupabase/Vercel/Stripe/envとは混ぜません。
 - Step G中に追加Production deploymentは発生していません。Production envとProduction custom domainは未設定のままです。
 - `NEXT_PUBLIC_APP_URL` は未設定です。現状のapp codeでは参照されておらず、未設定でもbuildは成功しています。Step G Preview smoke本体でもruntime blockerは見つかっていません。
 - Preview DBにはStep G smokeの検証データが残っています。10人テスト候補へ共有する前のcleanup / reset方針はStep H計画docsに整理済みです。
-- Phase 9 Step Hとして、Preview DB cleanup / reset計画docsを作成済みです。cleanup / resetはまだ実行していません。
-- Step Hの推奨方針は、Preview DBをfull resetし、migration / seedを再投入することです。ただし、Auth usersの扱いを確認してから人間GOを取ります。
+- Phase 9 Step Hとして、Preview DB cleanup / resetを実行済みです。
+- Step Hでは、Preview DBをfull resetし、migration / Preview seedを再投入しました。
 - Step H cleanup前read-only確認で、`auth.users=5`、`profiles=5`、`questions=1`、`quiz_launches=1`、`answers=2`、`question_ratings=1`、`reports=1`、`rank_events=4`、`admin_audit_logs=4` を確認しました。Step G smoke検証データは残っています。
 - `supabase/seed.sql` はlocal用 `SEASON0-TEST-001` のまま維持します。Preview reset後は `supabase/seed.preview.sql` で `SEASON0-PREVIEW-001` を再投入します。
 - `supabase db reset --linked --no-seed` 後に `auth.users` 件数を確認し、残っている場合はSupabase Dashboard Auth UsersまたはAdmin APIでStep G smoke用検証ユーザーだけを削除する方針に固定しました。
-- Preview seed再投入手順とAuth users cleanup手順を固定したため、Step H cleanup / resetはGO候補です。ただし、実行前に人間GOを取ります。
+- Preview seed再投入手順とAuth users cleanup手順に沿って実行し、Auth users追加cleanupは不要でした。
+- Phase 9 Step H cleanup / resetを実行済みです。`supabase db reset --linked --no-seed` と `supabase/seed.preview.sql` 適用により、Preview DBはseed状態へ戻りました。
+- cleanup後、`auth.users=0`、`profiles=0`、`questions=0`、`quiz_launches=0`、`answers=0`、`question_ratings=0`、`reports=0`、`rank_events=0`、`admin_audit_logs=0` を確認しました。
+- 初期world `クイズワールド`、world id `00000000-0000-4000-8000-000000000001`、`member_limit=10`、Preview invite code `SEASON0-PREVIEW-001` activeを確認済みです。`SEASON0-TEST-001` はPreview DBに存在しません。
+- Preview URLの軽量確認では `/`、`/api/world`、`/signup`、`/legal/terms`、`/legal/privacy` がpassしました。
 - Preview URL共有範囲はowner/adminのみを維持します。10人テスト候補への共有と `v0.10.0-phase9-preview-ready` tag作成はまだ行いません。
 - Supabase PreviewとVercel project作成は完了済みです。Stripe / Production環境はまだ作成しません。
 - Production deploy、Stripe、Web Push、Realtimeはまだ行いません。
 
 ## Next Work
 
-- Step H Preview DB cleanup / reset計画docsをcommit / pushする
-- cleanup / reset実行前に、人間GOを取る
-- Step H cleanup / resetの人間GOを取る
-- `supabase db reset --linked --no-seed` と `supabase/seed.preview.sql` 適用でPreviewをseed状態へ戻す
-- reset後に `auth.users` 件数を確認し、必要ならStep G smoke用検証ユーザーだけを削除する
-- cleanup / reset後に軽いPreview確認を行う
+- Step H Preview DB cleanup / reset結果docsをcommit / pushする
+- 必要ならPreviewでsignupからの軽量再確認を行う
+- `v0.10.0-phase9-preview-ready` tagを作成するか判断する
 - `v0.10.0-phase9-preview-ready` tagはまだ作成しない
 - `NEXT_PUBLIC_APP_URL` は今回runtime blockerなし。共有URLやabsolute URLが必要な機能を入れる前にPreview URLで設定するか再検討する
 - Production deployはまだ行わない
