@@ -546,12 +546,94 @@ Preview DBには今回の再実行によるsignup / question / launch / answer /
 2. 明示的automation bypass secretを使い、実値をdocs/repoに書かずに `/` と `/api/world` へ到達できるか確認する。
 3. Shareable Linkまたは明示的bypassでも404の場合は、Vercel projectのProtection / routing設定、Framework Preset明示、Root Directory / Output Directory設定を含む修正計画へ進む。
 
+## Step G NO-GO原因調査（Protection通過後404）
+
+2026-05-26 20:25 JSTに、Step G NO-GOの原因を追加調査した。
+
+この調査では、Preview smoke本体、Production deploy、Production env設定、Production custom domain設定、Stripe、Web Push、Realtimeは実行していない。Smart Buzzerにも触っていない。
+
+### 対象確認
+
+| 確認 | 結果 |
+| --- | --- |
+| 対象Vercel project | `quiz-world-preview` |
+| project id | `prj_fCviBUF2fYH077fLBUHV5uPFleMx` |
+| 対象deployment | `dpl_GwrDB65DmZxCJs4gA6H9468dmt4k` |
+| deployment URL | `https://quiz-world-preview-j5hl87g7x-chop0522s-projects.vercel.app` |
+| source / branch / commit | Git連携 / `preview` / `4fd64ef` |
+| deployment status | Ready |
+| Production Branch | `production-hold` |
+| Production env | 未設定 |
+| Production custom domain | 未設定。default project domainのみ存在 |
+| 追加Production deployment | なし。既存Production deployment 2件のみ |
+
+### Deployment Protection確認
+
+| 確認 | 結果 | 判断 |
+| --- | --- | --- |
+| 通常アクセス `/` | 401 | Deployment Protectionで停止 |
+| 通常アクセス `/api/world` | 401 | Deployment Protectionで停止 |
+| owner/adminブラウザ相当のChrome直接表示 `/` | 404 `NOT_FOUND` | Protection通過後またはToolbar経由でもappへ到達できていない |
+| Vercel CLI自動bypass `/` | 404 `NOT_FOUND` | Protectionだけではなくrouting / artifact側の問題を疑う |
+| Vercel CLI自動bypass `/api/world` | 404 `NOT_FOUND` | 同上 |
+| 明示的Automation Bypass `/` | 404 `NOT_FOUND` | 公式bypass方式でもapp routeへ到達できない |
+| 明示的Automation Bypass `/api/world` | 404 `NOT_FOUND` | 同上 |
+| Shareable Link | 未発行 | 追加の共有リンク作成は行わず、明示的Automation Bypassでpost-protection 404を確認した |
+
+Automation Bypass secretの実値はdocs/repoに記録していない。CLI出力やdocsにもsecret実値を残していない。
+
+この結果から、401はDeployment Protectionとして説明できるが、Protection通過後も404になるため、主因はProtectionだけではない可能性が高い。
+
+### routing / artifact / project設定確認
+
+| 確認 | 結果 | 判断 |
+| --- | --- | --- |
+| Root Directory | 未指定 / `null` | repo root扱い。`package.json` と `src/app` はrootに存在するため、明確な誤りは見えない |
+| Framework Preset | 未指定 / `null` | build logではNext.js 16.2.6としてauto-detectされているが、明示設定はされていない |
+| Build Command | 未指定 / `null` | Vercel defaultで `npm run build` が実行されている |
+| Output Directory | 未指定 / `null` | Next.js default。誤った固定outputは設定されていない |
+| Install Command | 未指定 / `null` | Vercel default |
+| `package.json` scripts | `build: next build` | Vercel build logと一致 |
+| repo root確認 | `package.json`, `next.config.ts`, `src/app/page.tsx`, `src/app/api/world/route.ts` がcommit `4fd64ef` に存在 | repo rootは正しく見えている |
+| build log | `Cloning github.com/chop0522/quiz-world (Branch: preview, Commit: 4fd64ef)` | Git連携Preview deployであることを確認 |
+| build log routes | `/`, `/signup`, `/login`, `/home`, `/create`, `/quiz/[launchId]`, `/result/[launchId]`, `/admin`, `/api/world` などが出力 | build時点ではNext.js routesが生成されている |
+| deployment metadata | `builds=[]`, `routes=null`, `functions=null` に見える | build logとの不整合があり、Vercel側のartifact / output認識を疑う |
+| files API | `File tree not found` | deployment artifactのfile treeを確認できない |
+
+### 原因候補
+
+現時点の有力候補:
+
+1. Vercel Project Settings上のFramework Presetが未指定で、Next.js auto-detect buildは成功しているが、serving / routing metadataが期待通りに構成されていない。
+2. deployment metadata上で `routes` / `functions` / file treeが確認できず、build log上のNext.js routesとVercel serving artifactの間に不整合がある。
+3. Deployment Protection通過後も404になるため、Shareable Linkだけでは解決しない可能性がある。ただし、完全な人間向け共有導線確認としてShareable Linkはまだ未確認。
+
+低そうな候補:
+
+- repo rootの誤り: rootに `package.json` と `src/app` があり、build logも正しいbranch / commitをcloneしているため、可能性は低い。
+- Output Directoryの誤設定: Output Directoryは未指定で、誤った固定値は見つかっていない。
+- `NEXT_PUBLIC_APP_URL` 未設定: build blockerではなく、404の直接原因とは判断しにくい。
+
+### 推奨修正方針
+
+Preview smoke再実行前に、以下の順で修正計画を作る。
+
+1. Vercel Project SettingsでFramework PresetをNext.jsに明示する。
+2. Root Directoryはrepo rootのままにする。必要なら明示的に空 / repo root扱いであることを確認する。
+3. Build Command / Output Directory / Install Commandはまずdefaultのまま維持する。Output Directoryを手動指定しない。
+4. Framework Preset明示後、`preview` branchで新しいGit連携Preview deploymentを作り直す。
+5. 新deploymentで明示的Automation BypassまたはShareable Linkを使い、`/` と `/api/world` の到達確認を行う。
+6. それでも404の場合は、Vercel support / project artifactの詳細確認、またはVercel CLIではなくDashboardのdeployment file/output確認へ進む。
+
+`vercel.json` によるframework明示は、現時点では第一候補にしない。まずVercel Project Settings側のFramework PresetをNext.jsへ明示する方針を優先する。
+
 ## 10人テスト前に残る課題
 
 | 優先度 | 課題 | 方針 |
 | --- | --- | --- |
 | P0 | Preview URLのDeployment Protectionにより通常smoke不可 | Shareable Link、または明示的なautomation bypass secretで `/` と `/api/world` 到達を確認する。実値はdocsに書かない |
 | P0 | 新しいGit連携Preview deploymentでもVercel CLI bypassが `404_NOT_FOUND` になる | 自動bypass経路またはVercel projectのProtection / routing設定を切り分ける。Shareable Linkや明示的bypassでも404なら修正計画を作る |
+| P0 | Framework Presetが未指定で、deployment metadata上のroutes/functions/file treeが確認できない | Vercel Project SettingsでFramework PresetをNext.jsに明示し、Git連携Preview deploymentを作り直す計画を立てる |
 | 解消済み | CLI deploymentのartifact / routingが不審 | Git連携Preview deploymentを `preview` / `4fd64ef` で新規作成済み。ただし新deploymentでもStep GはNO-GO |
 | 解消済み | `preview` branchがmainより古い | `preview` branchを最新の `origin/main` である `4fd64ef` に合わせてpush済み |
 | P1 | `NEXT_PUBLIC_APP_URL` runtime影響未確認 | Preview到達後に再確認。必要ならPreview URLをPreview envに設定する |
@@ -566,6 +648,6 @@ Step Hへ進む前に、Step G Preview smokeを完了できるアクセス方法
 推奨する次アクション:
 
 1. Shareable Linkを発行し、実値をdocsに書かずに `/` と `/api/world` 到達を確認する。
-2. Shareable Linkでも404なら、automation bypass secretを明示指定する確認を行う。secret実値はdocs/repoに書かない。
-3. 明示的bypassでも404なら、Vercel projectのProtection / routing設定、Framework Preset明示、Root Directory / Output Directory設定を含む修正計画を作る。
-4. Preview URLで `/`, `/signup`, `/api/world` へ到達できることを確認してから、MVP主要ループを再実行する。
+2. Vercel Project SettingsでFramework PresetをNext.jsに明示する計画を作る。
+3. Framework Preset明示後にGit連携Preview deploymentを作り直す。
+4. 明示的Automation BypassまたはShareable Linkで `/`, `/signup`, `/api/world` へ到達できることを確認してから、MVP主要ループを再実行する。

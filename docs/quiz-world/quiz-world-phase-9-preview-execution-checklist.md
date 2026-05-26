@@ -426,6 +426,30 @@ Step G再実行用 Git連携Preview deployment作成結果:
 - Shareable Linkまたは明示的bypassでも404の場合は、Vercel projectのProtection / routing設定、Framework Preset明示、Root Directory / Output Directory設定を含む修正計画へ進む
 - Step Gはpass扱いにしない。`v0.10.0-phase9-preview-ready` tagはまだ作らない
 
+Step G NO-GO原因調査:
+
+- 実行日時: `2026-05-26 20:25 JST`
+- Preview smoke本体、Production deploy、Production env設定、Production domain設定、Stripe、Web Push、Realtimeは実行していない
+- Vercel projectは `quiz-world-preview`
+- 対象deploymentは `dpl_GwrDB65DmZxCJs4gA6H9468dmt4k` / Git連携 / `preview` / `4fd64ef` / Ready
+- Production Branchは `production-hold`
+- Production envとProduction custom domainは未設定
+- 追加Production deploymentはなし。既存Production deployment 2件のみ
+- 通常アクセス `/` と `/api/world` は401。Deployment Protectionで停止
+- Chrome直接表示 `/` は404 `NOT_FOUND`
+- Vercel CLI自動bypass `/` と `/api/world` は404 `NOT_FOUND`
+- 明示的Automation Bypass `/` と `/api/world` も404 `NOT_FOUND`
+- Automation Bypass secret実値はdocs/repoに記録していない
+- Shareable Linkは未発行。追加共有リンク作成は行っていない
+- Root Directoryは未指定 / `null`
+- Framework Presetは未指定 / `null`
+- Build Command、Output Directory、Install Commandはいずれも未指定 / `null`
+- build logではNext.js 16.2.6としてbuildされ、`/` と `/api/world` を含むroutesが出力されている
+- deployment metadataでは `builds=[]`、`routes=null`、`functions=null` に見える
+- files APIでは `File tree not found`
+- 原因候補は、Framework Preset未指定のauto-detect状態またはVercel serving artifact / routing metadataの不整合
+- 推奨修正方針は、まずVercel Project SettingsでFramework PresetをNext.jsに明示し、Git連携Preview deploymentを作り直すこと
+
 ## 1. Phase 9で実作成するもの
 
 Step Aの実行判断後に作成する対象は以下に限定する。
