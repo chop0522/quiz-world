@@ -4,15 +4,15 @@
 
 このドキュメントは、Phase 9でQuiz World専用Preview環境を実作成する直前のGO/NO-GO判断と、Stepごとの実行結果記録に使うチェックリストである。
 
-2026-05-24時点で、Step AとしてQuiz World専用Supabase development projectを作成済み、Step BとしてPreview DBへのmigration / seed適用済み、Step CとしてPreview DB smokeをpass済みである。Step DとしてVercel Preview project作成前のGO/NO-GOレビューを行い、Quiz World専用Vercel projectを作成済みである。Step D follow-upとしてVercel GitHub Appのrepository accessに `chop0522/quiz-world` を追加し、Vercel projectへGitHub repo接続を完了した。Step EのVercel Preview env設定前チェックでは、想定外のProduction deploymentを検出したため一度NO-GOとした。Step E再開前調査では、Production deploymentが2件あり、どちらもGitHub連携後の `main` push由来であることを確認した。その後、不要build抑止のためVercel Ignored Build Stepを一時的に `exit 0` に設定し、`origin/main` から `production-hold` branchを作成してpushしたうえで、Vercel Production Branchを `production-hold` に変更した。Step EとしてVercel Preview envをPreview environmentのみに設定済みである。Step FとしてPreview deployを実行し、deploymentはReadyである。Step G Preview smokeは実行を試みたが、Vercel Deployment Protectionにより通常アクセスが401になり、CLI bypass経由も404になったためNO-GOである。その後、Step G再実行用にGit連携Preview deploymentを `preview` / `4fd64ef` で新規作成済みである。Production envは未設定、追加Production deployは未実行である。Stripe、Web Push、Realtimeはまだ作らない。Smart Buzzerのproduction / Stripe / Vercel / Supabase / env / legal page / cleanup / live keyには触らない。
+2026-05-24時点で、Step AとしてQuiz World専用Supabase development projectを作成済み、Step BとしてPreview DBへのmigration / seed適用済み、Step CとしてPreview DB smokeをpass済みである。Step DとしてVercel Preview project作成前のGO/NO-GOレビューを行い、Quiz World専用Vercel projectを作成済みである。Step D follow-upとしてVercel GitHub Appのrepository accessに `chop0522/quiz-world` を追加し、Vercel projectへGitHub repo接続を完了した。Step EのVercel Preview env設定前チェックでは、想定外のProduction deploymentを検出したため一度NO-GOとした。Step E再開前調査では、Production deploymentが2件あり、どちらもGitHub連携後の `main` push由来であることを確認した。その後、不要build抑止のためVercel Ignored Build Stepを一時的に `exit 0` に設定し、`origin/main` から `production-hold` branchを作成してpushしたうえで、Vercel Production Branchを `production-hold` に変更した。Step EとしてVercel Preview envをPreview environmentのみに設定済みである。Step FとしてPreview deployを実行し、deploymentはReadyである。Step G Preview smokeは実行を試みたが、Vercel Deployment Protectionにより通常アクセスが401になり、CLI bypass経由も404になったためNO-GOである。その後、Step G再実行用にGit連携Preview deploymentを `preview` / `4fd64ef` で新規作成済みである。新deploymentでも通常アクセスは401、Vercel CLI bypassとChrome直接表示は404となり、`/` と `/api/world` に到達できなかったため、Step Gは引き続きNO-GOである。Production envは未設定、追加Production deployは未実行である。Stripe、Web Push、Realtimeはまだ作らない。Smart Buzzerのproduction / Stripe / Vercel / Supabase / env / legal page / cleanup / live keyには触らない。
 
 ## レビュー結果
 
-2026-05-26時点のレビュー結果は「Step D Vercel project作成済み / GitHub repo接続済み / Step E再開前調査でGitHub main push由来のProduction deployment 2件を確認 / Ignored Build Stepを一時設定 / `production-hold` branch作成済み / Production Branchを `production-hold` に変更済み / Vercel Preview env設定済み / Step F Preview deploy Ready / Step G Preview smoke NO-GO / Step G再実行用Git連携Preview deployment Ready / Production env未設定 / 追加Production deploy未実行」である。
+2026-05-26時点のレビュー結果は「Step D Vercel project作成済み / GitHub repo接続済み / Step E再開前調査でGitHub main push由来のProduction deployment 2件を確認 / Ignored Build Stepを一時設定 / `production-hold` branch作成済み / Production Branchを `production-hold` に変更済み / Vercel Preview env設定済み / Step F Preview deploy Ready / Step G Preview smoke NO-GO / Step G再実行用Git連携Preview deployment Ready / 新deploymentでのStep G再実行も入口到達不可のためNO-GO / Production env未設定 / 追加Production deploy未実行」である。
 
 local実装、Phase 8 smoke、manual UI rehearsal follow-up、Phase 9計画、migration順、seed方針、env項目、rollback / cleanup方針は整理済みである。今回、Supabase organization / workspace、region、plan、cleanup担当、最終GO/NO-GO判断を人間決定済みとして反映した。
 
-cloud実作成はQuiz World専用Supabase development projectの作成、Preview DBへのmigration / seed適用、Quiz World専用Vercel project作成、GitHub repo接続、Vercel Preview env設定、Preview deploy、Step G再実行用Git連携Preview deployment作成まで完了した。Step G Preview smoke本体はまだ実行していない。追加のProduction deploy、Stripe、Web Push、Realtimeは行わない。Production deploymentはGitHub連携後の `main` pushで自動作成されたため、Step E再開前にproduction branch / deploy運用を整理した。現時点ではVercelのProduction Branch設定を `production-hold` に変更済みで、`main` は開発の安定branchとして残す。
+cloud実作成はQuiz World専用Supabase development projectの作成、Preview DBへのmigration / seed適用、Quiz World専用Vercel project作成、GitHub repo接続、Vercel Preview env設定、Preview deploy、Step G再実行用Git連携Preview deployment作成まで完了した。Step Gは再実行したが、通常アクセス401、Vercel CLI bypass 404、Chrome直接表示404により入口条件を満たせず、MVP主要ループには進めなかった。追加のProduction deploy、Stripe、Web Push、Realtimeは行わない。Production deploymentはGitHub連携後の `main` pushで自動作成されたため、Step E再開前にproduction branch / deploy運用を整理した。現時点ではVercelのProduction Branch設定を `production-hold` に変更済みで、`main` は開発の安定branchとして残す。
 
 決定済み:
 
@@ -27,7 +27,7 @@ cloud実作成はQuiz World専用Supabase development projectの作成、Preview
 - Preview共有範囲: owner/adminのみから開始
 - 初期admin email: 決定済み。実値はdocsに書かず、Vercel Preview envの `ADMIN_EMAILS` にのみ設定する
 - Preview DB cleanup担当: 自分
-- 最終GO/NO-GO判断: Step DでVercel project作成済み。Step D follow-upでGitHub repo接続済み。Step E再開前安全作業で `production-hold` branch作成とProduction Branch変更は完了。Step EでVercel Preview env設定済み。Step F Preview deployはReady。Step G Preview smokeはNO-GO
+- 最終GO/NO-GO判断: Step DでVercel project作成済み。Step D follow-upでGitHub repo接続済み。Step E再開前安全作業で `production-hold` branch作成とProduction Branch変更は完了。Step EでVercel Preview env設定済み。Step F Preview deployはReady。Step G Preview smokeは新Git連携Preview deploymentでもNO-GO
 
 Step A作成後の記録:
 
@@ -398,7 +398,33 @@ Step G再実行用 Git連携Preview deployment作成結果:
 - Build logでNext.js routesが出力され、`/`、`/signup`、`/login`、`/home`、`/create`、`/quiz/[launchId]`、`/result/[launchId]`、`/admin`、`/api/world` などが含まれることを確認
 - build logとdocsにsecret実値は記録していない
 - 追加Production deploymentは発生していない。既存Production deployment 2件のみ
-- Step G smoke本体はまだ実行していない。次は新Preview deployment URLでStep G smokeを行う
+- Step G smoke再実行前のdeployment作成は完了。この時点ではStep G smoke本体は未実行だったが、その後に下記の再実行を行った
+
+新Git連携Preview deploymentでのStep G再実行結果:
+
+- 実行日時: `2026-05-26 19:43 JST`
+- 対象Preview deployment URL: `https://quiz-world-preview-j5hl87g7x-chop0522s-projects.vercel.app`
+- 対象deployment id: `dpl_GwrDB65DmZxCJs4gA6H9468dmt4k`
+- deployment source / branch / commit: Git連携 / `preview` / `4fd64ef`
+- status: Ready
+- 通常アクセス `/`: 401。Vercel Deployment Protectionで停止
+- 通常アクセス `/api/world`: 401。Vercel Deployment Protectionで停止
+- Vercel CLI bypass `/`: 404 `NOT_FOUND`
+- Vercel CLI bypass `/api/world`: 404 `NOT_FOUND`
+- Chrome直接表示 `/`: 404 `NOT_FOUND`
+- alias URLの通常アクセス `/`: 401。Vercel Deployment Protectionで停止
+- alias URLのVercel CLI bypass `/` と `/api/world`: 404 `NOT_FOUND`
+- Build logではNext.js routesに `/` と `/api/world` が含まれることを確認済み
+- Step G判断: NO-GO。`/` と `/api/world` に到達できず、MVP主要ループは未実行
+- Preview DB cleanup / reset: signup / question / launch / answer / rating / report / admin操作まで進めなかったため不要
+- 追加Production deployment: なし。Production envとProduction custom domainは未設定のまま
+- secret実値、初期admin email実値、Supabase key、Vercel token、bypass secretはdocs/repoに記録していない
+
+次の判断:
+
+- Shareable Linkまたは明示的automation bypass secretを使い、`/` と `/api/world` へ到達できるか確認する。実値はdocs/repoに書かない
+- Shareable Linkまたは明示的bypassでも404の場合は、Vercel projectのProtection / routing設定、Framework Preset明示、Root Directory / Output Directory設定を含む修正計画へ進む
+- Step Gはpass扱いにしない。`v0.10.0-phase9-preview-ready` tagはまだ作らない
 
 ## 1. Phase 9で実作成するもの
 
@@ -681,7 +707,7 @@ cleanup担当は自分。audit log保持方針とSupabase project削除判断は
 
 ## 9. GO条件
 
-Step AからStep Cまでは以下を満たして実行済みである。Step DではVercel Preview project作成を行い、Step D follow-upでGitHub repo接続まで完了した。Step EでVercel Preview env設定まで完了した。Step FでPreview deployはReadyになった。Step GはDeployment Protection / bypass未解決によりNO-GOであり、Step Hへ進むにはPreview smokeの再実行が必要である。Production deployへ進む場合は、別途GO/NO-GO判断を行う。
+Step AからStep Cまでは以下を満たして実行済みである。Step DではVercel Preview project作成を行い、Step D follow-upでGitHub repo接続まで完了した。Step EでVercel Preview env設定まで完了した。Step FでPreview deployはReadyになった。Step GはDeployment Protection / bypass未解決によりNO-GOであり、新しいGit連携Preview deploymentでも `/` と `/api/world` に到達できていない。Step Hへ進むにはShareable Linkまたは明示的automation bypass secretで到達確認し、Preview smokeを完了する必要がある。Production deployへ進む場合は、別途GO/NO-GO判断を行う。
 
 すでに確認済み:
 
@@ -774,8 +800,11 @@ Step AでQuiz World専用Supabase development projectを作成し、Step BでPre
 | env確認 | Preview envに必要envを設定済み。Production envは未設定 |
 | deployment確認 | Preview deployment Ready。追加Production deploymentなし |
 | Step G Preview smoke | NO-GO。通常アクセスはDeployment Protectionの401、CLI bypass経由は `/` と `/api/world` が404 |
+| Step G再実行用Git連携Preview deployment | `https://quiz-world-preview-j5hl87g7x-chop0522s-projects.vercel.app` / `dpl_GwrDB65DmZxCJs4gA6H9468dmt4k` / Git連携 / `preview` / `4fd64ef` / Ready |
+| Step G再実行結果 | NO-GO。通常アクセスは `/` と `/api/world` が401、Vercel CLI bypassは `/` と `/api/world` が404、Chrome直接表示も `/` が404 |
+| Step G再実行後のMVP主要ループ | 未実行。入口条件である `/` と `/api/world` 到達を満たしていない |
 | 初期admin email | 決定済み。docsには実値を書かない。Vercel Preview envの `ADMIN_EMAILS` にのみ設定 |
 | Preview invite code | `SEASON0-PREVIEW-001` |
 | Preview共有先 | owner/adminのみから開始 |
 | cleanup担当 | 自分 |
-| GO / NO-GO判断 | Step G Preview smokeはNO-GO。Previewアクセス方法を確定して再実行する |
+| GO / NO-GO判断 | Step G Preview smokeは引き続きNO-GO。Shareable Linkまたは明示的automation bypass secretによる到達確認、またはVercel Protection / routing設定の追加調査が必要 |

@@ -2,7 +2,7 @@
 
 通知型早押しクイズワールドの専用リポジトリです。
 
-Phase 1の signup/auth ローカル実装は完了・push・tag済みです。Phase 2の四択クイズ作成local実装も完了・push・tag済みです。Phase 3 quiz launch / recipients local実装も完了・push・tag済みです。Phase 4 answer submission / ranking local実装も完了・push・tag済みです。Phase 5 result / rating / reports のlocal実装も完了・push・tag済みです。Phase 6 rank_events / ranking local実装も完了・push・tag済みです。Phase 7 admin / moderation のlocal実装も完了・push・tag済みです。Phase 8 10-user local smoke / ops rehearsalは89チェックpass、DB reset済みです。Phase 8 manual UI rehearsal follow-upも完了・push済みです。Phase 9 Step AとしてQuiz World専用Supabase development projectを作成済み、Step BとしてPreview DBへのmigration / seed適用済み、Step CとしてPreview DB smokeをpass済みです。Step DとしてQuiz World専用Vercel project `quiz-world-preview` を作成済みで、Step D follow-upとしてGitHub repo `chop0522/quiz-world` への接続も完了しました。Step EとしてVercel Preview envをPreview environmentのみに設定済みです。Step FとしてIgnored Build Stepを `preview` branchだけbuild許可する条件式へ変更し、`preview` branchを作成・pushしてPreview deployを実行しました。Preview deploymentはReadyです。Step G Preview smokeは実行を試みましたが、Vercel Deployment Protectionで通常アクセスが401になり、CLI bypass経由も404になったためNO-GOです。Step G再実行前のaccess investigation、artifact/root/output/deploy method調査、Git連携Preview deploy preflightも記録済みです。Step G再実行用に `preview` branchを最新の `origin/main` である `4fd64ef` に合わせてpushし、Git連携Preview deploymentを新規作成済みです。新deploymentはReadyですが、Step G smoke本体はまだ実行していません。Production envは未設定、追加Production deployは行っていません。`NEXT_PUBLIC_APP_URL` は未設定ですが、現状のbuild blockerではありません。Stripe、Web Push、Realtimeはまだ行っていません。既存Smart Buzzerとは別プロジェクトとして扱います。
+Phase 1の signup/auth ローカル実装は完了・push・tag済みです。Phase 2の四択クイズ作成local実装も完了・push・tag済みです。Phase 3 quiz launch / recipients local実装も完了・push・tag済みです。Phase 4 answer submission / ranking local実装も完了・push・tag済みです。Phase 5 result / rating / reports のlocal実装も完了・push・tag済みです。Phase 6 rank_events / ranking local実装も完了・push・tag済みです。Phase 7 admin / moderation のlocal実装も完了・push・tag済みです。Phase 8 10-user local smoke / ops rehearsalは89チェックpass、DB reset済みです。Phase 8 manual UI rehearsal follow-upも完了・push済みです。Phase 9 Step AとしてQuiz World専用Supabase development projectを作成済み、Step BとしてPreview DBへのmigration / seed適用済み、Step CとしてPreview DB smokeをpass済みです。Step DとしてQuiz World専用Vercel project `quiz-world-preview` を作成済みで、Step D follow-upとしてGitHub repo `chop0522/quiz-world` への接続も完了しました。Step EとしてVercel Preview envをPreview environmentのみに設定済みです。Step FとしてIgnored Build Stepを `preview` branchだけbuild許可する条件式へ変更し、`preview` branchを作成・pushしてPreview deployを実行しました。Preview deploymentはReadyです。Step G Preview smokeは実行を試みましたが、Vercel Deployment Protectionで通常アクセスが401になり、CLI bypass経由も404になったためNO-GOです。Step G再実行前のaccess investigation、artifact/root/output/deploy method調査、Git連携Preview deploy preflightも記録済みです。Step G再実行用に `preview` branchを最新の `origin/main` である `4fd64ef` に合わせてpushし、Git連携Preview deploymentを新規作成済みです。新deploymentはReadyですが、再実行でも通常アクセスは401、Vercel CLI bypassとChrome直接表示は404となり、`/` と `/api/world` に到達できませんでした。Step Gは引き続きNO-GOで、MVP主要ループは未実行です。Production envは未設定、追加Production deployは行っていません。`NEXT_PUBLIC_APP_URL` は未設定ですが、現状のbuild blockerではありません。Stripe、Web Push、Realtimeはまだ行っていません。既存Smart Buzzerとは別プロジェクトとして扱います。
 
 Smart Buzzer の production / Stripe / Vercel / Supabase / env / legal page / cleanup / live key には触れません。
 
@@ -384,6 +384,8 @@ Smart Buzzer のSupabase/Vercel/Stripe/envとは混ぜません。
 - 新Preview deployment id: `dpl_GwrDB65DmZxCJs4gA6H9468dmt4k`
 - 新Preview deployment status / source / branch / commit: Ready / Git連携 / `preview` / `4fd64ef`
 - Build logでNext.js routesが出力され、`/`、`/signup`、`/api/world` などが含まれることを確認しました。secret実値は記録していません。
+- 新しいGit連携Preview deploymentでStep G smokeを再実行しましたが、通常アクセスはDeployment Protectionにより `/` と `/api/world` が401、Vercel CLI bypassは `/` と `/api/world` が404、Chrome直接表示も `/` が404となりました。入口条件を満たせないため、MVP主要ループは未実行です。
+- Step G判断は引き続きNO-GOです。次はShareable Linkまたは明示的automation bypass secretを使った到達確認、あるいはVercel projectのProtection / routing設定の追加調査が必要です。Shareable Linkやbypass secretの実値はrepo/docsに書きません。
 - Step G中に追加Production deploymentは発生していません。Production envとProduction custom domainは未設定のままです。
 - `NEXT_PUBLIC_APP_URL` は未設定です。現状のapp codeでは参照されておらず、未設定でもbuildは成功していますが、Step GではPreview URLに到達できなかったためruntime影響は未確認です。
 - Supabase PreviewとVercel project作成は完了済みです。Stripe / Production環境はまだ作成しません。
@@ -391,10 +393,9 @@ Smart Buzzer のSupabase/Vercel/Stripe/envとは混ぜません。
 
 ## Next Work
 
-- 新しいGit連携Preview deploymentでStep G Preview smokeを再実行する
-- Vercel Deployment Protectionのowner/adminアクセスまたはbypass手順を確定する
-- owner/adminブラウザ、Shareable Link、または明示的automation bypassで `/` と `/api/world` に到達できるか確認する。Shareable Linkやbypass secretの実値はrepo/docsに書かない
-- Shareable Linkまたは明示的bypassでも404なら、deployment artifact / root / output / deploy methodの修正計画を作る
+- 新しいGit連携Preview deploymentでStep G Preview smokeを再実行したが、`/` と `/api/world` に到達できずNO-GO。MVP主要ループは未実行
+- Vercel Deployment ProtectionのShareable Link、または明示的automation bypass secretを使った到達手順を確定する。Shareable Linkやbypass secretの実値はrepo/docsに書かない
+- Shareable Linkまたは明示的bypassでも404なら、Vercel projectのProtection / routing設定、Framework Preset明示、Root Directory / Output設定を含む修正計画を作る
 - Preview URLへ到達できた後、必要なら `NEXT_PUBLIC_APP_URL` をPreview URLで追加設定する
 - Production deployはまだ行わない
 - Web Push / Realtime / production deploy はまだ作らない
