@@ -22,8 +22,8 @@ Phase 10ではProduction deploy、Stripe、Web Push、Realtimeは扱わない。
 参加者に個別共有するもの:
 
 - Preview URL
-- invite code
-- 不具合報告先
+- 参加者別invite code
+- 不具合報告先であるownerへの個別DM
 
 共有しないもの:
 
@@ -34,7 +34,7 @@ Phase 10ではProduction deploy、Stripe、Web Push、Realtimeは扱わない。
 - DB password
 - bypass secret
 
-Preview URL共有範囲は、owner/admin確認後に信頼できる1〜2名へ広げる。10人テスト候補全員への共有は、1〜2名確認後に判断する。
+Preview URL共有範囲は、owner/admin確認後にまず信頼できる1名へ個別DMで広げる。問題がなければ2名目へ拡張する。10人テスト候補全員への共有はまだ行わない。
 
 ## 3. Signup手順
 
@@ -162,7 +162,7 @@ Phase 10開始時点の既知制約:
 
 ## 10. 不具合報告テンプレート
 
-不具合や分かりにくい点は、以下の形で報告する。
+不具合や分かりにくい点は、ownerへの個別DMで以下の形で報告する。
 
 ```text
 画面名:
@@ -218,4 +218,4 @@ Quiz WorldのPreviewテストに協力してほしいです。
 報告時は、画面名、操作手順、期待した結果、実際の結果、スクリーンショット有無を教えてください。
 ```
 
-Preview URL、invite code、不具合報告先は個別共有時に追記する。docsやREADMEには実値を書かない。
+Preview URL、参加者別invite code、不具合報告先は個別共有時に追記する。docsやREADMEには実値を書かない。

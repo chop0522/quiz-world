@@ -2,7 +2,7 @@
 
 通知型早押しクイズワールドの専用リポジトリです。
 
-Phase 1〜7のlocal実装は完了・push・tag済みです。Phase 8 local smokeは89チェックpass、manual UI rehearsal follow-upも完了・push済みです。Phase 9ではQuiz World専用Supabase Preview projectとVercel Preview projectを作成し、Preview DB migration / seed、DB smoke、Vercel Preview env設定、Git連携Preview deployまで完了しています。Step G Preview smokeは、Framework PresetをNext.jsへ明示した後の新しいGit連携Preview deploymentで入口確認とMVP主要ループ本体をpassしました。Step H cleanup / resetも完了し、Preview DBはseed状態へ戻っています。Phase 9 Preview ready地点は `v0.10.0-phase9-preview-ready` tagで固定済みです。Phase 10 participant guide / admin ops checklist は作成済みです。Preview URL共有範囲はowner/adminのみを維持し、10人テスト候補へはまだ共有しません。Production envは未設定、Production deployは行っていません。Stripe、Web Push、Realtimeはまだ行っていません。既存Smart Buzzerとは別プロジェクトとして扱います。
+Phase 1〜7のlocal実装は完了・push・tag済みです。Phase 8 local smokeは89チェックpass、manual UI rehearsal follow-upも完了・push済みです。Phase 9ではQuiz World専用Supabase Preview projectとVercel Preview projectを作成し、Preview DB migration / seed、DB smoke、Vercel Preview env設定、Git連携Preview deployまで完了しています。Step G Preview smokeは、Framework PresetをNext.jsへ明示した後の新しいGit連携Preview deploymentで入口確認とMVP主要ループ本体をpassしました。Step H cleanup / resetも完了し、Preview DBはseed状態へ戻っています。Phase 9 Preview ready地点は `v0.10.0-phase9-preview-ready` tagで固定済みです。Phase 10 participant guide / admin ops checklist は作成済みです。Phase 10 owner/admin最終確認後の人間決定事項も反映済みで、まず信頼できる1名へ個別DMで限定共有し、問題がなければ2名目へ拡張する方針です。Preview URL共有自体はまだ実行しておらず、10人テスト候補全員へはまだ共有しません。Production envは未設定、Production deployは行っていません。Stripe、Web Push、Realtimeはまだ行っていません。既存Smart Buzzerとは別プロジェクトとして扱います。
 
 Smart Buzzer の production / Stripe / Vercel / Supabase / env / legal page / cleanup / live key には触れません。
 
@@ -421,17 +421,21 @@ Smart Buzzer のSupabase/Vercel/Stripe/envとは混ぜません。
 - Phase 9 Preview ready地点は `v0.10.0-phase9-preview-ready` tagで固定済みです。
 - Phase 10 10-user test planを作成・push済みです。participant guide / admin ops checklistも作成済みです。
 - Phase 10 owner/admin最終確認では、Preview DB seed状態、Preview invite code active、Preview URL、signup、admin role、`/admin`、participant guide、admin ops checklistを確認済みです。
-- 1〜2名への限定共有は条件付きGO候補ですが、最初に共有する相手、不具合報告先、invite code運用、owner/admin確認用admin userを残すかどうかは人間決定待ちです。
-- Phase 10は最初はowner/adminのみ、次に信頼できる1〜2名、問題なければ最大10名へ段階的に広げる方針です。
+- Phase 10 owner/admin最終確認後の人間決定事項を反映済みです。まず信頼できる1名へ個別DMで限定共有し、問題がなければ2名目へ拡張します。最大10名への共有はまだ行いません。
+- 不具合報告先はownerへの個別DMです。専用Slack / Discord / LINEグループは2名以上に広げる段階で再検討します。
+- 1〜2名共有ではadmin画面で参加者別invite codeを発行します。共通Preview invite code `SEASON0-PREVIEW-001` はowner/admin確認用または予備として扱います。参加者別invite code実値はdocsに書きません。
+- owner/admin確認用admin userは残したまま開始します。1〜2名共有前の再cleanupは行わず、共有前にread-onlyでPreview DB件数だけ軽く確認します。
+- Preview URL共有自体はまだ実行していません。共有方法は個別DMのみで、SNSや公開ページには出しません。
+- Phase 10は最初はowner/adminのみ、次に信頼できる1名、問題なければ2名目、さらに条件を満たせば最大10名へ段階的に広げる方針です。
 - Phase 10はPreview限定テストの準備であり、一般公開やProduction deployではありません。
 
 ## Next Work
 
-- Phase 10 owner/admin最終確認結果をレビューし、1〜2名へ限定共有するか判断する
-- 最初に共有する信頼できる1〜2名を決める
-- 不具合報告窓口を決める
-- invite code運用を、共通Preview invite codeから始めるか参加者別admin発行にするか決める
-- owner/admin確認用admin userを残して開始するか、再cleanupしてから開始するか決める
+- 共有前にPreview DB件数をread-onlyで軽く確認する
+- admin画面で最初の1名用の参加者別invite codeを発行する
+- participant guideをベースに個別DM文面を作る
+- Preview URLと参加者別invite codeを個別DMで1名に共有する
+- 1名のsignup / login / 主要ループ / 不具合報告を確認後、2名目へ拡張するか判断する
 - `NEXT_PUBLIC_APP_URL` は今回runtime blockerなし。共有URLやabsolute URLが必要な機能を入れる前にPreview URLで設定するか再検討する
 - Production deployはまだ行わない
 - Web Push / Realtime / production deploy はまだ作らない

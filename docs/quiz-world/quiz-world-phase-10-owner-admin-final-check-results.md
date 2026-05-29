@@ -183,22 +183,30 @@ signup後のDB確認:
 - participant guideに不足は見つからない
 - admin ops checklistに大きな矛盾は見つからない
 
-1〜2名へ限定共有する前に、人間が決めるべき項目:
+1〜2名へ限定共有する前の人間決定事項は、2026-05-29時点で以下に固定した。
 
-- 最初に共有する信頼できる1〜2名
-- 不具合報告先
-- 共有時のinvite code運用
-  - 共通Preview invite codeを使うか
-  - admin画面で参加者別invite codeを発行するか
-- owner/admin確認で作成したadmin userを残して開始するか、再cleanupしてから開始するか
-- Preview URLとinvite codeを個別DM等で共有する具体手段
+- 最初は信頼できる1名から開始する
+- その1名で問題がなければ2名目へ拡張する
+- 最大10名への共有はまだ行わない
+- 不具合報告先は、まずownerへの個別DMにする
+- 不具合報告はparticipant guideのテンプレートを使う
+- 専用Slack / Discord / LINEグループは、2名以上に広げる段階で再検討する
+- 1〜2名共有では、admin画面で参加者別invite codeを発行する
+- 共通Preview invite code `SEASON0-PREVIEW-001` はowner/admin確認用または予備として扱う
+- 参加者別invite codeの実値はdocsに書かない
+- 共有時は個別DMでPreview URLとinvite codeを渡す
+- owner/admin確認用admin userは残したまま開始する
+- 1〜2名共有前の再cleanupは行わない
+- 共有前にread-onlyでPreview DB件数だけ軽く確認する
+- Preview URL共有方法は個別DMのみとし、SNSや公開ページには出さない
 
-これらが決まれば、1〜2名への限定共有はGO候補になる。10人テスト候補全員への共有、SNS公開、Production deployはまだNO-GO。
+上記により、1名限定共有はGO候補になった。ただし、Preview URL共有自体はまだ実行していない。10人テスト候補全員への共有、SNS公開、Production deployはまだNO-GO。
 
 ## 11. 確認後の状態
 
 - Preview URL共有範囲はowner/adminのみ
 - 10人テスト候補へはまだ共有していない
+- 信頼できる1名への限定共有はGO候補だが、まだ共有していない
 - Preview DBにはowner/admin確認用admin userが1件存在する
 - Preview invite code `SEASON0-PREVIEW-001` はactive
 - Production deployは行っていない
@@ -210,8 +218,8 @@ signup後のDB確認:
 
 ## 12. 次アクション
 
-1. 人間側で最初に共有する1〜2名を決める。
-2. 不具合報告先を決める。
-3. invite code運用を決める。
-4. owner/admin確認用admin userを残すか、再cleanupするか決める。
-5. 決定後、1〜2名への限定共有GO/NO-GOを最終判断する。
+1. 共有前にPreview DB件数をread-onlyで軽く確認する。
+2. admin画面で最初の1名用の参加者別invite codeを発行する。
+3. participant guideをベースに個別DM文面を作る。
+4. Preview URLと参加者別invite codeを個別DMで1名に共有する。
+5. 1名のsignup / login / 主要ループ / 不具合報告を確認後、2名目へ拡張するか判断する。

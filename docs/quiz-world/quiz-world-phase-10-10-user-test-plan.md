@@ -23,24 +23,28 @@ Phase 10ではProduction deploy、Stripe、Web Push、Realtimeは扱わない。
 | 段階 | 対象 | 目的 | 共有範囲 |
 | --- | --- | --- | --- |
 | Step 1 | owner/adminのみ | Preview seed状態からsignup、admin role、admin画面を再確認する | 非公開 |
-| Step 2 | 信頼できる1〜2名 | 初回説明文、signup、回答導線、不具合報告の伝わり方を確認する | 個別共有 |
+| Step 2a | 信頼できる1名 | 初回説明文、signup、回答導線、不具合報告の伝わり方を最小人数で確認する | 個別DM |
+| Step 2b | 2名目 | 1名目で大きな問題がなければ、2名目へ拡張して複数人のlaunch / answer導線を確認する | 個別DM |
 | Step 3 | 最大10名 | MVP主要ループ、通報、moderation、cleanupまで確認する | 限定共有 |
 
 固定方針:
 
 - SNSや公開ページにはPreview URLを出さない
-- 10人テスト候補全員への一括共有は、owner/admin確認後に行う
+- まず信頼できる1名から開始する
+- 1名で問題がなければ2名目へ拡張する
+- 最大10名への共有はまだ行わない
+- 10人テスト候補全員への一括共有はまだ行わない
 - 参加者にはPreviewテストであることを明示する
 - テストデータは削除される可能性があることを明示する
 - 18歳以上であることを参加条件にする
 
 ## 3. 招待コード方針
 
-候補は2つある。
+方針は以下に固定する。
 
 ### A. 共通Preview invite codeを使う
 
-`SEASON0-PREVIEW-001` を参加者に共有する。
+`SEASON0-PREVIEW-001` を参加者に共有する案。
 
 メリット:
 
@@ -68,11 +72,13 @@ adminが参加者ごとにinvite codeを発行する。
 - admin操作が増える
 - 参加者ごとのcode管理が必要になる
 
-### 推奨
+### 決定済み方針
 
 最初はowner/admin確認で `SEASON0-PREVIEW-001` を使う。
 
-信頼できる1〜2名へ広げる段階から、参加者別invite codeをadmin画面で発行する方針を推奨する。最大10名に広げる場合も、参加者別invite codeを基本にする。
+信頼できる1〜2名へ広げる段階から、参加者別invite codeをadmin画面で発行する。共通Preview invite code `SEASON0-PREVIEW-001` はowner/admin確認用または予備として扱う。
+
+参加者別invite codeの実値はdocsに書かない。共有時はPreview URLと参加者別invite codeを個別DMで渡す。SNSや公開ページには出さない。
 
 ## 4. 参加者向け案内文
 
@@ -101,7 +107,7 @@ Quiz WorldのPreviewテストに協力してほしいです。
 報告時は、画面名、操作手順、期待した結果、実際の結果、スクリーンショット有無を教えてください。
 ```
 
-案内文にはPreview URL、invite code、問い合わせ先を追記して使う。ただし、SNSや公開ページには掲載しない。
+案内文にはPreview URL、参加者別invite code、不具合報告先を追記して使う。ただし、docsには実値を書かず、SNSや公開ページにも掲載しない。
 
 ## 5. テスト手順
 
@@ -171,6 +177,8 @@ Phase 10開始時点の既知制約:
 
 ## 8. 不具合報告方法
 
+不具合報告先は、まずownerへの個別DMにする。専用Slack / Discord / LINEグループは、2名以上に広げる段階で再検討する。
+
 不具合報告は以下のテンプレートで集める。
 
 ```text
@@ -193,7 +201,7 @@ Phase 10開始時点の既知制約:
 | P1 | 主要ループは通るが、参加者が迷う、危険操作が分かりにくい | 10人テスト前または途中で修正判断 |
 | P2 | 表示改善、説明追加、軽微な操作感 | 既知制約として記録し、次Phaseで整理 |
 
-報告窓口はPhase 10開始前に決める。候補はownerへのDM、専用Slack/Discord/LINEグループ、または共有メモである。
+報告窓口はownerへの個別DMに決定済みである。participant guideの不具合報告テンプレートを使う。
 
 ## 9. テスト終了後のcleanup
 
@@ -239,6 +247,10 @@ Phase 10開始のGO条件:
 - 参加者向け案内文が用意済み
 - 不具合報告窓口が決定済み
 - Preview URL共有範囲が決定済み
+- まず信頼できる1名から開始し、問題がなければ2名目へ拡張する方針が決定済み
+- 1〜2名共有では参加者別invite codeをadmin画面で発行する方針が決定済み
+- 共通Preview invite code `SEASON0-PREVIEW-001` はowner/admin確認用または予備として扱う
+- 1〜2名共有前の再cleanupは行わず、共有前にread-onlyでPreview DB件数だけ確認する方針が決定済み
 - Production deploy、Production env、Production custom domainに進まない方針が維持されている
 - Smart Buzzerと混ざらないことを確認済み
 
@@ -255,6 +267,8 @@ Phase 10開始のGO条件:
 - report / admin moderationが動かない
 - Preview URL共有範囲が未定
 - 不具合報告窓口が未定
+- 最初に共有する1名が未定
+- 参加者別invite code発行方針が未定
 - 参加者向け案内文が未準備
 - Production envやProduction custom domainが誤って設定されている
 - Smart BuzzerのVercel / Supabase / envと混同している
@@ -264,7 +278,8 @@ Phase 10開始のGO条件:
 Phase 10の完了条件:
 
 - owner/adminのみの確認が完了する
-- 信頼できる1〜2名の限定テストを実施する
+- 信頼できる1名の限定テストを実施する
+- 問題がなければ2名目の限定テストを実施する
 - 必要なら最大10名まで広げる
 - signupからadmin moderationまでの主要ループをPreviewで確認する
 - P0がない
