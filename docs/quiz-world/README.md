@@ -716,7 +716,7 @@ Step A / Step B / Step C / Step D作成後の記録:
 - GO条件
 - NO-GO条件
 
-Step AとしてQuiz World専用Supabase development projectを作成済み。Step BとしてPreview DBへのmigration / seed適用済み。Step CとしてPreview DB smokeをpass済み。Step DとしてQuiz World専用Vercel projectを作成済み。Step D follow-upでGitHub repo接続済み。Step E再開前調査でProduction deployment 2件を確認済み。Ignored Build Step一時設定、`production-hold` branch作成、Production Branch変更は完了済み。Step EとしてVercel Preview envは設定済み。Step F Preview deployは実行済み。Framework Preset明示後のStep G Preview smoke本体はpass済み。Step H cleanup / resetも実行済みで、Preview DBはseed状態へ戻っている。Phase 9 Preview ready地点は `v0.10.0-phase9-preview-ready` tagで固定済み。Phase 10 participant guide / admin ops checklist は作成済みである。Phase 10 owner/admin最終確認では、Preview DB seed状態、Preview invite code active、Preview URL、signup、admin role、`/admin`、participant guide、admin ops checklistを確認済みである。Phase 10 owner/admin最終確認後の人間決定事項も反映済みである。まず信頼できる1名へ個別DMで限定共有し、問題がなければ2名目へ拡張する。1〜2名共有ではadmin画面で参加者別invite codeを発行し、共通Preview invite code `SEASON0-PREVIEW-001` はowner/admin確認用または予備として扱う。Preview URL共有自体はまだ実行していない。追加のProduction deploy、Stripe、Web Push、Realtimeはまだ作らない。
+Step AとしてQuiz World専用Supabase development projectを作成済み。Step BとしてPreview DBへのmigration / seed適用済み。Step CとしてPreview DB smokeをpass済み。Step DとしてQuiz World専用Vercel projectを作成済み。Step D follow-upでGitHub repo接続済み。Step E再開前調査でProduction deployment 2件を確認済み。Ignored Build Step一時設定、`production-hold` branch作成、Production Branch変更は完了済み。Step EとしてVercel Preview envは設定済み。Step F Preview deployは実行済み。Framework Preset明示後のStep G Preview smoke本体はpass済み。Step H cleanup / resetも実行済みで、Preview DBはseed状態へ戻っている。Phase 9 Preview ready地点は `v0.10.0-phase9-preview-ready` tagで固定済み。Phase 10 participant guide / admin ops checklist は作成済みである。Phase 10 owner/admin最終確認では、Preview DB seed状態、Preview invite code active、Preview URL、signup、admin role、`/admin`、participant guide、admin ops checklistを確認済みである。Phase 10 owner/admin最終確認後の人間決定事項も反映済みである。1名限定共有前read-only確認もpass済みで、Preview DBにはowner/admin確認用admin userだけが残り、questions / launches / answers / ratings / reports / rank_events / admin_audit_logs は0件である。1名限定共有用の参加者別invite codeを1件発行済みで、active確認と `admin_audit_logs` の `invite_created` 確認も完了している。参加者別invite code実値はdocs/repoに書いていない。まず信頼できる1名へ個別DMで限定共有し、問題がなければ2名目へ拡張する。共通Preview invite code `SEASON0-PREVIEW-001` はowner/admin確認用または予備として扱う。Preview URL共有自体はまだ実行していない。追加のProduction deploy、Stripe、Web Push、Realtimeはまだ作らない。
 
 チェックリストは `quiz-world-phase-9-preview-execution-checklist.md` に記録済み。
 
@@ -724,10 +724,8 @@ Step AとしてQuiz World専用Supabase development projectを作成済み。Ste
 
 ### A. Phase 10 10-user test planning
 
-- 共有前にPreview DB件数をread-onlyで軽く確認する。
-- admin画面で最初の1名用の参加者別invite codeを発行する。
 - participant guideをベースに個別DM文面を作る。
-- Preview URLと参加者別invite codeを個別DMで1名に共有する。
+- ownerがadmin画面で参加者別invite code実値を確認し、Preview URLと一緒に個別DMで1名に共有する。
 - 1名のsignup / login / 主要ループ / 不具合報告を確認後、2名目へ拡張するか判断する。
 - `NEXT_PUBLIC_APP_URL` は今回runtime blockerなし。共有URLやabsolute URLが必要な機能を入れる前にPreview URLで設定するか再検討する。
 - Production deployはまだ行わない。

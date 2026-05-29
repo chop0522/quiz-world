@@ -425,16 +425,16 @@ Smart Buzzer のSupabase/Vercel/Stripe/envとは混ぜません。
 - 不具合報告先はownerへの個別DMです。専用Slack / Discord / LINEグループは2名以上に広げる段階で再検討します。
 - 1〜2名共有ではadmin画面で参加者別invite codeを発行します。共通Preview invite code `SEASON0-PREVIEW-001` はowner/admin確認用または予備として扱います。参加者別invite code実値はdocsに書きません。
 - owner/admin確認用admin userは残したまま開始します。1〜2名共有前の再cleanupは行わず、共有前にread-onlyでPreview DB件数だけ軽く確認します。
+- Phase 10の1名限定共有前read-only確認はpassしました。Preview DBにはowner/admin確認用admin userだけが残り、questions / launches / answers / ratings / reports / rank_events / admin_audit_logs は0件です。`SEASON0-PREVIEW-001` はactive、`SEASON0-TEST-001` はPreview DBに存在しません。
+- Phase 10の1名限定共有用に参加者別invite codeを1件発行済みです。発行理由は `Phase 10 first limited participant`、`max_uses=1`、active確認済み、`admin_audit_logs` の `invite_created` も確認済みです。参加者別invite code実値はdocs/repoに書いていません。
 - Preview URL共有自体はまだ実行していません。共有方法は個別DMのみで、SNSや公開ページには出しません。
 - Phase 10は最初はowner/adminのみ、次に信頼できる1名、問題なければ2名目、さらに条件を満たせば最大10名へ段階的に広げる方針です。
 - Phase 10はPreview限定テストの準備であり、一般公開やProduction deployではありません。
 
 ## Next Work
 
-- 共有前にPreview DB件数をread-onlyで軽く確認する
-- admin画面で最初の1名用の参加者別invite codeを発行する
 - participant guideをベースに個別DM文面を作る
-- Preview URLと参加者別invite codeを個別DMで1名に共有する
+- ownerがadmin画面で参加者別invite code実値を確認し、Preview URLと一緒に個別DMで1名に共有する
 - 1名のsignup / login / 主要ループ / 不具合報告を確認後、2名目へ拡張するか判断する
 - `NEXT_PUBLIC_APP_URL` は今回runtime blockerなし。共有URLやabsolute URLが必要な機能を入れる前にPreview URLで設定するか再検討する
 - Production deployはまだ行わない

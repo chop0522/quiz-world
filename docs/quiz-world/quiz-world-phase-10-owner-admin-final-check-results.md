@@ -223,3 +223,139 @@ signup後のDB確認:
 3. participant guideをベースに個別DM文面を作る。
 4. Preview URLと参加者別invite codeを個別DMで1名に共有する。
 5. 1名のsignup / login / 主要ループ / 不具合報告を確認後、2名目へ拡張するか判断する。
+
+## 13. 1名限定共有前 read-only 確認結果
+
+実行日時: 2026-05-29 23:36 JST
+
+信頼できる1名へ限定共有する前に、Preview DBとVercel状態をread-onlyで確認した。Preview URLやinvite codeの共有、新しいinvite code発行、DB変更は行っていない。
+
+対象確認:
+
+- Supabase Preview project: `quiz-world-preview`
+- Supabase project ref: `ogfuohrvzfjmgvdewvcl`
+- Vercel project: `quiz-world-preview`
+
+Supabase CLIのlinked projectは `quiz-world-preview` / `ogfuohrvzfjmgvdewvcl` だった。project一覧にはSmart Buzzer projectも存在するが、linked対象はQuiz World Previewであることを確認した。Smart BuzzerのSupabase projectには触っていない。
+
+### DB件数
+
+| 対象 | 件数 |
+| --- | ---: |
+| `auth.users` | 1 |
+| `profiles` | 1 |
+| `world_members` | 1 |
+| `waitlist` | 0 |
+| `invites` | 1 |
+| `questions` | 0 |
+| `blocks` | 0 |
+| `quiz_launches` | 0 |
+| `quiz_recipients` | 0 |
+| `answers` | 0 |
+| `question_ratings` | 0 |
+| `reports` | 0 |
+| `rank_events` | 0 |
+| `admin_audit_logs` | 0 |
+
+`profiles` は `active admin` が1件、`world_members` は `active` が1件だった。これはowner/admin確認用admin userを残す方針と一致する。
+
+### 初期world / invite確認
+
+| 項目 | 結果 |
+| --- | --- |
+| world name | `クイズワールド` |
+| world id | `00000000-0000-4000-8000-000000000001` |
+| member_limit | `10` |
+| world status | `active` |
+| Preview invite code | `SEASON0-PREVIEW-001` |
+| Preview invite status | `active` |
+| Preview invite use_count | `1` |
+| Preview invite max_uses | `100` |
+| local用 invite code `SEASON0-TEST-001` | Preview DBに存在しない |
+
+### 想定外データ確認
+
+以下はすべて0件であり、1名共有前の想定外データは見つからなかった。
+
+- `questions`
+- `quiz_launches`
+- `quiz_recipients`
+- `answers`
+- `question_ratings`
+- `reports`
+- `rank_events`
+- `admin_audit_logs`
+
+### Vercel確認
+
+- 直近のmain push由来deploymentは `Canceled / Preview`
+- Production deploymentの追加作成なし
+- Vercel envはPreview environmentのみ設定済み
+- Production envは未設定
+- Production custom domainは未設定
+- project aliasはVercelのPreview / default `vercel.app` 系のみで、独自Production custom domainは確認されない
+
+### 判断
+
+判定: 1名限定共有前read-only確認はpass。
+
+1名限定共有へ進む前提は満たしている。ただし、Preview URL共有自体はまだ実行していない。新しい参加者別invite codeもまだ発行していない。
+
+次に進む場合の順序:
+
+1. 最初の1名用の参加者別invite codeを発行する。
+2. participant guideをベースに個別DM文面を作る。
+3. Preview URLと参加者別invite codeを個別DMで1名に共有する。
+
+引き続き、10人テスト候補全員への共有、SNS公開、Production deploy、Production env設定、Production custom domain設定、Stripe、Web Push、Realtimeは行わない。Smart Buzzerにも触らない。
+
+## 14. 1名限定共有用 invite code 発行結果
+
+実行日時: 2026-05-29 23:42 JST
+
+信頼できる1名へ限定共有するための参加者別invite codeを1件発行した。Preview URLやinvite codeはまだ相手に共有していない。invite code実値はdocs、README、commit message、PR本文に書かない。
+
+対象確認:
+
+- Supabase Preview project: `quiz-world-preview`
+- Supabase project ref: `ogfuohrvzfjmgvdewvcl`
+- Smart BuzzerのSupabase projectには触っていない
+
+発行方法:
+
+- admin APIで使っている `admin_create_invite` RPCをPreview DBに対して実行した
+- codeはserver生成にした
+- `max_uses = 1`
+- `expires_at = null`
+- reason: `Phase 10 first limited participant`
+
+確認結果:
+
+| 項目 | 結果 |
+| --- | --- |
+| invite作成 | pass |
+| 参加者別invite active確認 | pass |
+| 参加者別invite use_count | `0` |
+| 参加者別invite max_uses | `1` |
+| `admin_audit_logs` の `invite_created` | pass |
+| audit reason | `Phase 10 first limited participant` |
+| Preview invite code `SEASON0-PREVIEW-001` | activeのまま維持 |
+| Preview URL共有 | 未実行 |
+| 参加者別invite code共有 | 未実行 |
+
+発行後の件数:
+
+| 対象 | 件数 |
+| --- | ---: |
+| `invites` | 2 |
+| active invites | 2 |
+| 参加者別 active invites | 1 |
+| `admin_audit_logs` の matching `invite_created` | 1 |
+
+参加者別invite codeの実値は記録していない。共有する段階ではownerがadmin画面で実値を確認し、個別DMでPreview URLと一緒に1名へ渡す。
+
+### 判断
+
+判定: 1名限定共有用invite発行はpass。
+
+1名への個別DM共有へ進む前提は満たしている。ただし、Preview URL共有とinvite code共有はまだ実行していない。10人テスト候補全員への共有、SNS公開、Production deploy、Production env設定、Production custom domain設定、Stripe、Web Push、Realtimeは引き続き行わない。
