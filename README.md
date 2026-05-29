@@ -333,6 +333,7 @@ Smart Buzzer のSupabase/Vercel/Stripe/envとは混ぜません。
 - [Phase 10 10-user test plan](docs/quiz-world/quiz-world-phase-10-10-user-test-plan.md)
 - [Phase 10 participant guide](docs/quiz-world/quiz-world-phase-10-participant-guide.md)
 - [Phase 10 admin ops checklist](docs/quiz-world/quiz-world-phase-10-admin-ops-checklist.md)
+- [Phase 10 owner/admin final check results](docs/quiz-world/quiz-world-phase-10-owner-admin-final-check-results.md)
 
 ## Current Status
 
@@ -419,14 +420,18 @@ Smart Buzzer のSupabase/Vercel/Stripe/envとは混ぜません。
 - Production deploy、Stripe、Web Push、Realtimeはまだ行いません。
 - Phase 9 Preview ready地点は `v0.10.0-phase9-preview-ready` tagで固定済みです。
 - Phase 10 10-user test planを作成・push済みです。participant guide / admin ops checklistも作成済みです。
+- Phase 10 owner/admin最終確認では、Preview DB seed状態、Preview invite code active、Preview URL、signup、admin role、`/admin`、participant guide、admin ops checklistを確認済みです。
+- 1〜2名への限定共有は条件付きGO候補ですが、最初に共有する相手、不具合報告先、invite code運用、owner/admin確認用admin userを残すかどうかは人間決定待ちです。
 - Phase 10は最初はowner/adminのみ、次に信頼できる1〜2名、問題なければ最大10名へ段階的に広げる方針です。
 - Phase 10はPreview限定テストの準備であり、一般公開やProduction deployではありません。
 
 ## Next Work
 
-- owner/adminのみでPreview seed状態からsignup / admin確認を再実施する
+- Phase 10 owner/admin最終確認結果をレビューし、1〜2名へ限定共有するか判断する
+- 最初に共有する信頼できる1〜2名を決める
 - 不具合報告窓口を決める
 - invite code運用を、共通Preview invite codeから始めるか参加者別admin発行にするか決める
+- owner/admin確認用admin userを残して開始するか、再cleanupしてから開始するか決める
 - `NEXT_PUBLIC_APP_URL` は今回runtime blockerなし。共有URLやabsolute URLが必要な機能を入れる前にPreview URLで設定するか再検討する
 - Production deployはまだ行わない
 - Web Push / Realtime / production deploy はまだ作らない
