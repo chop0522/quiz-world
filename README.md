@@ -2,7 +2,7 @@
 
 通知型早押しクイズワールドの専用リポジトリです。
 
-Phase 1〜7のlocal実装は完了・push・tag済みです。Phase 8 local smokeは89チェックpass、manual UI rehearsal follow-upも完了・push済みです。Phase 9ではQuiz World専用Supabase Preview projectとVercel Preview projectを作成し、Preview DB migration / seed、DB smoke、Vercel Preview env設定、Git連携Preview deployまで完了しています。Step G Preview smokeは、Framework PresetをNext.jsへ明示した後の新しいGit連携Preview deploymentで入口確認とMVP主要ループ本体をpassしました。Step H cleanup / resetも完了し、Preview DBはseed状態へ戻っています。Phase 9 Preview ready地点は `v0.10.0-phase9-preview-ready` tagで固定済みです。現在はPhase 10として、Preview環境で10人未満〜10人の限定テストを行う準備計画中です。Preview URL共有範囲はowner/adminのみを維持し、10人テスト候補へはまだ共有しません。Production envは未設定、Production deployは行っていません。Stripe、Web Push、Realtimeはまだ行っていません。既存Smart Buzzerとは別プロジェクトとして扱います。
+Phase 1〜7のlocal実装は完了・push・tag済みです。Phase 8 local smokeは89チェックpass、manual UI rehearsal follow-upも完了・push済みです。Phase 9ではQuiz World専用Supabase Preview projectとVercel Preview projectを作成し、Preview DB migration / seed、DB smoke、Vercel Preview env設定、Git連携Preview deployまで完了しています。Step G Preview smokeは、Framework PresetをNext.jsへ明示した後の新しいGit連携Preview deploymentで入口確認とMVP主要ループ本体をpassしました。Step H cleanup / resetも完了し、Preview DBはseed状態へ戻っています。Phase 9 Preview ready地点は `v0.10.0-phase9-preview-ready` tagで固定済みです。Phase 10 participant guide / admin ops checklist は作成済みです。Preview URL共有範囲はowner/adminのみを維持し、10人テスト候補へはまだ共有しません。Production envは未設定、Production deployは行っていません。Stripe、Web Push、Realtimeはまだ行っていません。既存Smart Buzzerとは別プロジェクトとして扱います。
 
 Smart Buzzer の production / Stripe / Vercel / Supabase / env / legal page / cleanup / live key には触れません。
 
@@ -331,6 +331,8 @@ Smart Buzzer のSupabase/Vercel/Stripe/envとは混ぜません。
 - [Phase 9 Preview cleanup plan](docs/quiz-world/quiz-world-phase-9-preview-cleanup-plan.md)
 - [Phase 9 Preview cleanup results](docs/quiz-world/quiz-world-phase-9-preview-cleanup-results.md)
 - [Phase 10 10-user test plan](docs/quiz-world/quiz-world-phase-10-10-user-test-plan.md)
+- [Phase 10 participant guide](docs/quiz-world/quiz-world-phase-10-participant-guide.md)
+- [Phase 10 admin ops checklist](docs/quiz-world/quiz-world-phase-10-admin-ops-checklist.md)
 
 ## Current Status
 
@@ -416,14 +418,14 @@ Smart Buzzer のSupabase/Vercel/Stripe/envとは混ぜません。
 - Supabase PreviewとVercel project作成は完了済みです。Stripe / Production環境はまだ作成しません。
 - Production deploy、Stripe、Web Push、Realtimeはまだ行いません。
 - Phase 9 Preview ready地点は `v0.10.0-phase9-preview-ready` tagで固定済みです。
-- Phase 10 10-user test planを作成済みです。最初はowner/adminのみ、次に信頼できる1〜2名、問題なければ最大10名へ段階的に広げる方針です。
+- Phase 10 10-user test planを作成・push済みです。participant guide / admin ops checklistも作成済みです。
+- Phase 10は最初はowner/adminのみ、次に信頼できる1〜2名、問題なければ最大10名へ段階的に広げる方針です。
 - Phase 10はPreview限定テストの準備であり、一般公開やProduction deployではありません。
 
 ## Next Work
 
-- Phase 10 10-user test planをcommit / pushする
 - owner/adminのみでPreview seed状態からsignup / admin確認を再実施する
-- 参加者向け案内文の最終版と不具合報告窓口を決める
+- 不具合報告窓口を決める
 - invite code運用を、共通Preview invite codeから始めるか参加者別admin発行にするか決める
 - `NEXT_PUBLIC_APP_URL` は今回runtime blockerなし。共有URLやabsolute URLが必要な機能を入れる前にPreview URLで設定するか再検討する
 - Production deployはまだ行わない
