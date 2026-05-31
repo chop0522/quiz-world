@@ -408,7 +408,7 @@ export function ResultClient({ launchId }: { launchId: string }) {
               <>
                 {ratingSubmitted ? (
                   <p className="rounded-md border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-800">
-                    評価済みです。MVPでは評価の変更はできません。
+                    評価済みです。現在は評価の変更はできません。
                   </p>
                 ) : null}
                 <div className="flex flex-wrap gap-2">

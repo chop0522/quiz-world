@@ -12,6 +12,7 @@ import {
   LogIn,
   ShieldCheck,
   Trophy,
+  UserCog,
   UserRound,
   UserRoundPlus
 } from "lucide-react";
@@ -70,6 +71,12 @@ export const mainRoutes: AppRoute[] = [
     icon: UserRound
   },
   {
+    href: "/account",
+    label: "アカウント",
+    description: "ログアウトとパスワード変更",
+    icon: UserCog
+  },
+  {
     href: "/invite",
     label: "招待",
     description: "招待コードとwaitlist",
@@ -93,7 +100,7 @@ export const publicRoutes: AppRoute[] = [
   {
     href: "/signup",
     label: "登録",
-    description: "18歳以上と招待コード",
+    description: "招待コードで登録",
     icon: UserRoundPlus
   }
 ];
@@ -102,13 +109,13 @@ export const legalRoutes: AppRoute[] = [
   {
     href: "/legal/terms",
     label: "利用規約",
-    description: "MVP草案",
+    description: "利用条件",
     icon: FileText
   },
   {
     href: "/legal/privacy",
     label: "プライバシー",
-    description: "MVP草案",
+    description: "個人情報の扱い",
     icon: FileText
   }
 ];
@@ -215,28 +222,28 @@ export const adminActions = [
 
 export const phaseBadges = [
   {
-    label: "Phase 1",
+    label: "通知",
     value: "15秒ポーリング",
     icon: Clock
   },
   {
-    label: "Phase 1.5",
-    value: "home新着のみRealtime",
+    label: "更新",
+    value: "home新着中心",
     icon: Bell
   },
   {
-    label: "Phase 2",
-    value: "Web Push検討",
+    label: "通知強化",
+    value: "後続で検討",
     icon: CircleAlert
   },
   {
-    label: "Phase 0",
-    value: "local scaffold",
+    label: "Preview",
+    value: "限定テスト",
     icon: LayoutDashboard
   },
   {
-    label: "MVP",
-    value: "18歳以上限定",
+    label: "Safety",
+    value: "招待制",
     icon: ShieldCheck
   },
   {

@@ -11,6 +11,7 @@ Phase 10で確認すること:
 - signup / login / invite code / waitlist が実ユーザーに伝わるか
 - question作成、launch、answer、result、rating、reportの流れが通るか
 - `/profile` のscore / rank / recent rank_eventsが最低限理解できるか
+- login状態に応じたheader導線、`/account`、logout、password変更導線が分かりやすいか
 - `/admin` でreport、question、user、waitlist、invite、audit logsを確認・操作できるか
 - 10人以下の限定運用で、問い合わせ、通報、cleanupを回せるか
 
@@ -118,16 +119,18 @@ Quiz WorldのPreviewテストに協力してほしいです。
 3. 18歳以上確認、terms同意、privacy同意を行う
 4. invite codeを入力する
 5. `/login` でログインできることを確認する
-6. `/home` を確認する
-7. `/create` で四択クイズを作成する
-8. active questionをlaunchする
-9. 他参加者の `/home` に届いたクイズが表示されることを確認する
-10. start_at前に問題本文・選択肢が見えないことを確認する
-11. start_at後に `/quiz/[launchId]` で回答する
-12. `/result/[launchId]` で結果を見る
-13. ratingを作成する
-14. reportを作成する
-15. `/profile` でscore / rank / recent rank_eventsを見る
+6. login後にheaderからログインボタンが消え、アカウント導線が出ることを確認する
+7. `/account` のログアウト導線と `/account/password` のパスワード変更導線を確認する
+8. `/home` を確認する
+9. `/create` で四択クイズを作成する
+10. active questionをlaunchする
+11. 他参加者の `/home` に届いたクイズが表示されることを確認する
+12. start_at前に問題本文・選択肢が見えないことを確認する
+13. start_at後に `/quiz/[launchId]` で回答する
+14. `/result/[launchId]` で結果を見る
+15. ratingを作成する
+16. reportを作成する
+17. `/profile` でscore / rank / recent rank_eventsを見る
 
 テスト時の観点:
 
@@ -244,6 +247,8 @@ Phase 10開始のGO条件:
 - Preview invite code `SEASON0-PREVIEW-001` がactive
 - owner/adminがPreview URLへ到達できる
 - owner/adminがsignup / login / `/admin` を確認できる
+- `/account` と `/account/password` の導線をowner/adminで確認できる
+- headerにlogoutを出さず、logoutは `/account` に置く方針が反映されている
 - 参加者向け案内文が用意済み
 - 不具合報告窓口が決定済み
 - Preview URL共有範囲が決定済み
@@ -261,6 +266,9 @@ Phase 10開始のGO条件:
 - Preview DBにStep G smokeデータが残っている
 - signupできない
 - loginできない
+- login後もheaderにログインボタンが出続ける
+- logoutがheaderに出ている
+- `/account` または `/account/password` が使えない
 - invite codeが使えない
 - 初期adminがadminにならない
 - `/admin` に入れない

@@ -16,8 +16,8 @@ export default function LandingPage() {
             </ButtonLink>
           </>
         }
-        description="24時間365日、いつ届くかわからないクイズに少人数で早押し回答するMVPです。Season 0は管理者発行の招待コード制で、最初の参加枠は10人です。"
-        eyebrow="Season 0 local scaffold"
+        description="24時間365日、いつ届くかわからないクイズに少人数で早押し回答します。Season 0は管理者発行の招待コード制で、最初の参加枠は10人です。"
+        eyebrow="Season 0 Preview"
         title="通知が始まるまで、問題は見えない。"
       />
 
@@ -28,16 +28,16 @@ export default function LandingPage() {
           value={`${worldSnapshot.members}/${worldSnapshot.memberLimit}`}
         />
         <Metric
-          helper="MVP初期は画面内通知"
+          helper="画面内更新で確認"
           label="通知"
           value="15秒ポーリング"
         />
-        <Metric helper="保護者同意があってもMVPでは不可" label="年齢" value="18+" />
+        <Metric helper="保護者同意があっても利用不可" label="年齢" value="18+" />
       </section>
 
       <Section
-        description="Phase 1〜7のMVP主要ループはSupabase localで確認済みです。cloud環境、Web Push、Realtime、production deployはまだ扱いません。"
-        title="MVPの固定方針"
+        description="招待制で少人数から確認します。Web PushとRealtimeはまだ使わず、画面内更新を中心にします。"
+        title="Season 0の固定方針"
       >
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
           {phaseBadges.map((item) => {
@@ -64,7 +64,7 @@ export default function LandingPage() {
             <KeyRound aria-hidden className="mb-3 size-5 text-[color:var(--accent)]" />
             <h2 className="font-semibold">管理者招待</h2>
             <p className="mt-2 text-sm leading-6 text-[color:var(--muted)]">
-              一般ユーザーによる招待はMVPでは不可。参加枠が埋まった場合はwaitlistへ誘導します。
+              一般ユーザーによる招待はできません。参加枠が埋まった場合はwaitlistへ誘導します。
             </p>
           </Surface>
           <Surface>

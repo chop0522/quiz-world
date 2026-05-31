@@ -131,12 +131,12 @@ export function ProfileSession() {
           value={`Lv.${data.profile.questionerRank}`}
         />
         <Metric
-          helper="MVP初期"
+          helper="現在"
           label="回答スコア"
           value={data.profile.answerScore}
         />
         <Metric
-          helper="MVP初期"
+          helper="現在"
           label="出題スコア"
           value={data.profile.questionerScore}
         />

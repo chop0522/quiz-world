@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     default: "通知型早押しクイズワールド",
     template: "%s | Quiz World"
   },
-  description: "少人数招待制の通知型早押しクイズゲームMVP scaffold",
+  description: "少人数招待制の通知型早押しクイズゲームPreview",
   manifest: "/manifest.webmanifest"
 };
 

@@ -428,6 +428,7 @@ Smart Buzzer のSupabase/Vercel/Stripe/envとは混ぜません。
 - Phase 10の1名限定共有前read-only確認はpassしました。Preview DBにはowner/admin確認用admin userだけが残り、questions / launches / answers / ratings / reports / rank_events / admin_audit_logs は0件です。`SEASON0-PREVIEW-001` はactive、`SEASON0-TEST-001` はPreview DBに存在しません。
 - Phase 10の1名限定共有用に参加者別invite codeを1件発行済みです。発行理由は `Phase 10 first limited participant`、`max_uses=1`、active確認済み、`admin_audit_logs` の `invite_created` も確認済みです。参加者別invite code実値はdocs/repoに書いていません。
 - Preview URL共有自体はまだ実行していません。共有方法は個別DMのみで、SNSや公開ページには出しません。
+- Phase 10の1名限定共有前UI整理として、ログイン状態に応じたheader/nav表示、`/account`、`/account/password`、logout配置、admin導線の表示条件を最小修正済みです。logoutはheaderに出さず、`/account` に置きます。`npm run typecheck` / `npm run lint` / `npm run test` / `npm run build` はpass済みです。
 - Phase 10は最初はowner/adminのみ、次に信頼できる1名、問題なければ2名目、さらに条件を満たせば最大10名へ段階的に広げる方針です。
 - Phase 10はPreview限定テストの準備であり、一般公開やProduction deployではありません。
 

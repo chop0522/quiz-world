@@ -146,7 +146,7 @@ export function SignupForm() {
           value={email}
         />
       </Field>
-      <Field label="パスワード" hint="8文字以上。MVP初期はemail/password方式で開始します。">
+      <Field label="パスワード" hint="8文字以上。email/password方式で登録します。">
         <TextInput
           autoComplete="new-password"
           minLength={8}
@@ -182,7 +182,7 @@ export function SignupForm() {
           onChange={(event) => setAgeConfirmed(event.target.checked)}
           type="checkbox"
         />
-        <span>私は18歳以上です。MVPでは生年月日は保存しません。</span>
+        <span>私は18歳以上です。生年月日は保存しません。</span>
       </label>
       <label className="flex gap-3 rounded-md border border-[color:var(--line)] bg-white p-3 text-sm">
         <input

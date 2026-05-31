@@ -1,14 +1,59 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { Bell, ShieldCheck } from "lucide-react";
+import { Bell } from "lucide-react";
 import {
   appName,
   legalRoutes,
   mainRoutes,
   publicRoutes
 } from "@/lib/quiz-world";
+import { getSupabaseAdminClient } from "@/lib/supabase/admin";
+import { getSupabaseServerClient } from "@/lib/supabase/server";
 
-export function AppShell({ children }: { children: ReactNode }) {
+type ShellSession = {
+  loggedIn: boolean;
+  isAdmin: boolean;
+};
+
+async function getShellSession(): Promise<ShellSession> {
+  try {
+    const server = await getSupabaseServerClient();
+    const {
+      data: { user }
+    } = await server.auth.getUser();
+
+    if (!user) {
+      return {
+        loggedIn: false,
+        isAdmin: false
+      };
+    }
+
+    const admin = getSupabaseAdminClient();
+    const { data: profile } = await admin
+      .from("profiles")
+      .select("role,status")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    return {
+      loggedIn: true,
+      isAdmin: profile?.role === "admin" && profile?.status === "active"
+    };
+  } catch {
+    return {
+      loggedIn: false,
+      isAdmin: false
+    };
+  }
+}
+
+export async function AppShell({ children }: { children: ReactNode }) {
+  const session = await getShellSession();
+  const visibleRoutes = session.loggedIn
+    ? mainRoutes.filter((route) => route.href !== "/admin" || session.isAdmin)
+    : publicRoutes;
+
   return (
     <div className="min-h-screen">
       <header className="border-b border-[color:var(--line)] bg-[color:var(--surface)]/92 backdrop-blur">
@@ -28,14 +73,10 @@ export function AppShell({ children }: { children: ReactNode }) {
                 </span>
               </span>
             </Link>
-            <div className="flex items-center gap-2 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-medium text-amber-900">
-              <ShieldCheck aria-hidden className="size-4" />
-              MVPは18歳以上限定
-            </div>
           </div>
           <nav aria-label="Primary navigation">
             <div className="flex gap-2 overflow-x-auto pb-1">
-              {[...publicRoutes, ...mainRoutes].map((route) => {
+              {visibleRoutes.map((route) => {
                 const Icon = route.icon;
 
                 return (
@@ -61,10 +102,10 @@ export function AppShell({ children }: { children: ReactNode }) {
         <div className="mx-auto grid max-w-6xl gap-4 px-4 py-6 text-sm text-[color:var(--muted)] md:grid-cols-[1fr_auto] md:px-6">
           <div>
             <p className="font-medium text-[color:var(--foreground)]">
-              Quiz World local scaffold
+              Quiz World Preview
             </p>
             <p className="mt-1">
-              MVP主要ループはSupabase localで確認中。cloud環境、Stripe、production deployは未作成です。
+              招待制のPreview環境で主要ループを確認中です。一般公開と課金機能は扱いません。
             </p>
           </div>
           <div className="flex flex-wrap gap-3">

@@ -14,7 +14,7 @@ export default function SignupPage() {
             waitlistへ
           </ButtonLink>
         }
-        description="Season 0は管理者発行の招待コード制です。MVPでは18歳未満は保護者同意があっても利用できません。"
+        description="Season 0は管理者発行の招待コード制です。18歳未満は保護者同意があっても利用できません。"
         eyebrow="Signup"
         title="18歳以上確認と招待コード"
       />

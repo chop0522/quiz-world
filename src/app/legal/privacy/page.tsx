@@ -7,7 +7,7 @@ export const metadata = {
 const privacyItems = [
   ["メールアドレス", "認証、連絡、waitlist、招待。"],
   ["表示名", "ゲーム内表示、結果表示。"],
-  ["年齢確認日時", "18歳以上確認の記録。生年月日はMVPでは保存しません。"],
+  ["年齢確認日時", "18歳以上確認の記録。生年月日は保存しません。"],
   ["同意日時", "利用規約とプライバシーポリシーへの同意管理。"],
   ["クイズ作成履歴", "出題、評価、ランク、通報対応。"],
   ["回答履歴", "結果表示、順位、回答ランク。"],
@@ -20,7 +20,7 @@ export default function PrivacyPage() {
   return (
     <>
       <PageHeader
-        description="これは法務完成版ではなく、MVP実装開始前の草案です。第三者サービスは実際の利用確定後に更新します。"
+        description="これは法務完成版ではなく、Previewテスト向けの草案です。第三者サービスは実際の利用確定後に更新します。"
         eyebrow="Legal draft"
         title="プライバシーポリシー草案"
       />
@@ -42,7 +42,7 @@ export default function PrivacyPage() {
       <Section title="第三者サービス">
         <Surface>
           <p className="text-sm leading-6 text-[color:var(--muted)]">
-            Supabase localを前提に準備します。Supabase cloud、Vercel、Push通知サービスはまだ作成せず、10人テスト前に利用内容を確定します。
+            SupabaseとVercelを使ったPreview環境で確認します。Push通知サービスはまだ使わず、10人テスト前に利用内容を確定します。
           </p>
         </Surface>
       </Section>
