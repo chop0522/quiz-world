@@ -250,6 +250,7 @@ audit logが残せない場合、管理操作全体を失敗扱いにする。
 - [ ] admin moderation手順が通る
 - [ ] admin_audit_logs確認手順が通る
 - [ ] header / account / password変更導線をowner/adminで確認した
+- [ ] `/home` の参加者向け表示から内部仕様文言が消えている
 - [ ] Preview URLをowner/admin以外へ一括共有していない
 - [ ] まず1名から開始し、問題がなければ2名目へ拡張する方針を維持している
 - [ ] 最大10名への共有はまだ行わない

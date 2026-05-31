@@ -2,7 +2,7 @@
 
 通知型早押しクイズワールドの専用リポジトリです。
 
-Phase 1〜7のlocal実装は完了・push・tag済みです。Phase 8 local smokeは89チェックpass、manual UI rehearsal follow-upも完了・push済みです。Phase 9ではQuiz World専用Supabase Preview projectとVercel Preview projectを作成し、Preview DB migration / seed、DB smoke、Vercel Preview env設定、Git連携Preview deployまで完了しています。Step G Preview smokeは、Framework PresetをNext.jsへ明示した後の新しいGit連携Preview deploymentで入口確認とMVP主要ループ本体をpassしました。Step H cleanup / resetも完了し、Preview DBはseed状態へ戻っています。Phase 9 Preview ready地点は `v0.10.0-phase9-preview-ready` tagで固定済みです。Phase 10 participant guide / admin ops checklist は作成済みです。Phase 10 owner/admin最終確認後の人間決定事項も反映済みで、まず信頼できる1名へ個別DMで限定共有し、問題がなければ2名目へ拡張する方針です。Preview URL共有自体はまだ実行しておらず、10人テスト候補全員へはまだ共有しません。Production envは未設定、Production deployは行っていません。Stripe、Web Push、Realtimeはまだ行っていません。既存Smart Buzzerとは別プロジェクトとして扱います。
+Phase 1〜7のlocal実装は完了・push・tag済みです。Phase 8 local smokeは89チェックpass、manual UI rehearsal follow-upも完了・push済みです。Phase 9ではQuiz World専用Supabase Preview projectとVercel Preview projectを作成し、Preview DB migration / seed、DB smoke、Vercel Preview env設定、Git連携Preview deployまで完了しています。Step G Preview smokeは、Framework PresetをNext.jsへ明示した後の新しいGit連携Preview deploymentで入口確認とMVP主要ループ本体をpassしました。Step H cleanup / resetも完了し、Preview DBはseed状態へ戻っています。Phase 9 Preview ready地点は `v0.10.0-phase9-preview-ready` tagで固定済みです。Phase 10 participant guide / admin ops checklist は作成済みです。Phase 10 owner/admin最終確認後の人間決定事項も反映済みで、まず信頼できる1名へ個別DMで限定共有し、問題がなければ2名目へ拡張する方針です。Phase 10の1名限定共有前UI整理はPreview deploymentへ反映済みで、反映後確認もpass済みです。追加で `/home` の参加者向け表示から内部仕様文言を削除し、新着確認処理は内部処理として維持する方針に整理済みです。Preview URL共有自体はまだ実行しておらず、10人テスト候補全員へはまだ共有しません。Production envは未設定、Production deployは行っていません。Stripe、Web Push、Realtimeはまだ行っていません。既存Smart Buzzerとは別プロジェクトとして扱います。
 
 Smart Buzzer の production / Stripe / Vercel / Supabase / env / legal page / cleanup / live key には触れません。
 
@@ -429,6 +429,9 @@ Smart Buzzer のSupabase/Vercel/Stripe/envとは混ぜません。
 - Phase 10の1名限定共有用に参加者別invite codeを1件発行済みです。発行理由は `Phase 10 first limited participant`、`max_uses=1`、active確認済み、`admin_audit_logs` の `invite_created` も確認済みです。参加者別invite code実値はdocs/repoに書いていません。
 - Preview URL共有自体はまだ実行していません。共有方法は個別DMのみで、SNSや公開ページには出しません。
 - Phase 10の1名限定共有前UI整理として、ログイン状態に応じたheader/nav表示、`/account`、`/account/password`、logout配置、admin導線の表示条件を最小修正済みです。logoutはheaderに出さず、`/account` に置きます。`npm run typecheck` / `npm run lint` / `npm run test` / `npm run build` はpass済みです。
+- Phase 10の1名限定共有前UI整理はPreview deploymentへ反映済みです。deploymentはGit連携 / `preview` / `b48d73a` / Preview environment / Readyで、Production deploymentは追加作成されていません。
+- Phase 10の1名限定共有前UI整理 Preview反映後確認はpass済みです。未ログイン時のlogin / signup導線、`/account`、`/account/password`、`/admin` の未ログイン保護、`/api/admin/*` の401、headerにlogoutが出ないことを確認しました。ログイン済みnavとadmin導線は反映済みcommitの実装条件とserver-side protectionで確認しています。
+- `/home` の参加者向けUIから `15秒ポーリング`、`polling`、`quiz_recipients`、`recipient`、`start_at`、`end_at`、秒数表示などの内部仕様文言を削除しました。新着確認処理は内部処理として維持し、開始前は問題本文と選択肢を隠す仕様も維持します。
 - Phase 10は最初はowner/adminのみ、次に信頼できる1名、問題なければ2名目、さらに条件を満たせば最大10名へ段階的に広げる方針です。
 - Phase 10はPreview限定テストの準備であり、一般公開やProduction deployではありません。
 

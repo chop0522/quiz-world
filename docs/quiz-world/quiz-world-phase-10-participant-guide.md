@@ -167,7 +167,7 @@ Phase 10開始時点の既知制約:
 
 - Web Pushなし
 - Realtimeなし
-- `/home` のポーリング中心
+- `/home` は画面を開いている間に自動で新着を確認する
 - profile rank説明は最小表示
 - `/world` 補助指標は最小表示
 - Preview URLはDeployment Protection配下
