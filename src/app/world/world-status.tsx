@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Metric, ProgressBar, Surface } from "@/components/ui";
+import { Metric, Surface } from "@/components/ui";
 
 type WorldResponse = {
   ok: boolean;
@@ -74,21 +74,12 @@ export function WorldStatus() {
     );
   }
 
-  const memberPercent = Math.round(
-    (data.world.activeMemberCount / data.world.memberLimit) * 100
-  );
-
   return (
-    <>
-      <section className="grid gap-4 md:grid-cols-4">
-        <Metric label="現在の参加人数" value={data.world.activeMemberCount} />
-        <Metric label="参加枠" value={data.world.memberLimit} />
-        <Metric label="残り枠" value={data.world.remainingSeats} />
-        <Metric label="Season" value={`Season ${data.world.currentSeason}`} />
-      </section>
-      <Surface>
-        <ProgressBar label={`${data.world.name} 参加枠`} value={memberPercent} />
-      </Surface>
-    </>
+    <section className="grid gap-4 md:grid-cols-4">
+      <Metric label="現在の参加人数" value={data.world.activeMemberCount} />
+      <Metric label="参加枠" value={data.world.memberLimit} />
+      <Metric label="残り枠" value={data.world.remainingSeats} />
+      <Metric label="Season" value={`Season ${data.world.currentSeason}`} />
+    </section>
   );
 }

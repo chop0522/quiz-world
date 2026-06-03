@@ -81,6 +81,22 @@ function statusTone(status: QuestionListItem["status"]) {
   return "neutral";
 }
 
+function statusLabel(status: QuestionListItem["status"] | UserQuestionStatus) {
+  if (status === "active") {
+    return "出題可能";
+  }
+
+  if (status === "review_required") {
+    return "確認中";
+  }
+
+  if (status === "suspended") {
+    return "停止中";
+  }
+
+  return "下書き";
+}
+
 function formatDateTime(value: string) {
   return new Intl.DateTimeFormat("ja-JP", {
     month: "2-digit",
@@ -266,7 +282,7 @@ export function QuestionAuthoringClient() {
                 {editingId ? "問題を編集" : "四択クイズを作成"}
               </h2>
               <p className="mt-1 text-sm text-[color:var(--muted)]">
-                activeな問題は作成済み問題一覧から出題できます。回答、順位、結果、評価、通報、rank eventsは後続画面で確認できます。
+                作成したクイズは、一覧から出題できます。
               </p>
             </div>
             {editingId ? <Badge tone="amber">編集中</Badge> : <Badge>新規</Badge>}
@@ -333,8 +349,8 @@ export function QuestionAuthoringClient() {
                 onChange={(event) => setStatus(event.target.value as UserQuestionStatus)}
                 value={status}
               >
-                <option value="draft">draft</option>
-                <option value="active">active</option>
+                <option value="draft">下書き</option>
+                <option value="active">出題可能</option>
               </SelectInput>
             </Field>
           </div>
@@ -360,14 +376,14 @@ export function QuestionAuthoringClient() {
               </SelectInput>
             </Field>
             <Field
-              hint="その他の場合だけ保存します。回答者向けAPIには返しません。"
+              hint="カテゴリがその他の場合だけ使います。"
               label="カテゴリ補足"
             >
               <TextInput
                 disabled={!categoryNoteEnabled}
                 maxLength={questionLimits.categoryNoteMaxLength}
                 onChange={(event) => setCategoryNote(event.target.value)}
-                placeholder="例: ローカル文化、ボードゲームなど"
+                placeholder="例: 地域文化、ボードゲームなど"
                 value={categoryNote}
               />
             </Field>
@@ -433,7 +449,7 @@ export function QuestionAuthoringClient() {
                 <div className="flex items-start justify-between gap-2">
                   <FileQuestion aria-hidden className="mt-1 size-4 shrink-0 text-[color:var(--accent)]" />
                   <Badge tone={statusTone(question.status)}>
-                    {question.status}
+                    {statusLabel(question.status)}
                   </Badge>
                 </div>
                 <p className="mt-2 text-sm font-medium leading-6">
@@ -466,7 +482,7 @@ export function QuestionAuthoringClient() {
                 </button>
                 {question.status !== "active" ? (
                   <p className="mt-2 text-xs text-[color:var(--muted)]">
-                    activeにすると出題できます。
+                    状態を出題可能にすると出題できます。
                   </p>
                 ) : null}
               </div>

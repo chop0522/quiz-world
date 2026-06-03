@@ -251,6 +251,9 @@ audit logが残せない場合、管理操作全体を失敗扱いにする。
 - [ ] admin_audit_logs確認手順が通る
 - [ ] header / account / password変更導線をowner/adminで確認した
 - [ ] `/home` の参加者向け表示から内部仕様文言が消えている
+- [ ] `/create` の参加者向け表示から `active`、`rank events`、`admin moderation`、`local` などの内部説明が消えている
+- [ ] `/world` が現在の参加人数、参加枠、残り枠、Seasonの確認に絞られている
+- [ ] `/world` に平均評価、良問率、解放条件、累計出題数、累計回答数、通報率、上位出題者/回答者数、次の解放枠が表示されない
 - [ ] Preview URLをowner/admin以外へ一括共有していない
 - [ ] まず1名から開始し、問題がなければ2名目へ拡張する方針を維持している
 - [ ] 最大10名への共有はまだ行わない
@@ -338,3 +341,4 @@ cleanup後に残すもの:
 - owner/admin確認用admin userは残したまま開始する
 - 1〜2名共有前の再cleanupは行わない
 - Preview URL共有は個別DMのみ
+- Phase 10の1名テストでは `/world` の平均評価や参加枠解放条件を表示しない

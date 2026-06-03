@@ -2,7 +2,7 @@
 
 通知型早押しクイズワールドの専用リポジトリです。
 
-Phase 1〜7のlocal実装は完了・push・tag済みです。Phase 8 local smokeは89チェックpass、manual UI rehearsal follow-upも完了・push済みです。Phase 9ではQuiz World専用Supabase Preview projectとVercel Preview projectを作成し、Preview DB migration / seed、DB smoke、Vercel Preview env設定、Git連携Preview deployまで完了しています。Step G Preview smokeは、Framework PresetをNext.jsへ明示した後の新しいGit連携Preview deploymentで入口確認とMVP主要ループ本体をpassしました。Step H cleanup / resetも完了し、Preview DBはseed状態へ戻っています。Phase 9 Preview ready地点は `v0.10.0-phase9-preview-ready` tagで固定済みです。Phase 10 participant guide / admin ops checklist は作成済みです。Phase 10 owner/admin最終確認後の人間決定事項も反映済みで、まず信頼できる1名へ個別DMで限定共有し、問題がなければ2名目へ拡張する方針です。Phase 10の1名限定共有前UI整理はPreview deploymentへ反映済みで、反映後確認もpass済みです。追加で `/home` の参加者向け表示から内部仕様文言を削除し、新着確認処理は内部処理として維持する方針に整理済みです。Preview URL共有自体はまだ実行しておらず、10人テスト候補全員へはまだ共有しません。Production envは未設定、Production deployは行っていません。Stripe、Web Push、Realtimeはまだ行っていません。既存Smart Buzzerとは別プロジェクトとして扱います。
+Phase 1〜7のlocal実装は完了・push・tag済みです。Phase 8 local smokeは89チェックpass、manual UI rehearsal follow-upも完了・push済みです。Phase 9ではQuiz World専用Supabase Preview projectとVercel Preview projectを作成し、Preview DB migration / seed、DB smoke、Vercel Preview env設定、Git連携Preview deployまで完了しています。Step G Preview smokeは、Framework PresetをNext.jsへ明示した後の新しいGit連携Preview deploymentで入口確認とMVP主要ループ本体をpassしました。Step H cleanup / resetも完了し、Preview DBはseed状態へ戻っています。Phase 9 Preview ready地点は `v0.10.0-phase9-preview-ready` tagで固定済みです。Phase 10 participant guide / admin ops checklist は作成済みです。Phase 10 owner/admin最終確認後の人間決定事項も反映済みで、まず信頼できる1名へ個別DMで限定共有し、問題がなければ2名目へ拡張する方針です。Phase 10の1名限定共有前UI整理はPreview deploymentへ反映済みで、反映後確認もpass済みです。追加で `/home` の参加者向け表示から内部仕様文言を削除し、新着確認処理は内部処理として維持する方針に整理済みです。さらに `/create` と `/world` の参加者向け表示から内部仕様文言、未確定指標、平均評価、解放条件を削除し、`/world` は参加状況確認に絞る方針へ整理済みです。Preview URL共有自体はまだ実行しておらず、10人テスト候補全員へはまだ共有しません。Production envは未設定、Production deployは行っていません。Stripe、Web Push、Realtimeはまだ行っていません。既存Smart Buzzerとは別プロジェクトとして扱います。
 
 Smart Buzzer の production / Stripe / Vercel / Supabase / env / legal page / cleanup / live key には触れません。
 
@@ -432,6 +432,10 @@ Smart Buzzer のSupabase/Vercel/Stripe/envとは混ぜません。
 - Phase 10の1名限定共有前UI整理はPreview deploymentへ反映済みです。deploymentはGit連携 / `preview` / `b48d73a` / Preview environment / Readyで、Production deploymentは追加作成されていません。
 - Phase 10の1名限定共有前UI整理 Preview反映後確認はpass済みです。未ログイン時のlogin / signup導線、`/account`、`/account/password`、`/admin` の未ログイン保護、`/api/admin/*` の401、headerにlogoutが出ないことを確認しました。ログイン済みnavとadmin導線は反映済みcommitの実装条件とserver-side protectionで確認しています。
 - `/home` の参加者向けUIから `15秒ポーリング`、`polling`、`quiz_recipients`、`recipient`、`start_at`、`end_at`、秒数表示などの内部仕様文言を削除しました。新着確認処理は内部処理として維持し、開始前は問題本文と選択肢を隠す仕様も維持します。
+- `/home` の参加者向けUI整理はPreview deploymentへ反映済みです。deploymentはGit連携 / `preview` / `cdab98c` / Preview environment / Readyで、反映後の `/home` 表示確認もpass済みです。Production deploymentは追加作成されていません。
+- `/create` の参加者向けUIから `active`、`rank events`、`admin moderation`、`local` などの内部説明を削除し、状態表示は「下書き」「出題可能」に整理しました。
+- `/world` の参加者向けUIから平均評価、良問率、解放条件、累計出題数、累計回答数、通報率、上位出題者/回答者数、次の解放枠を削除しました。Phase 10の1名テストでは、現在の参加人数、参加枠、残り枠、Seasonの確認に絞ります。
+- `/world` の平均評価 `良問 62%` は古いmock snapshot由来でした。平均評価や参加枠解放条件は、question_ratingsの集計定義と参加枠増加ルールを正式化するまで後続課題として扱います。
 - Phase 10は最初はowner/adminのみ、次に信頼できる1名、問題なければ2名目、さらに条件を満たせば最大10名へ段階的に広げる方針です。
 - Phase 10はPreview限定テストの準備であり、一般公開やProduction deployではありません。
 

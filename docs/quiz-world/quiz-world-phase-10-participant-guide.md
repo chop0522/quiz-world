@@ -169,7 +169,8 @@ Phase 10開始時点の既知制約:
 - Realtimeなし
 - `/home` は画面を開いている間に自動で新着を確認する
 - profile rank説明は最小表示
-- `/world` 補助指標は最小表示
+- `/world` は参加状況の確認に絞る
+- 平均評価や参加枠の解放条件は、正式な集計ルールが決まるまで表示しない
 - Preview URLはDeployment Protection配下
 - Production環境ではない
 - テストデータは削除される可能性がある
