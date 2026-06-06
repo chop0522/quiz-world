@@ -5,9 +5,6 @@ import { Badge, Metric, Surface } from "@/components/ui";
 
 type ProfileResponse = {
   ok: boolean;
-  user?: {
-    email?: string;
-  };
   profile?: {
     displayName: string;
     role: string;
@@ -42,7 +39,7 @@ const rankEventLabels: Record<string, string> = {
   answer_correct_rank_bonus: "正解者順位",
   answer_difficulty_bonus: "難問正解",
   question_rating: "クイズ評価",
-  question_reason_penalty: "理由タグ"
+  question_reason_penalty: "評価理由"
 };
 
 function formatDateTime(value: string) {
@@ -144,37 +141,25 @@ export function ProfileSession() {
 
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(280px,360px)]">
         <Surface>
-          <h2 className="font-semibold">ログイン中のプロフィール</h2>
+          <h2 className="font-semibold">プロフィール</h2>
           <dl className="mt-3 grid gap-2 text-sm">
             <div className="flex justify-between gap-3">
               <dt className="text-[color:var(--muted)]">表示名</dt>
               <dd className="font-medium">{data.profile.displayName}</dd>
             </div>
-            <div className="flex justify-between gap-3">
-              <dt className="text-[color:var(--muted)]">メール</dt>
-              <dd className="font-medium">{data.user?.email}</dd>
-            </div>
-            <div className="flex justify-between gap-3">
-              <dt className="text-[color:var(--muted)]">role</dt>
-              <dd>
-                <Badge tone={data.profile.role === "admin" ? "green" : "neutral"}>
-                  {data.profile.role}
-                </Badge>
-              </dd>
-            </div>
-            <div className="flex justify-between gap-3">
-              <dt className="text-[color:var(--muted)]">status</dt>
-              <dd>
-                <Badge tone={data.profile.status === "active" ? "green" : "red"}>
-                  {data.profile.status}
-                </Badge>
-              </dd>
-            </div>
+            {data.profile.role === "admin" && data.profile.status === "active" ? (
+              <div className="flex justify-between gap-3">
+                <dt className="text-[color:var(--muted)]">管理</dt>
+                <dd>
+                  <Badge tone="green">管理者アカウント</Badge>
+                </dd>
+              </div>
+            ) : null}
           </dl>
         </Surface>
 
         <Surface>
-          <h2 className="font-semibold">直近rank events</h2>
+          <h2 className="font-semibold">最近の履歴</h2>
           {!data.rankEvents || data.rankEvents.length === 0 ? (
             <p className="mt-3 text-sm text-[color:var(--muted)]">
               まだスコア変動はありません。

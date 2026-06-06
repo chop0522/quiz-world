@@ -24,15 +24,15 @@ Phase 10ではProduction deploy、Stripe、Web Push、Realtimeは扱わない。
 | 段階 | 対象 | 目的 | 共有範囲 |
 | --- | --- | --- | --- |
 | Step 1 | owner/adminのみ | Preview seed状態からsignup、admin role、admin画面を再確認する | 非公開 |
-| Step 2a | 信頼できる1名 | 初回説明文、signup、回答導線、不具合報告の伝わり方を最小人数で確認する | 個別DM |
+| Step 2a | 信頼できる1名 | 初回説明文、signup、回答導線、不具合報告の伝わり方を最小人数で確認する | 個別DM。開始済み |
 | Step 2b | 2名目 | 1名目で大きな問題がなければ、2名目へ拡張して複数人のlaunch / answer導線を確認する | 個別DM |
 | Step 3 | 最大10名 | MVP主要ループ、通報、moderation、cleanupまで確認する | 限定共有 |
 
 固定方針:
 
 - SNSや公開ページにはPreview URLを出さない
-- まず信頼できる1名から開始する
-- 1名で問題がなければ2名目へ拡張する
+- 信頼できる1名への個別共有は開始済み
+- 1名テストでP0/P1がないことを確認してから2名目へ拡張する
 - 最大10名への共有はまだ行わない
 - 10人テスト候補全員への一括共有はまだ行わない
 - 参加者にはPreviewテストであることを明示する
@@ -80,6 +80,8 @@ adminが参加者ごとにinvite codeを発行する。
 信頼できる1〜2名へ広げる段階から、参加者別invite codeをadmin画面で発行する。共通Preview invite code `SEASON0-PREVIEW-001` はowner/admin確認用または予備として扱う。
 
 参加者別invite codeの実値はdocsに書かない。共有時はPreview URLと参加者別invite codeを個別DMで渡す。SNSや公開ページには出さない。
+
+2026-06-03時点で、信頼できる1名への個別共有は開始済みである。参加者別invite codeの実値はdocsに書かない。2名目へ進む前に、1名テスト結果、read-only DB確認、non-admin導線確認、P0/P1整理を記録する。
 
 ## 4. 参加者向け案内文
 
@@ -173,7 +175,8 @@ Phase 10開始時点の既知制約:
 - `NEXT_PUBLIC_APP_URL` は未設定だが、現時点ではbuild / runtime blockerではない
 - Preview URLはDeployment Protection配下
 - Preview URL共有範囲はowner/adminから段階的に広げる
-- profileのrank説明は最小表示で、詳細なヘルプはまだない
+- `/profile` はスコア、ランク、最近の履歴の確認に絞る
+- 表示名編集や通知設定保存は後続課題
 - `/world` の補助指標は最小表示で、詳細な運用指標はまだない
 - Production env、Production custom domain、Production deployは未実施
 - Stripeは未実施
@@ -253,6 +256,7 @@ Phase 10開始のGO条件:
 - 不具合報告窓口が決定済み
 - Preview URL共有範囲が決定済み
 - まず信頼できる1名から開始し、問題がなければ2名目へ拡張する方針が決定済み
+- 信頼できる1名への個別共有を開始済みである
 - 1〜2名共有では参加者別invite codeをadmin画面で発行する方針が決定済み
 - 共通Preview invite code `SEASON0-PREVIEW-001` はowner/admin確認用または予備として扱う
 - 1〜2名共有前の再cleanupは行わず、共有前にread-onlyでPreview DB件数だけ確認する方針が決定済み
@@ -275,8 +279,9 @@ Phase 10開始のGO条件:
 - report / admin moderationが動かない
 - Preview URL共有範囲が未定
 - 不具合報告窓口が未定
-- 最初に共有する1名が未定
 - 参加者別invite code発行方針が未定
+- 1名テスト結果の記録がないまま2名目へ進もうとしている
+- non-admin導線確認が未整理のまま2名目へ進もうとしている
 - 参加者向け案内文が未準備
 - Production envやProduction custom domainが誤って設定されている
 - Smart BuzzerのVercel / Supabase / envと混同している
@@ -286,7 +291,7 @@ Phase 10開始のGO条件:
 Phase 10の完了条件:
 
 - owner/adminのみの確認が完了する
-- 信頼できる1名の限定テストを実施する
+- 信頼できる1名の限定テストを実施し、結果を記録する
 - 問題がなければ2名目の限定テストを実施する
 - 必要なら最大10名まで広げる
 - signupからadmin moderationまでの主要ループをPreviewで確認する

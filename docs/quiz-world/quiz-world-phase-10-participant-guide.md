@@ -34,7 +34,7 @@ Phase 10ではProduction deploy、Stripe、Web Push、Realtimeは扱わない。
 - DB password
 - bypass secret
 
-Preview URL共有範囲は、owner/admin確認後にまず信頼できる1名へ個別DMで広げる。問題がなければ2名目へ拡張する。10人テスト候補全員への共有はまだ行わない。
+Preview URL共有範囲は、owner/admin確認後にまず信頼できる1名へ個別DMで広げる。2026-06-03時点で信頼できる1名への個別共有は開始済みである。問題がなければ2名目へ拡張するが、10人テスト候補全員への共有、SNSや公開ページでの共有はまだ行わない。
 
 ## 3. Signup手順
 
@@ -168,7 +168,8 @@ Phase 10開始時点の既知制約:
 - Web Pushなし
 - Realtimeなし
 - `/home` は画面を開いている間に自動で新着を確認する
-- profile rank説明は最小表示
+- `/profile` はスコア、ランク、最近の履歴の確認に絞る
+- 表示名編集や通知設定保存は後続課題
 - `/world` は参加状況の確認に絞る
 - 平均評価や参加枠の解放条件は、正式な集計ルールが決まるまで表示しない
 - Preview URLはDeployment Protection配下

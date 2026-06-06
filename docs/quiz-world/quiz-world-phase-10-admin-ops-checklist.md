@@ -4,13 +4,13 @@
 
 このチェックリストは、Quiz World Preview環境で10人未満〜10人の限定テストを始める前に、owner/adminが安全に運用できることを確認するためのものである。
 
-Phase 10は一般公開ではない。Production環境でもない。Preview URL共有範囲はowner/adminから開始し、まず信頼できる1名、問題がなければ2名目、さらに条件を満たした場合だけ最大10名へ段階的に広げる。
+Phase 10は一般公開ではない。Production環境でもない。Preview URL共有範囲はowner/adminから開始し、2026-06-03時点で信頼できる1名への個別共有を開始済みである。問題がなければ2名目、さらに条件を満たした場合だけ最大10名へ段階的に広げる。
 
 Phase 10ではProduction deploy、Production env、Production custom domain、Stripe、Web Push、Realtimeは扱わない。Smart Buzzerにも触らない。
 
 ## 2. Owner/Adminのみで最初に確認する項目
 
-最初にowner/adminだけで確認する。
+最初にowner/adminだけで確認する。1名共有開始後は、seed状態ではなく1名テスト由来データが残る可能性があるため、2名目へ拡張する前にread-onlyで現在状態を確認する。
 
 - [ ] Preview URLをowner/adminだけが把握している
 - [ ] Preview URLをSNSや公開ページに出していない
@@ -25,7 +25,7 @@ Phase 10ではProduction deploy、Production env、Production custom domain、St
 - [ ] 追加Production deployが発生していない
 - [ ] Smart BuzzerのSupabase / Vercel / envと混ざっていない
 
-## 3. Preview DB seed状態確認
+## 3. Preview DB seed状態 / 1名共有後状態確認
 
 seed状態として期待するもの:
 
@@ -33,6 +33,14 @@ seed状態として期待するもの:
 - Preview invite code `SEASON0-PREVIEW-001` がactive
 - smoke由来のquestions / launches / answers / ratings / reports / rank_events / admin_audit_logsが残っていない
 - Auth usersが0、または意図した検証ユーザーのみ
+
+1名共有開始後に期待するもの:
+
+- active memberはowner/admin確認用ユーザーと1名参加者の2名を基本とする
+- 参加者別invite codeは使用済み、または用途どおりの状態になっている
+- 共通Preview invite code `SEASON0-PREVIEW-001` はowner/admin確認用または予備としてactive維持する
+- 1名テスト由来のquestions / launches / answers / ratings / rank_eventsがある場合は件数のみ記録する
+- email実値、参加者別invite code実値、secret実値はdocsに書かない
 
 確認対象:
 
@@ -254,6 +262,10 @@ audit logが残せない場合、管理操作全体を失敗扱いにする。
 - [ ] `/create` の参加者向け表示から `active`、`rank events`、`admin moderation`、`local` などの内部説明が消えている
 - [ ] `/world` が現在の参加人数、参加枠、残り枠、Seasonの確認に絞られている
 - [ ] `/world` に平均評価、良問率、解放条件、累計出題数、累計回答数、通報率、上位出題者/回答者数、次の解放枠が表示されない
+- [ ] `/profile` がスコア、ランク、最近の履歴、最小限のプロフィール表示に絞られている
+- [ ] 通常ユーザーの `/profile` にraw `role` / `status` が表示されない
+- [ ] `/profile` に保存できない表示名・通知設定フォームが表示されない
+- [ ] `/profile` に「次Phase」などの内部向け文言が表示されない
 - [ ] Preview URLをowner/admin以外へ一括共有していない
 - [ ] まず1名から開始し、問題がなければ2名目へ拡張する方針を維持している
 - [ ] 最大10名への共有はまだ行わない
