@@ -252,6 +252,7 @@ audit logが残せない場合、管理操作全体を失敗扱いにする。
 - [ ] 不具合報告窓口はownerへの個別DMに決まっている
 - [ ] 専用Slack / Discord / LINEグループは2名以上に広げる段階で再検討する
 - [ ] 1名目の参加者別invite codeをadmin画面で発行した
+- [ ] 2名目へ拡張する場合は、共有前にread-only確認を行い、2名目用の参加者別invite codeを発行した
 - [ ] 参加者別invite codeの実値をdocsに書いていない
 - [ ] Preview URLと参加者別invite codeを個別DMだけで共有する準備ができている
 - [ ] report確認手順が通る
@@ -351,6 +352,7 @@ cleanup後に残すもの:
 
 - 不具合報告窓口はownerへの個別DM
 - 1〜2名共有では参加者別invite codeをadmin画面で発行する
+- 2名目共有前read-only確認は実施済みで、2名目用の参加者別invite codeは発行済み
 - 共通Preview invite code `SEASON0-PREVIEW-001` はowner/admin確認用または予備
 - owner/admin確認用admin userは残したまま開始する
 - 1〜2名共有前の再cleanupは行わない

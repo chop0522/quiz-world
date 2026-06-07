@@ -81,7 +81,7 @@ adminが参加者ごとにinvite codeを発行する。
 
 参加者別invite codeの実値はdocsに書かない。共有時はPreview URLと参加者別invite codeを個別DMで渡す。SNSや公開ページには出さない。
 
-2026-06-03時点で、信頼できる1名への個別共有は開始済みである。参加者別invite codeの実値はdocsに書かない。2名目へ進む前に、1名テスト結果、read-only DB確認、non-admin導線確認、P0/P1整理を記録する。
+2026-06-03時点で、信頼できる1名への個別共有は開始済みである。2026-06-07時点で、2名目共有前のGPT Proレビュー、read-only DB確認、admin保護確認、2名目用invite発行は完了済みである。参加者別invite codeの実値はdocsに書かない。2名目へのPreview URL / invite code共有実行はまだ行っていない。
 
 ## 4. 参加者向け案内文
 

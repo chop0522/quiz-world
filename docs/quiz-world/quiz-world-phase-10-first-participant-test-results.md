@@ -482,3 +482,36 @@ GPT Pro追加レビュー後の2名目共有前小P1整理をcommit / pushし、
 - Preview URLとinvite codeは個別DMでのみ共有する
 - 参加者別invite code実値、初期admin email実値、secret実値はdocs/repoに書かない
 - 10人テスト候補全員への共有、SNS/公開ページ共有、Production deploy、Production env設定、Production custom domain設定、Stripe、Web Push、Realtimeは引き続き行わない
+
+## 15. 2名目共有前確認とinvite準備
+
+実施日: 2026-06-07 JST
+
+GPT Pro追加レビュー後、2名目共有前のP0/P1実装修正は残っていないことを確認した。forgot passwordはPhase 10の1〜2名テストではP2としてownerへの個別DMサポートで運用する。username変更はP2、avatar設定はP3として後続課題にする。
+
+2名目共有前に、Preview DBとPreview API / routeを確認した。
+
+- `auth.users=2`
+- `profiles=2`
+- `world_members=2`
+- `activeMemberCount=2`
+- `remainingSeats=8`
+- Preview invite code `SEASON0-PREVIEW-001` はactive
+- local用 invite code `SEASON0-TEST-001` はPreview DBに存在しない
+- 1名目の参加者別inviteは使用済み
+- `/api/world` は `activeMemberCount=2`、`memberLimit=10`、`remainingSeats=8`、`currentSeason=0` を返す
+- `/account` にraw `role` / `status` / `active` は表示されない
+- `/admin` 非許可画面に内部DB条件は表示されない
+- `/api/admin/users`、`/api/admin/reports`、`/api/admin/questions` は未ログイン時に `ログインが必要です。` を返す
+
+2名目用の参加者別invite codeを1件発行した。
+
+- 用途: `Phase 10 second limited participant`
+- `max_uses=1`
+- status: `active`
+- use_count: `0`
+- `admin_audit_logs` の `invite_created` を確認済み
+
+2名目用の参加者別invite code実値はdocs/repoに書いていない。2名目へのPreview URL / invite code共有はまだ実行していない。
+
+詳細は `docs/quiz-world/quiz-world-phase-10-second-participant-prep-results.md` に記録した。
