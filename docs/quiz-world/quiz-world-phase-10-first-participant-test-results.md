@@ -429,3 +429,56 @@ local実装・検証結果:
 - Preview deploymentへ反映する
 - Preview上の `/account` と `/admin` 非許可画面を確認する
 - 2名目への限定共有はPreview確認後に再判断する
+
+## 14. `/account` / `/admin` 小P1整理 Preview反映後確認
+
+実施日: 2026-06-07 JST
+
+GPT Pro追加レビュー後の2名目共有前小P1整理をcommit / pushし、Git連携Preview deploymentへ反映した。
+
+対象commit:
+
+- `3d0895c fix: simplify phase 10 account and admin access UI`
+
+対象Preview deployment:
+
+| 項目 | 値 |
+| --- | --- |
+| URL | `https://quiz-world-preview-38ugdhavs-chop0522s-projects.vercel.app` |
+| deployment id | `dpl_GsS3WxFLapLEoEzMXxYUjMPRqUVs` |
+| target | Preview |
+| branch / commit | `preview` / `3d0895c` |
+| status | Ready |
+
+確認方法:
+
+- Vercel CLIのDeployment Protection bypassで `/account`、`/admin`、`/api/admin/users`、`/api/world` を確認した
+- `vercel inspect` で対象deploymentがPreview / Readyであり、Next.js outputが存在することを確認した
+- `vercel ls` で追加Production deploymentが発生していないことを確認した
+
+確認結果:
+
+| 項目 | 結果 |
+| --- | --- |
+| `/account` 未ログイン表示 | pass。`アカウント設定`、`ログインが必要です`、`パスワード変更とログアウトを行えます` を表示する |
+| `/account` raw `status` / `active` | pass。HTML上にraw `status` / `active` / `role` は表示されない |
+| `/admin` 未ログイン表示 | pass。`管理者だけが利用できるページです。` と `ログインが必要です。` を表示する |
+| `/admin` 内部DB条件 | pass。`profiles.role` / `profiles.status` / `activeなadmin権限` / `Phase 7 admin` は表示されない |
+| `/api/admin/users` 未ログイン保護 | pass。`{"ok":false,"errors":["ログインが必要です。"]}` を返す |
+| `/api/world` | pass。初期world情報を返す |
+| Production deployment | pass。追加Production deploymentなし |
+| secret実値 | pass。docs/repoに記録していない |
+
+判断:
+
+- `/account` / `/admin` 小P1整理のPreview反映後確認はpass
+- 1名テスト継続はGO
+- 2名目への限定共有はGO候補
+- ただし、2名目への共有実行はまだ行っていない
+
+2名目へ進む場合:
+
+- 参加者別invite codeを新規発行する
+- Preview URLとinvite codeは個別DMでのみ共有する
+- 参加者別invite code実値、初期admin email実値、secret実値はdocs/repoに書かない
+- 10人テスト候補全員への共有、SNS/公開ページ共有、Production deploy、Production env設定、Production custom domain設定、Stripe、Web Push、Realtimeは引き続き行わない

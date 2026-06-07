@@ -1055,3 +1055,46 @@ local実装・検証結果:
 - Preview deploymentへ反映する
 - Preview上の `/account` と `/admin` 非許可画面を確認する
 - 2名目への限定共有はPreview確認後に再判断する
+
+## 29. `/account` / `/admin` 小P1整理 Preview反映後確認
+
+実施日: 2026-06-07 JST
+
+GPT Pro追加レビュー後の2名目共有前小P1整理を、最新Preview deploymentへ反映して確認した。
+
+対象:
+
+- commit: `3d0895c fix: simplify phase 10 account and admin access UI`
+- Preview deployment URL: `https://quiz-world-preview-38ugdhavs-chop0522s-projects.vercel.app`
+- deployment id: `dpl_GsS3WxFLapLEoEzMXxYUjMPRqUVs`
+- target: Preview
+- branch / commit: `preview` / `3d0895c`
+- status: Ready
+
+確認結果:
+
+- `/account` は未ログイン時に `アカウント設定` とログインが必要である旨を表示する
+- `/account` にraw `status` / `active` / `role` は表示されない
+- `/admin` は未ログイン時に `管理者だけが利用できるページです。` と `ログインが必要です。` を表示する
+- `/admin` 非許可画面に `profiles.role` / `profiles.status` / `activeなadmin権限` / `Phase 7 admin` などの内部DB条件は表示されない
+- `/api/admin/users` は未ログイン時に `ログインが必要です。` を返す
+- `/api/world` は初期world情報を返す
+- Production deploymentは追加作成されていない
+- secret実値、初期admin email実値、Supabase keys、Vercel token、bypass secret、参加者別invite code実値はdocs/repoに書いていない
+
+判断:
+
+- `/account` / `/admin` 小P1整理のPreview反映後確認はpass
+- 1名テスト継続はGO
+- 2名目への限定共有はGO候補
+- ただし、2名目への共有実行はまだ行っていない
+
+次に2名目へ進む場合:
+
+1. Preview DB件数を軽くread-only確認する
+2. 2名目用の参加者別invite codeを1件発行する
+3. admin audit logに `invite_created` が残ることを確認する
+4. Preview URLとinvite codeを個別DMでのみ共有する
+5. 共有後のsignup / login / 主要ループ / 不具合報告を記録する
+
+10人テスト候補全員への共有、SNS/公開ページ共有、Production deploy、Production env設定、Production custom domain設定、Stripe、Web Push、Realtimeは引き続き行わない。
