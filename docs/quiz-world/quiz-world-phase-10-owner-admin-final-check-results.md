@@ -889,3 +889,169 @@ admin保護確認:
 - non-adminのadmin導線非表示と `/admin` / `/api/admin/*` 保護が維持されていること
 
 Preview URL、参加者別invite code、email実値、Supabase keys、Vercel token、bypass secretはdocs/repoに書かない。
+
+## 25. `/profile` P1整理 Preview反映
+
+実施日: 2026-06-06 JST
+
+Phase 10の1名テスト中に見つかった `/profile` P1整理をcommit / pushし、Git連携Preview deploymentへ反映した。
+
+対象commit:
+
+- `38b67b5 fix: simplify phase 10 profile participant UI`
+
+Preview deployment:
+
+| 項目 | 値 |
+| --- | --- |
+| URL | `https://quiz-world-preview-3lkn9dbs8-chop0522s-projects.vercel.app` |
+| deployment id | `dpl_Qsoen9DGZBGAvTgmmc3W4k46KobB` |
+| target | Preview |
+| branch / commit | `preview` / `38b67b5` |
+| status | Ready |
+
+確認したこと:
+
+- `preview` branchは `origin/main` の最新commit `38b67b5` に更新済み
+- Vercel deploymentはGit連携PreviewとしてReady
+- `main` push由来のdeploymentはCanceledのPreview扱いであり、Production deploymentは追加作成されていない
+- Production env、Production custom domainは未設定のまま
+- build outputには `/profile`、`/account`、`/account/password`、`/admin` のroute artifactが含まれる
+- secret実値、初期admin email実値、Supabase keys、Vercel token、bypass secret、参加者別invite code実値はdocs/repoに書いていない
+
+次の確認:
+
+- Preview上の `/profile` でraw `role` / `status` が通常ユーザーに表示されないこと
+- 保存できない表示名・通知設定フォームが表示されないこと
+- 最近の履歴が自然な日本語で表示され、内部値が露出していないこと
+- ログイン済みnon-admin視点でAdmin導線が表示されないこと
+
+判断:
+
+- `/profile` P1整理のPreview反映は完了
+- 1名テスト継続はGO
+- 2名目への拡張は、上記のPreview反映後確認が終わるまで保留
+
+## 26. `/profile` P1整理 Preview反映後確認
+
+実施日: 2026-06-06 JST
+
+対象:
+
+- Preview deployment URL: `https://quiz-world-preview-3lkn9dbs8-chop0522s-projects.vercel.app`
+- deployment id: `dpl_Qsoen9DGZBGAvTgmmc3W4k46KobB`
+- branch / commit: `preview` / `38b67b5`
+
+確認結果:
+
+- `/profile` はDeployment Protection bypass経由でHTMLを返した
+- `/profile` の未ログイン時headerはログイン / 登録導線
+- `/profile` の見出しは `ランクと履歴`
+- `/profile` の説明は `スコア、ランク、最近の履歴を確認できます。`
+- source上、通常ユーザーにraw `role` / `status` を表示しない
+- source上、admin activeユーザーにだけ `管理者アカウント` badgeを表示する
+- source上、保存できない表示名編集フォーム、通知設定フォーム、通知モード、quiet hours、1日の通知上限は `/profile` から削除済み
+- source上、`/profile` から「次Phase」などの内部向け文言は削除済み
+- rank event reasonは日本語のreasonをそのまま表示する
+- `/admin` は未ログイン時に401表示
+- `/api/admin/users` は未ログイン時に401 JSON
+- Production deploymentは追加作成されていない
+- Production env、Production custom domainは未設定のまま
+- secret実値、初期admin email実値、Supabase keys、Vercel token、bypass secret、参加者別invite code実値はdocs/repoに書いていない
+
+未完了:
+
+- Chromeのログイン済み実画面確認は、別の拡張UIが開いているため自動読み取りがブロックされた
+- 最新Preview上で通常ユーザー本人が `/profile` を開き、raw `role` / `status` と保存できないフォームが表示されないことを目視確認する
+- 最新Preview上で通常ユーザー本人がheaderにAdmin導線が出ないことを目視確認する
+
+追加で見つかった後続候補:
+
+- `/account` には `status` 表示が残っている。今回のP1対象は `/profile` だったため変更していないが、参加者向けUIからraw状態表示をさらに減らすなら後続で整理する。
+- `/admin` 未ログイン画面にはadmin判定条件の説明が残っている。admin向けrouteとしては問題ないが、直接アクセス時の参加者向け表現をさらに自然にするなら後続で整理する。
+
+判断:
+
+- `/profile` P1整理のPreview反映後確認は、CLI / sourceで確認できる範囲はpass
+- 1名テスト継続はGO
+- 2名目への拡張は、ログイン済み通常ユーザーの実画面確認後まで保留
+
+## 27. 通常ユーザー実画面確認
+
+実施日: 2026-06-06 JST
+
+通常ユーザーとしてログインした状態で、最新Preview deploymentの `/profile` と `/admin` 直接アクセスを確認した。
+
+対象:
+
+- Preview deployment URL: `https://quiz-world-preview-3lkn9dbs8-chop0522s-projects.vercel.app`
+- branch / commit: `preview` / `38b67b5`
+
+確認結果:
+
+- `/profile` は `ランクと履歴` として表示される
+- 通常ユーザーにraw `role` は表示されない
+- 通常ユーザーにraw `status` は表示されない
+- 通常ユーザーに `管理者アカウント` badgeは表示されない
+- 保存できない表示名フォームは表示されない
+- 通知モード、quiet hours、1日の通知上限、深夜通知許可などの保存できない通知設定フォームは表示されない
+- `次Phase` などの内部向け文言は表示されない
+- 最近の履歴は `クイズ評価` / `良問評価` のような自然な日本語で表示される
+- headerにAdmin導線は表示されない
+- `/admin` 直接アクセスは403で拒否され、`activeなadmin権限が必要です。` と表示される
+- Production deploymentは追加作成されていない
+
+判断:
+
+- `/profile` P1整理の通常ユーザー実画面確認はpass
+- non-adminのAdmin導線非表示と `/admin` 直接アクセス拒否はpass
+- 1名テスト継続はGO
+- 2名目への限定共有はGO候補
+
+2名目への共有実行はまだ行っていない。実行する場合は、1名目と同様に参加者別invite codeを発行し、Preview URLとinvite codeを個別DMでのみ共有する。10人テスト候補全員への共有、SNS/公開ページ共有、Production deploy、Production env設定、Production custom domain設定、Stripe、Web Push、Realtimeは引き続き行わない。
+
+## 28. GPT Pro追加レビュー後の2名目共有前P1整理
+
+実施日: 2026-06-07 JST
+
+`/profile` P1整理の通常ユーザー確認結果をGPT Proへ共有し、2名目へ進む前の残項目を確認した。
+
+判断:
+
+- 1名テスト継続はGO
+- 2名目への限定共有は、`/account` と `/admin` 非許可画面の小P1整理後に再判断する
+- forgot passwordはPhase 10の1〜2名テストではP2。まずはownerへの個別DMサポートで運用する
+- username変更はP2。実装する場合は `/account` に保存ボタンと保存APIをセットで置く
+- avatar設定はP3。Web Previewの1〜2名テストでは不要
+
+今回の追加整理:
+
+- `/account` からraw `status` / `active` 表示を削除する
+- `/admin` 非許可画面から `profiles.role` / `profiles.status` / `Phase 7 admin` などの内部説明を削除する
+- `/admin` 非許可画面は、管理者専用ページであることと権限がないことだけを自然な日本語で表示する
+- admin判定自体は `profiles.role` / `profiles.status` を使うserver-side protectionとして維持する
+
+確認予定:
+
+- `/account` にraw `status` / `active` が表示されない
+- non-adminまたは未ログインの `/admin` 非許可画面に内部DB条件が表示されない
+- `/api/admin/*` のserver-side protectionが維持されている
+- Production deploy、Production env、Production custom domain、Stripe、Web Push、Realtimeは引き続き行わない
+- secret実値、初期admin email実値、参加者別invite code実値はdocs/repoに書かない
+
+local実装・検証結果:
+
+- `/account` は表示名、パスワード変更、ログアウトに絞り、raw `status` / `active` 表示を削除した
+- `/admin` 非許可画面は内部DB条件を出さず、管理者専用ページであることと権限がないことを自然な日本語で表示する
+- `/admin` page と `/api/admin/*` のserver-side protectionは `profiles.role` / `profiles.status` ベースで維持する
+- `npm run typecheck`: pass
+- `npm run lint`: pass
+- `npm run test`: pass、7 files / 43 tests
+- `npm run build`: pass
+- secret実値、初期admin email実値、参加者別invite code実値はdiffに含めていない
+
+次の確認:
+
+- Preview deploymentへ反映する
+- Preview上の `/account` と `/admin` 非許可画面を確認する
+- 2名目への限定共有はPreview確認後に再判断する

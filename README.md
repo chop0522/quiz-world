@@ -2,7 +2,7 @@
 
 通知型早押しクイズワールドの専用リポジトリです。
 
-Phase 1〜7のlocal実装は完了・push・tag済みです。Phase 8 local smokeは89チェックpass、manual UI rehearsal follow-upも完了・push済みです。Phase 9ではQuiz World専用Supabase Preview projectとVercel Preview projectを作成し、Preview DB migration / seed、DB smoke、Vercel Preview env設定、Git連携Preview deployまで完了しています。Step G Preview smokeは、Framework PresetをNext.jsへ明示した後の新しいGit連携Preview deploymentで入口確認とMVP主要ループ本体をpassしました。Step H cleanup / resetも完了し、Preview DBはseed状態へ戻っています。Phase 9 Preview ready地点は `v0.10.0-phase9-preview-ready` tagで固定済みです。Phase 10 participant guide / admin ops checklist は作成済みです。Phase 10 owner/admin最終確認後の人間決定事項も反映済みで、まず信頼できる1名へ個別DMで限定共有し、問題がなければ2名目へ拡張する方針です。Phase 10の1名限定共有前UI整理はPreview deploymentへ反映済みで、反映後確認もpass済みです。追加で `/home` の参加者向け表示から内部仕様文言を削除し、新着確認処理は内部処理として維持する方針に整理済みです。さらに `/create` と `/world` の参加者向け表示から内部仕様文言、未確定指標、平均評価、解放条件を削除し、`/world` は参加状況確認に絞る方針へ整理済みです。この `/create` / `/world` UI整理もGit連携Preview deploymentへ反映済みで、反映後確認もpass済みです。信頼できる1名への個別共有は開始済みで、Preview URLと参加者別invite codeは個別DMでのみ共有しています。2名目への共有、10人テスト候補全員への共有、SNSや公開ページでの共有はまだ行いません。Production envは未設定、Production deployは行っていません。Stripe、Web Push、Realtimeはまだ行っていません。既存Smart Buzzerとは別プロジェクトとして扱います。
+Phase 1〜7のlocal実装は完了・push・tag済みです。Phase 8 local smokeは89チェックpass、manual UI rehearsal follow-upも完了・push済みです。Phase 9ではQuiz World専用Supabase Preview projectとVercel Preview projectを作成し、Preview DB migration / seed、DB smoke、Vercel Preview env設定、Git連携Preview deployまで完了しています。Step G Preview smokeは、Framework PresetをNext.jsへ明示した後の新しいGit連携Preview deploymentで入口確認とMVP主要ループ本体をpassしました。Step H cleanup / resetも完了し、Preview DBはseed状態へ戻っています。Phase 9 Preview ready地点は `v0.10.0-phase9-preview-ready` tagで固定済みです。Phase 10 participant guide / admin ops checklist は作成済みです。Phase 10 owner/admin最終確認後の人間決定事項も反映済みで、まず信頼できる1名へ個別DMで限定共有し、問題がなければ2名目へ拡張する方針です。Phase 10の1名限定共有前UI整理はPreview deploymentへ反映済みで、反映後確認もpass済みです。追加で `/home` の参加者向け表示から内部仕様文言を削除し、新着確認処理は内部処理として維持する方針に整理済みです。さらに `/create` と `/world` の参加者向け表示から内部仕様文言、未確定指標、平均評価、解放条件を削除し、`/world` は参加状況確認に絞る方針へ整理済みです。この `/create` / `/world` UI整理もGit連携Preview deploymentへ反映済みで、反映後確認もpass済みです。Phase 10の1名テスト中に見つかった `/profile` P1も整理済みで、通常ユーザーにraw `role` / `status` や保存できないフォームを出さない実装をcommit / pushし、Git連携Preview deploymentへ反映済みです。通常ユーザーのPreview実画面で `/profile` にraw `role` / `status` と保存できないフォームが出ないこと、headerにAdmin導線が出ないこと、`/admin` 直接アクセスが拒否されることを確認済みです。GPT Pro追加レビュー後の2名目共有前小P1として、`/account` のraw `status` 表示と `/admin` 非許可画面の内部説明をlocalで整理し、`typecheck` / `lint` / `test` / `build` はpass済みです。Preview deploymentへの反映と画面確認は次に行います。信頼できる1名への個別共有は開始済みで、Preview URLと参加者別invite codeは個別DMでのみ共有しています。2名目への共有は、`/account` と `/admin` の小P1整理をPreview確認した後に判断します。10人テスト候補全員への共有、SNSや公開ページでの共有はまだ行いません。Production envは未設定、Production deployは行っていません。Stripe、Web Push、Realtimeはまだ行っていません。既存Smart Buzzerとは別プロジェクトとして扱います。
 
 Smart Buzzer の production / Stripe / Vercel / Supabase / env / legal page / cleanup / live key には触れません。
 
@@ -441,13 +441,14 @@ Smart Buzzer のSupabase/Vercel/Stripe/envとは混ぜません。
 - 1名参加後のread-only確認では、`auth.users=2`、`profiles=2`、`world_members=2`、`activeMemberCount=2` を確認しました。内訳はadmin 1名、通常user 1名で想定通りです。参加者別invite codeは使用済み1件、共通Preview invite code `SEASON0-PREVIEW-001` はactiveで予備として維持しています。参加者別invite code実値とemail実値はdocs/repoに書いていません。
 - Phase 10の1名テスト中にGPT Proレビューを実施し、`/profile` のP1として、通常ユーザーにraw `role` / `status` を見せないこと、保存できない表示名・通知設定フォームを出さないこと、内部向けの「次Phase」文言を消すことを確認しました。`/profile` はスコア、ランク、最近の履歴、最小限のプロフィール表示に絞り、admin activeユーザーだけに最小の管理者表示を出す方針へ整理済みです。
 - 表示名編集、通知設定保存、通知モード、quiet hours、1日の通知上限は後続課題として扱います。Phase 10の1名テストでは、保存できない入力フォームを参加者向けUIに出しません。
-- Phase 10は信頼できる1名の個別テストを継続中です。2名目、最大10名への拡張は、1名テスト結果、non-admin導線確認、P0/P1整理後に判断します。
+- Phase 10は信頼できる1名の個別テストを継続中です。`/account` と `/admin` の小P1整理はlocal実装・検証済みです。2名目、最大10名への拡張は、Preview反映後確認とP0/P1整理後に判断します。
 - Phase 10はPreview限定テストの準備であり、一般公開やProduction deployではありません。
 
 ## Next Work
 
 - 1名テストのsignup / login / 主要ループ / 不具合報告を継続確認し、結果をdocsに記録する
-- `/profile` P1整理後の表示を確認し、通常ユーザーにraw `role` / `status` や保存できないフォームが出ないことを確認する
+- `/account` にraw `status` / `active` が表示されないことを確認する
+- non-adminまたは未ログインの `/admin` 非許可画面に `profiles.role` / `profiles.status` などの内部説明が表示されないことを確認する
 - non-adminのheaderにAdmin導線が出ないこと、`/admin` と `/api/admin/*` が保護されていることを必要に応じて参加者視点でも確認する
 - 1名テスト結果とP0/P1整理後、2名目へ拡張するか判断する
 - `NEXT_PUBLIC_APP_URL` は今回runtime blockerなし。共有URLやabsolute URLが必要な機能を入れる前にPreview URLで設定するか再検討する

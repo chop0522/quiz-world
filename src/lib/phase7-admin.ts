@@ -65,7 +65,7 @@ export async function getAdminContext(): Promise<AdminContext> {
     return {
       ok: false,
       status: 403,
-      error: "activeなadmin権限が必要です。"
+      error: "このページを利用する権限がありません。"
     };
   }
 
@@ -105,7 +105,7 @@ export function adminRpcMessage(status: string): string {
     validation_error: "入力内容が不正です。",
     not_found: "対象が見つかりません。",
     world_not_found: "activeなworldが見つかりません。",
-    admin_forbidden: "activeなadmin権限が必要です。",
+    admin_forbidden: "管理者専用の操作です。権限がありません。",
     self_suspend_forbidden: "自分自身の停止はできません。",
     conflict: "現在の状態と同じため更新できません。",
     code_conflict: "同じinvite codeが既に存在します。"

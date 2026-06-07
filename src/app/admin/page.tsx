@@ -7,6 +7,10 @@ export const metadata = {
   title: "Admin"
 };
 
+function adminAccessLabel(status: number) {
+  return status === 401 ? "ログインが必要" : "権限なし";
+}
+
 export default async function AdminPage() {
   const adminContext = await getAdminContext();
 
@@ -14,7 +18,7 @@ export default async function AdminPage() {
     return (
       <>
         <PageHeader
-          description="Phase 7 adminはprofiles.role=adminかつprofiles.status=activeのユーザーだけが利用できます。"
+          description="管理者だけが利用できるページです。"
           eyebrow="Admin"
           title="管理画面"
         />
@@ -24,7 +28,7 @@ export default async function AdminPage() {
             <div>
               <div className="flex flex-wrap items-center gap-2">
                 <h2 className="font-semibold">アクセスできません</h2>
-                <Badge tone="red">{adminContext.status}</Badge>
+                <Badge tone="red">{adminAccessLabel(adminContext.status)}</Badge>
               </div>
               <p className="mt-2 text-sm leading-6 text-[color:var(--muted)]">
                 {adminContext.error}
@@ -39,7 +43,7 @@ export default async function AdminPage() {
   return (
     <>
       <PageHeader
-        description="10人テストを安全に運用するための簡易adminです。削除ではなく停止を優先し、すべての管理操作をadmin_audit_logsに残します。"
+        description="10人テストを安全に運用するための管理画面です。削除ではなく停止を優先し、管理操作は操作ログに残します。"
         eyebrow="Admin"
         title="運用とモデレーション"
       />

@@ -37,7 +37,7 @@ export default async function AccountPage() {
   const admin = getSupabaseAdminClient();
   const { data: profile } = await admin
     .from("profiles")
-    .select("display_name,status")
+    .select("display_name")
     .eq("id", user.id)
     .maybeSingle();
 
@@ -58,10 +58,6 @@ export default async function AccountPage() {
               <dd className="font-medium">
                 {profile?.display_name ?? "未設定"}
               </dd>
-            </div>
-            <div className="flex justify-between gap-3">
-              <dt className="text-[color:var(--muted)]">status</dt>
-              <dd className="font-medium">{profile?.status ?? "-"}</dd>
             </div>
           </dl>
         </Surface>

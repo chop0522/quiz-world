@@ -266,6 +266,8 @@ audit logが残せない場合、管理操作全体を失敗扱いにする。
 - [ ] 通常ユーザーの `/profile` にraw `role` / `status` が表示されない
 - [ ] `/profile` に保存できない表示名・通知設定フォームが表示されない
 - [ ] `/profile` に「次Phase」などの内部向け文言が表示されない
+- [ ] `/account` にraw `status` / `active` が表示されない
+- [ ] non-adminまたは未ログインの `/admin` 非許可画面に `profiles.role` / `profiles.status` / `Phase 7 admin` などの内部説明が表示されない
 - [ ] Preview URLをowner/admin以外へ一括共有していない
 - [ ] まず1名から開始し、問題がなければ2名目へ拡張する方針を維持している
 - [ ] 最大10名への共有はまだ行わない
